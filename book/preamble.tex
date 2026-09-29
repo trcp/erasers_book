@@ -1,0 +1,74 @@
+%% preamble.tex --- パッケージ読み込みと共通マクロ
+
+%% ---------- フォント・基本 ----------
+\usepackage{luatexja-fontspec}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{images/}}
+
+%% ---------- コードリスト ----------
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  keepspaces=true,
+  breaklines=true,
+  frame=single,
+  framerule=0.4pt,
+  rulecolor=\color{black!40},
+  backgroundcolor=\color{black!3},
+  numbers=left,
+  numberstyle=\tiny\color{black!50},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!40!black},
+  stringstyle=\color{red!60!black},
+  showstringspaces=false,
+  tabsize=4,
+}
+\lstdefinestyle{python}{language=Python}
+\lstdefinestyle{bash}{language=bash}
+\lstdefinestyle{cpp}{language=C++}
+\lstdefinestyle{xml}{language=XML}
+
+%% ---------- 囲み ----------
+\usepackage[most]{tcolorbox}
+
+% ターミナル操作例:  \begin{terminal} $ ls -l \end{terminal}
+\newtcblisting{terminal}[1][]{
+  listing only,
+  colback=black!85, colupper=white, colframe=black!85,
+  arc=2pt, boxrule=0pt, left=4pt, right=4pt,
+  listing options={basicstyle=\ttfamily\small\color{white},
+    columns=fullflexible, keepspaces=true, breaklines=true,
+    numbers=none, frame=none, backgroundcolor={}},
+  title={#1}, fonttitle=\sffamily\small,
+}
+
+% この章で学ぶこと
+\newtcolorbox{goalbox}{
+  colback=blue!4, colframe=blue!50!black, arc=2pt,
+  title={この章で学ぶこと}, fonttitle=\sffamily\bfseries,
+}
+
+% ポイント・注意・コラム
+\newtcolorbox{point}[1][ポイント]{
+  colback=green!4, colframe=green!40!black, arc=2pt,
+  title={#1}, fonttitle=\sffamily\bfseries,
+}
+\newtcolorbox{caution}[1][注意]{
+  colback=red!4, colframe=red!60!black, arc=2pt,
+  title={#1}, fonttitle=\sffamily\bfseries,
+}
+\newtcolorbox{column}[1]{
+  colback=orange!4, colframe=orange!60!black, arc=2pt,
+  title={コラム：#1}, fonttitle=\sffamily\bfseries,
+}
+
+%% ---------- 共通マクロ ----------
+\newcommand{\cmd}[1]{\texttt{#1}}          % インラインのコマンド・ファイル名
+\newcommand{\key}[1]{\fbox{\small\texttt{#1}}} % キー入力 例: \key{Ctrl}+\key{C}
+\newcommand{\todo}[1]{{\color{red}[TODO: #1]}}

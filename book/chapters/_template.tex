@@ -1,0 +1,63 @@
+%% 執筆用サンプル（main.tex からは読み込まれません）
+%% 各章で使える環境・マクロの書き方例です。
+
+\chapter{章タイトル}
+\label{chap:example}
+
+\begin{goalbox}
+  \begin{itemize}
+    \item 学ぶこと 1
+    \item 学ぶこと 2
+  \end{itemize}
+\end{goalbox}
+
+\section{節タイトル}
+
+インラインでコマンドを書くときは \cmd{ls -l} のようにします。
+キー操作は \key{Ctrl}+\key{C} のように書きます。
+
+% ターミナル操作例（タイトルは省略可）
+\begin{terminal}[ファイル一覧を表示する]
+$ ls -l ~/ros2_ws/src
+total 4
+drwxrwxr-x 3 user user 4096 Sep 29 18:33 my_package
+\end{terminal}
+
+% ソースコード
+\begin{lstlisting}[style=python, caption={最小のノード}, label={lst:minimal}]
+import rclpy
+from rclpy.node import Node
+
+def main():
+    rclpy.init()
+    node = Node('minimal')
+    rclpy.spin(node)
+    rclpy.shutdown()
+\end{lstlisting}
+
+% 外部ファイルのコードを読み込む場合
+% \lstinputlisting[style=python]{samples/ch19/talker.py}
+
+\begin{point}
+  覚えておきたいポイント。
+\end{point}
+
+\begin{caution}[rm コマンドに注意]
+  \cmd{rm -rf} は取り消せません。
+\end{caution}
+
+\begin{column}{ROS 1 との違い}
+  コラム本文。
+\end{column}
+
+% 図
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.8\linewidth]{ch17/rqt_graph.png}
+%   \caption{rqt\_graph の表示例}
+%   \label{fig:rqt_graph}
+% \end{figure}
+
+\todo{あとで書く}
+
+\section*{この章のまとめ}

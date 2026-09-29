@@ -1,0 +1,56 @@
+name: Build PDF
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+# 連続して push されたときは古い実行をキャンセルし、最新のものだけを残す
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: texlive/texlive:latest
+    defaults:
+      run:
+        working-directory: book
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          command -v make || (apt-get update && apt-get install -y make)
+          make
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pdf
+          path: book/build/main.pdf
+
+  # master への push のときだけ、Releases の "latest" を最新の PDF で置き換える
+  release:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pdf
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mv main.pdf erasers_book.pdf
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest erasers_book.pdf \
+            --target "$GITHUB_SHA" \
+            --title "最新版 PDF" \
+            --notes "master ブランチの最新コミット (${GITHUB_SHA::7}) から自動生成した PDF です。"
