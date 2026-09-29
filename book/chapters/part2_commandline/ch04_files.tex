@@ -4,34 +4,663 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item カレントディレクトリの確認と移動（\cmd{pwd}, \cmd{cd}, \cmd{ls}）
+    \item 絶対パスと相対パスの考え方
+    \item ファイルやディレクトリの作成・コピー・移動・削除
+    \item ファイルの中身の確認と、ファイルの探し方
+    \item ワイルドカードとブレース展開を使った効率的な指定方法
   \end{itemize}
 \end{goalbox}
 
-\section{現在地の確認と移動}
+ふだん GUI のファイルマネージャで行っている「フォルダを開く」「ファイルをコピーする」「ゴミ箱に捨てる」といった操作は、すべて CLI でも行えます。
+この章では、ファイルとディレクトリを操作する基本的なコマンドを学びます。
+ここで学ぶコマンドは、ROS 2 のワークスペースを作ったりプログラムを編集したりするときに毎日のように使うものばかりです。
 
-TODO
+\section{現在地の確認と移動}
+\label{sec:files-navigation}
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：/ を頂点に、home/user/{Desktop,Documents,...}、etc、usr、opt/ros/jazzy などを木構造で示した図
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{ch04/directory_tree.pdf}
+  \caption{Linux のディレクトリ構成（一部）}
+  \label{fig:files-tree}
+\end{figure}
+
+\ref{chap:linux_internals}章で説明したように、Linux のファイルは \cmd{/}（ルートディレクトリ）を頂点とする木構造で管理されています。
+CLI で作業するときは、常にこの木構造のどこかのディレクトリに「いる」状態になります。
+このディレクトリを\textbf{カレントディレクトリ}（作業ディレクトリ）といいます。
+図\ref{fig:files-tree}に、Linux のディレクトリ構成の一部を示します。
+
+\subsection{\cmd{pwd}：今いる場所を表示する}
+
+\cmd{pwd}（print working directory）は、カレントディレクトリを表示するコマンドです。
+
+\begin{terminal}[カレントディレクトリを表示する]
+$ pwd
+/home/user
+\end{terminal}
+
+ターミナルを起動した直後は、自分の\textbf{ホームディレクトリ}（\cmd{/home/ユーザ名}）にいます。
+ホームディレクトリは、そのユーザが自由にファイルを置ける専用のディレクトリです。
+
+\subsection{\cmd{ls}：ディレクトリの中身を表示する}
+
+\cmd{ls}（list）は、ディレクトリの中にあるファイルやディレクトリの一覧を表示します。
+引数を省略するとカレントディレクトリの中身を、引数にディレクトリを指定するとそのディレクトリの中身を表示します。
+
+\begin{terminal}[ディレクトリの中身を表示する]
+$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+$ ls /
+bin   dev  home  lib64  mnt  proc  run   snap  sys  usr
+boot  etc  lib   media  opt  root  sbin  srv   tmp  var
+\end{terminal}
+
+\cmd{ls} には多くのオプションがありますが、まずは次の 3 つを覚えておきましょう。
+
+\begin{center}
+  \begin{tabular}{lp{0.75\linewidth}}
+    \toprule
+    オプション & 意味 \\
+    \midrule
+    \cmd{-l} & 権限・サイズ・更新日時などの詳しい情報を表示する \\
+    \cmd{-a} & \cmd{.} で始まる隠しファイルも表示する \\
+    \cmd{-h} & \cmd{-l} と組み合わせ、サイズを K, M などの単位で表示する \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{terminal}[詳しい情報を表示する]
+$ ls -lh
+total 32K
+drwxr-xr-x 2 user user 4.0K Sep 29 18:33 Desktop
+drwxr-xr-x 2 user user 4.0K Sep 29 18:40 Documents
+drwxr-xr-x 2 user user 4.0K Sep 29 18:33 Downloads
+...
+\end{terminal}
+
+\cmd{ls -l} の各列は、左から次の意味です。
+
+\begin{enumerate}
+  \item 種類と権限（先頭の \cmd{d} はディレクトリ、\cmd{-} は通常のファイル。権限は\ref{chap:permission}章で説明します）
+  \item リンク数
+  \item 所有者
+  \item グループ
+  \item サイズ
+  \item 最終更新日時
+  \item 名前
+\end{enumerate}
+
+\subsection{隠しファイル}
+
+名前が \cmd{.}（ドット）で始まるファイルやディレクトリは\textbf{隠しファイル}として扱われ、\cmd{ls} では表示されません。
+隠しファイルを表示するには、\cmd{-a} オプションを付けます。
+
+\begin{terminal}[隠しファイルも表示する]
+$ ls -a
+.              .bashrc  .local    Documents  Music     Public     Videos
+..             .cache   .profile  Downloads  Pictures  Templates
+.bash_history  .config  Desktop   ...
+\end{terminal}
+
+\cmd{.bashrc} や \cmd{.config} のように、隠しファイルの多くはアプリケーションの設定ファイルです。
+ふだんは目にする必要がないので隠されていますが、開発環境を整えるときには編集することがあります（\ref{chap:env}章）。
+先頭の \cmd{.} と \cmd{..} については、次の節で説明します。
+
+\subsection{\cmd{cd}：ディレクトリを移動する}
+
+\cmd{cd}（change directory）は、カレントディレクトリを移動するコマンドです。
+引数に移動先のディレクトリを指定します。
+
+\begin{terminal}[ディレクトリを移動する]
+$ cd Documents
+$ pwd
+/home/user/Documents
+$ cd /etc
+$ pwd
+/etc
+\end{terminal}
+
+\cmd{cd} には、次のような便利な使い方があります。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    コマンド & 移動先 \\
+    \midrule
+    \cmd{cd} & ホームディレクトリ（引数を省略した場合） \\
+    \cmd{cd \textasciitilde} & ホームディレクトリ \\
+    \cmd{cd ..} & 1 つ上のディレクトリ（親ディレクトリ） \\
+    \cmd{cd -} & 直前にいたディレクトリ \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{terminal}[cd の便利な使い方]
+$ cd /usr/share
+$ cd ..
+$ pwd
+/usr
+$ cd
+$ pwd
+/home/user
+$ cd -
+/usr
+\end{terminal}
+
+どこにいるのかわからなくなったら、\cmd{cd} だけを入力してホームディレクトリに戻りましょう。
+
+\begin{column}{ホームディレクトリの中のディレクトリ名}
+  Ubuntu を日本語でインストールすると、ホームディレクトリの中のディレクトリが「デスクトップ」「ドキュメント」のような日本語の名前で作られます。
+  CLI では日本語の入力切り替えが必要になって不便なので、英語の名前に変えておくことをおすすめします。
+  次のコマンドを実行し、表示されたダイアログで「Update Names」を選ぶと、ディレクトリ名が英語に変わります。
+  \begin{terminal}
+$ LANG=C xdg-user-dirs-gtk-update
+  \end{terminal}
+  本書では、英語の名前（\cmd{Desktop}, \cmd{Documents} など）を使って説明します。
+\end{column}
 
 \section{絶対パスと相対パス}
+\label{sec:files-path}
 
-TODO
+\cmd{/home/user/Documents} のように、ファイルやディレクトリの場所を表す文字列を\textbf{パス}といいます。
+パスの中の \cmd{/} は、ディレクトリの区切りを表しています。
+パスの書き方には、\textbf{絶対パス}と\textbf{相対パス}の 2 種類があります。
+
+\subsection{絶対パス}
+
+\textbf{絶対パス}は、ルートディレクトリ \cmd{/} から目的の場所までの道順をすべて書いたパスです。
+必ず \cmd{/} で始まります。
+
+\begin{terminal}[絶対パスの例]
+/home/user/Documents/memo.txt
+/etc/os-release
+/opt/ros/jazzy/setup.bash
+\end{terminal}
+
+絶対パスは、カレントディレクトリがどこであっても同じ場所を指します。
+住所でいえば「東京都千代田区……」のように、都道府県から書いた住所にあたります。
+
+\subsection{相対パス}
+
+\textbf{相対パス}は、カレントディレクトリを起点にして目的の場所までの道順を書いたパスです。
+\cmd{/} では始まりません。
+たとえばカレントディレクトリが \cmd{/home/user} のとき、次の 2 つは同じファイルを指します。
+
+\begin{terminal}[絶対パスと相対パス]
+$ pwd
+/home/user
+$ cat /home/user/Documents/memo.txt    # 絶対パス
+$ cat Documents/memo.txt               # 相対パス
+\end{terminal}
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：ディレクトリの木構造の上で、/ から memo.txt までの道順（絶対パス）と、/home/user から memo.txt までの道順（相対パス）を色分けした矢印で示した図
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{ch04/abs_rel_path.pdf}
+  \caption{絶対パスと相対パスの道順（カレントディレクトリが \cmd{/home/user} の場合）}
+  \label{fig:files-path}
+\end{figure}
+
+図\ref{fig:files-path}は、同じファイルを絶対パスと相対パスで指定したときの道順を表したものです。
+相対パスは、住所でいえば「ここから 2 軒先」のような言い方です。
+短く書けて便利ですが、カレントディレクトリが変わると指す場所も変わることに注意してください。
+
+\subsection{特別な記号：\cmd{\textasciitilde}, \cmd{.}, \cmd{..}}
+
+パスの中では、次の記号を使えます。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    記号 & 意味 \\
+    \midrule
+    \cmd{\textasciitilde} & 自分のホームディレクトリ（\cmd{/home/user}） \\
+    \cmd{.} & カレントディレクトリ \\
+    \cmd{..} & 1 つ上のディレクトリ（親ディレクトリ） \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\cmd{ls -a} で表示された \cmd{.} と \cmd{..} は、これらを表していたのです。
+\cmd{..} は重ねて使うこともできます。
+
+\begin{terminal}[特別な記号を使ったパス]
+$ cd ~/Documents     # /home/user/Documents に移動
+$ cd ..              # /home/user に移動
+$ cd ../..           # 2 つ上の / に移動
+$ ls ~/Downloads     # どこにいても /home/user/Downloads の中身を表示
+\end{terminal}
+
+\cmd{.} は一見使い道がないように思えますが、「カレントディレクトリにあるプログラムを実行する」ときなどに使います（\ref{chap:shellscript}章）。
+
+\begin{terminal}[カレントディレクトリにあるプログラムを実行する]
+$ ./setup.sh
+\end{terminal}
+
+\begin{point}[どちらを使えばよいか]
+  ターミナルで手を動かしているときは、短く書ける相対パスが便利です。
+  一方、スクリプトや設定ファイル、人に伝える手順書では、どこから実行しても同じ場所を指す絶対パス（または \cmd{\textasciitilde} から始まるパス）を使うのが安全です。
+\end{point}
 
 \section{作成・コピー・移動・削除}
+\label{sec:files-manipulate}
 
-TODO
+ここからは、ファイルやディレクトリを作ったり、コピーしたり、消したりするコマンドを学びます。
+練習用のディレクトリを作って、その中で試してみましょう。
+
+\subsection{\cmd{mkdir}：ディレクトリを作る}
+
+\cmd{mkdir}（make directory）は、ディレクトリを作るコマンドです。
+
+\begin{terminal}[ディレクトリを作る]
+$ cd
+$ mkdir practice
+$ cd practice
+$ pwd
+/home/user/practice
+\end{terminal}
+
+深い階層のディレクトリを一度に作りたいときは、\cmd{-p} オプションを付けます。
+\cmd{-p} を付けると、途中のディレクトリが存在しなければまとめて作ってくれます。
+
+\begin{terminal}[深い階層のディレクトリを一度に作る]
+$ mkdir a/b/c
+mkdir: cannot create directory 'a/b/c': No such file or directory
+$ mkdir -p a/b/c
+$ ls a/b
+c
+\end{terminal}
+
+ROS 2 のワークスペースを作るときにも、\cmd{mkdir -p \textasciitilde/ros2\_ws/src} のようにこのオプションを使います（\ref{chap:workspace}章）。
+
+\subsection{\cmd{touch}：空のファイルを作る}
+
+\cmd{touch} は、空のファイルを作るコマンドです。
+（本来はファイルの更新日時を変更するコマンドですが、ファイルが存在しない場合には新しく作るので、空のファイルを作るためによく使われます。）
+
+\begin{terminal}[空のファイルを作る]
+$ touch memo.txt
+$ ls
+a  memo.txt
+\end{terminal}
+
+\subsection{\cmd{cp}：コピーする}
+
+\cmd{cp}（copy）は、ファイルをコピーするコマンドです。
+\cmd{cp コピー元 コピー先} の順に指定します。
+
+\begin{terminal}[ファイルをコピーする]
+$ cp memo.txt memo_backup.txt
+$ ls
+a  memo.txt  memo_backup.txt
+\end{terminal}
+
+コピー先に既存のディレクトリを指定すると、そのディレクトリの中に同じ名前でコピーされます。
+
+\begin{terminal}[ディレクトリの中にコピーする]
+$ cp memo.txt a/
+$ ls a
+b  memo.txt
+\end{terminal}
+
+ディレクトリを中身ごとコピーするときは、\cmd{-r}（recursive）オプションが必要です。
+
+\begin{terminal}[ディレクトリを中身ごとコピーする]
+$ cp a a_copy
+cp: -r not specified; omitting directory 'a'
+$ cp -r a a_copy
+$ ls
+a  a_copy  memo.txt  memo_backup.txt
+\end{terminal}
+
+\subsection{\cmd{mv}：移動する・名前を変える}
+
+\cmd{mv}（move）は、ファイルやディレクトリを移動するコマンドです。
+使い方は \cmd{cp} と同じで、\cmd{mv 移動元 移動先} の順に指定します。
+ディレクトリの場合も \cmd{-r} は必要ありません。
+
+\begin{terminal}[ファイルを移動する]
+$ mv memo_backup.txt a/
+$ ls
+a  a_copy  memo.txt
+\end{terminal}
+
+Linux には「名前を変える」専用のコマンドはなく、\cmd{mv} で同じディレクトリの中の別の名前に移動することで名前を変更します。
+
+\begin{terminal}[名前を変える]
+$ mv a_copy b
+$ ls
+a  b  memo.txt
+\end{terminal}
+
+\begin{caution}[上書きに注意]
+  \cmd{cp} や \cmd{mv} では、コピー先・移動先に同じ名前のファイルがあると、確認なしに上書きされます。
+  上書きの前に確認してほしいときは、\cmd{-i}（interactive）オプションを付けます。
+  \begin{terminal}
+$ cp -i memo.txt a/memo.txt
+cp: overwrite 'a/memo.txt'? n
+  \end{terminal}
+  上書きしてよければ \key{y}、やめるときは \key{n} を入力して \key{Enter} を押します。
+\end{caution}
+
+\subsection{\cmd{rm}：削除する}
+
+\cmd{rm}（remove）は、ファイルを削除するコマンドです。
+
+\begin{terminal}[ファイルを削除する]
+$ rm memo.txt
+$ ls
+a  b
+\end{terminal}
+
+ディレクトリを中身ごと削除するときは、\cmd{-r} オプションを付けます。
+
+\begin{terminal}[ディレクトリを中身ごと削除する]
+$ rm b
+rm: cannot remove 'b': Is a directory
+$ rm -r b
+$ ls
+a
+\end{terminal}
+
+空のディレクトリであれば、\cmd{rmdir} でも削除できます。
+
+\begin{caution}[rm で消したファイルは元に戻せない]
+  GUI のファイルマネージャで削除したファイルはゴミ箱に移動しますが、\cmd{rm} で削除したファイルはゴミ箱を経由せず、すぐに消えてしまいます。
+  \textbf{元に戻す方法はありません。}
+  特に \cmd{rm -r} や、確認なしに強制的に削除する \cmd{rm -rf} を実行するときは、引数に指定したパスが本当に正しいかを必ず確認してください。
+  不安なときは \cmd{rm -i} で 1 つずつ確認しながら削除しましょう。
+\end{caution}
+
+\subsection{スペースを含む名前}
+
+\ref{sec:terminal-command-structure}節で説明したように、シェルはスペースを引数の区切りとして扱います。
+そのため、名前にスペースを含むファイルを扱うときは、クォートで囲むか、スペースの前に \cmd{\textbackslash} を付ける必要があります。
+
+\begin{terminal}[スペースを含む名前を扱う]
+$ touch "my memo.txt"
+$ ls
+a  'my memo.txt'
+$ rm my\ memo.txt
+\end{terminal}
+
+入力の手間や間違いのもとになるので、自分でファイルを作るときは、名前にスペースや日本語を使わず、半角英数字とハイフン（\cmd{-}）・アンダースコア（\cmd{\_}）だけを使うようにしましょう。
 
 \section{ファイルの中身を見る}
+\label{sec:files-view}
 
-TODO
+次は、ファイルの中身を表示するコマンドです。
+設定ファイルやプログラムの中身、ログファイルを確認するときに使います。
+
+\subsection{\cmd{cat}：全体を表示する}
+
+\cmd{cat} は、ファイルの中身をすべて表示するコマンドです。
+短いファイルの中身を確認するときに使います。
+
+\begin{terminal}[ファイルの中身を表示する]
+$ cat /etc/hostname
+robot
+\end{terminal}
+
+もともとは複数のファイルをつなげて（concatenate）表示するためのコマンドなので、引数に複数のファイルを指定すると、続けて表示します。
+
+\subsection{\cmd{less}：1 画面ずつ表示する}
+
+長いファイルを \cmd{cat} で表示すると、画面から流れてしまって先頭のほうが読めません。
+そのようなときは \cmd{less} を使います。
+
+\begin{terminal}[長いファイルを 1 画面ずつ表示する]
+$ less /etc/services
+\end{terminal}
+
+\cmd{less} の操作は、\ref{sec:terminal-help}節で紹介した \cmd{man} と同じです（実は \cmd{man} は、内部で \cmd{less} を使って表示しています）。
+\key{Space} で次のページ、\key{b} で前のページ、\key{/} で検索、\key{q} で終了です。
+このほか、\key{g} でファイルの先頭に、\key{G} でファイルの末尾に移動できます。
+
+\subsection{\cmd{head} と \cmd{tail}：先頭・末尾を表示する}
+
+\cmd{head} はファイルの先頭部分を、\cmd{tail} は末尾部分を表示します。
+標準では 10 行を表示し、\cmd{-n} オプションで行数を指定できます。
+
+\begin{terminal}[先頭と末尾を表示する]
+$ head -n 2 /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.1 LTS"
+NAME="Ubuntu"
+$ tail -n 2 /etc/os-release
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+\end{terminal}
+
+\cmd{tail} に \cmd{-f} オプションを付けると、ファイルの末尾を表示したまま待機し、ファイルに行が追加されるたびに表示を更新します。
+プログラムが書き出すログファイルを監視するときに便利です。
+終了するときは \key{Ctrl}+\key{C} を押します。
+
+\begin{terminal}[ログファイルを監視する]
+$ tail -f ~/.ros/log/latest/launch.log
+\end{terminal}
 
 \section{ファイルを探す}
+\label{sec:files-find}
 
-TODO
+「あのファイルはどこに置いたっけ？」というときや、「ROS 2 のあの設定ファイルはどこにあるのだろう？」というときには、ファイルを検索するコマンドを使います。
+
+\subsection{\cmd{find}：条件を指定して探す}
+
+\cmd{find} は、指定したディレクトリの中を下の階層までたどって、条件に合うファイルを探すコマンドです。
+\cmd{find 探す場所 条件} の順に指定します。
+最もよく使う条件は、名前で探す \cmd{-name} です。
+
+\begin{terminal}[名前でファイルを探す]
+$ find ~ -name memo.txt
+/home/user/practice/a/memo.txt
+\end{terminal}
+
+名前の一部しかわからないときは、次の節で説明するワイルドカード \cmd{*} を使います。
+このとき、パターンはクォートで囲んでください（理由は次の節で説明します）。
+
+\begin{terminal}[名前の一部で探す]
+$ find /opt/ros/jazzy -name "*.launch.py"
+/opt/ros/jazzy/share/demo_nodes_cpp/launch/topics/talker_listener.launch.py
+...
+\end{terminal}
+
+\cmd{find} では、ほかにも次のような条件を指定できます。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    条件 & 意味 \\
+    \midrule
+    \cmd{-name パターン} & 名前がパターンに一致する \\
+    \cmd{-iname パターン} & 大文字・小文字を区別せずに名前で探す \\
+    \cmd{-type f} & 通常のファイルだけを探す \\
+    \cmd{-type d} & ディレクトリだけを探す \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{terminal}[ディレクトリだけを探す]
+$ find ~/practice -type d
+/home/user/practice
+/home/user/practice/a
+/home/user/practice/a/b
+/home/user/practice/a/b/c
+\end{terminal}
+
+システム全体（\cmd{/}）から探すと、権限のないディレクトリについて \cmd{Permission denied} というメッセージがたくさん表示されます。
+これは読めないディレクトリを飛ばしたという意味で、検索自体は続いています。
+
+\subsection{\cmd{locate}：データベースから高速に探す}
+
+\cmd{find} は実際にディレクトリをたどって探すので、範囲が広いと時間がかかります。
+\cmd{locate} は、あらかじめ作っておいたファイル名のデータベースから探すので、システム全体からでも一瞬で見つけられます。
+Ubuntu 24.04 では標準でインストールされていないので、\cmd{plocate} パッケージをインストールして使います。
+
+\begin{terminal}[locate を使う]
+$ sudo apt install plocate
+$ locate turtlesim_node
+/opt/ros/jazzy/lib/turtlesim/turtlesim_node
+\end{terminal}
+
+データベースは 1 日に 1 回自動で更新されるため、作ったばかりのファイルは見つからないことがあります。
+すぐに探したいときは、\cmd{sudo updatedb} を実行してデータベースを更新してください。
 
 \section{ワイルドカードとブレース展開}
+\label{sec:files-wildcard}
 
-TODO
+たくさんのファイルをまとめて操作したいとき、ファイル名を 1 つずつ入力するのは大変です。
+シェルには、複数のファイル名を短く指定するためのしくみがあります。
+
+\subsection{ワイルドカード}
+
+\textbf{ワイルドカード}は、ファイル名のパターンを表す特別な記号です。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    記号 & 意味 \\
+    \midrule
+    \cmd{*} & 任意の 0 文字以上の文字列 \\
+    \cmd{?} & 任意の 1 文字 \\
+    \cmd{[abc]} & \cmd{a}, \cmd{b}, \cmd{c} のどれか 1 文字 \\
+    \cmd{[0-9]} & \cmd{0} から \cmd{9} までのどれか 1 文字 \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+練習用のファイルを作って試してみましょう。
+
+\begin{terminal}[ワイルドカードを使う]
+$ cd ~/practice
+$ touch data1.csv data2.csv data10.csv note.txt image.png
+$ ls *.csv
+data1.csv  data10.csv  data2.csv
+$ ls data?.csv
+data1.csv  data2.csv
+$ ls data[12].csv
+data1.csv  data2.csv
+\end{terminal}
+
+\cmd{*.csv} は「\cmd{.csv} で終わるすべてのファイル」、\cmd{data?.csv} は「\cmd{data} と \cmd{.csv} の間がちょうど 1 文字のファイル」を表します。
+ワイルドカードは \cmd{ls} だけでなく、\cmd{cp} や \cmd{mv}、\cmd{rm} など、ファイル名を受け取るどのコマンドでも使えます。
+
+\begin{terminal}[CSV ファイルをまとめて移動する]
+$ mkdir csv
+$ mv *.csv csv/
+$ ls csv
+data1.csv  data10.csv  data2.csv
+\end{terminal}
+
+\subsection{ワイルドカードを展開するのはシェル}
+
+ワイルドカードを解釈しているのは、実は \cmd{ls} や \cmd{mv} ではなく\textbf{シェル}です。
+シェルは、コマンドを実行する前にワイルドカードを一致するファイル名の一覧に置き換え（\textbf{展開}し）てから、コマンドに渡しています。
+\cmd{echo} を使うと、展開された結果を確認できます。
+
+\begin{terminal}[ワイルドカードの展開結果を確認する]
+$ echo csv/*
+csv/data1.csv csv/data10.csv csv/data2.csv
+\end{terminal}
+
+つまり \cmd{mv *.csv csv/} は、シェルによって \cmd{mv data1.csv data10.csv data2.csv csv/} に書き換えられてから実行されていたのです。
+\ref{sec:files-find}節の \cmd{find} でパターンをクォートで囲んだのは、シェルに展開させずに、\cmd{*} をそのまま \cmd{find} に渡すためです。
+
+\begin{caution}[rm とワイルドカード]
+  \cmd{rm *} はカレントディレクトリのファイルをすべて削除します。
+  \cmd{rm *.txt} のつもりで \cmd{rm * .txt} と余計なスペースを入れてしまうと、すべてのファイルが消えてしまいます。
+  ワイルドカードを使って削除する前に、同じパターンで \cmd{ls} や \cmd{echo} を実行し、対象のファイルを確認する習慣をつけましょう。
+\end{caution}
+
+\subsection{ブレース展開}
+
+\textbf{ブレース展開}は、\cmd{\{ \}} の中にカンマ区切りで書いた文字列を、それぞれ展開するしくみです。
+ワイルドカードと違って、ファイルが存在するかどうかに関係なく展開されるので、新しくファイルやディレクトリを作るときにも使えます。
+
+\begin{terminal}[ブレース展開]
+$ echo file_{a,b,c}.txt
+file_a.txt file_b.txt file_c.txt
+$ echo log{1..5}
+log1 log2 log3 log4 log5
+\end{terminal}
+
+\cmd{\{1..5\}} のように \cmd{..} でつなぐと、連続した数字や文字に展開されます。
+ブレース展開を使うと、複数のディレクトリを一度に作ることができます。
+
+\begin{terminal}[複数のディレクトリを一度に作る]
+$ mkdir -p my_robot/{config,launch,scripts}
+$ ls my_robot
+config  launch  scripts
+\end{terminal}
+
+ファイルのバックアップを作るときにも便利です。
+
+\begin{terminal}[バックアップを作る]
+$ cp note.txt{,.bak}
+$ ls note*
+note.txt  note.txt.bak
+\end{terminal}
+
+\cmd{note.txt\{,.bak\}} は \cmd{note.txt note.txt.bak} に展開されるので、\cmd{cp note.txt note.txt.bak} と入力したのと同じ意味になります。
+
+最後に、練習用のディレクトリを削除しておきましょう。
+
+\begin{terminal}[練習用のディレクトリを削除する]
+$ cd
+$ rm -r ~/practice
+\end{terminal}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item \cmd{pwd} でカレントディレクトリを確認し、\cmd{ls} で中身を表示し、\cmd{cd} で移動します。
+  \item パスには、\cmd{/} から始まる絶対パスと、カレントディレクトリを起点とする相対パスがあります。\cmd{\textasciitilde} はホームディレクトリ、\cmd{.} はカレントディレクトリ、\cmd{..} は親ディレクトリを表します。
+  \item \cmd{mkdir}, \cmd{touch}, \cmd{cp}, \cmd{mv}, \cmd{rm} で、ファイルやディレクトリを作成・コピー・移動・削除します。\cmd{rm} で消したファイルは元に戻せません。
+  \item \cmd{cat}, \cmd{less}, \cmd{head}, \cmd{tail} でファイルの中身を確認します。
+  \item \cmd{find} や \cmd{locate} でファイルを探します。
+  \item ワイルドカードとブレース展開はシェルが展開するしくみで、複数のファイルをまとめて指定できます。
+\end{itemize}
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    コマンド & 働き \\
+    \midrule
+    \cmd{pwd} & カレントディレクトリを表示する \\
+    \cmd{ls} & ディレクトリの中身を表示する \\
+    \cmd{cd} & ディレクトリを移動する \\
+    \cmd{mkdir} & ディレクトリを作る \\
+    \cmd{touch} & 空のファイルを作る \\
+    \cmd{cp} & コピーする \\
+    \cmd{mv} & 移動する・名前を変える \\
+    \cmd{rm} & 削除する \\
+    \cmd{cat} & ファイルの中身を表示する \\
+    \cmd{less} & ファイルを 1 画面ずつ表示する \\
+    \cmd{head} / \cmd{tail} & ファイルの先頭 / 末尾を表示する \\
+    \cmd{find} / \cmd{locate} & ファイルを探す \\
+    \bottomrule
+  \end{tabular}
+\end{center}

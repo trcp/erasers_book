@@ -4,30 +4,681 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item GUI と CUI（CLI）の違いと、ロボット開発で CUI が使われる理由
+    \item ターミナル・シェル・コマンドがそれぞれ何をしているのか
+    \item プロンプトの読み方とコマンドの基本的な構造
+    \item わからないコマンドの使い方を自分で調べる方法
+    \item 入力を楽にするキー操作（Tab 補完、履歴検索など）
   \end{itemize}
 \end{goalbox}
 
-\section{ターミナル・シェル・コマンドの関係}
+\section{GUI と CUI}
+\label{sec:terminal-gui-cui}
 
-TODO
+\ref{chap:what_is_linux}章では、Ubuntu のデスクトップ環境をマウスで操作しました。
+ウィンドウやアイコン、ボタンを見ながらマウスでクリックして操作する方式を \textbf{GUI}（Graphical User Interface）といいます。
+Windows や macOS、スマートフォンの画面操作も GUI です。
+
+これに対して、キーボードから文字で命令（\textbf{コマンド}）を入力し、結果も文字で受け取る方式を \textbf{CUI}（Character User Interface）といいます。
+コマンドを入力して操作することから、\textbf{CLI}（Command Line Interface）とも呼ばれます。
+本書では、以降は主に CLI と呼ぶことにします。
+
+たとえば「ホームディレクトリにある \cmd{Documents} ディレクトリの中身を見る」という操作は、GUI と CLI で次のように違います。
+
+\begin{itemize}
+  \item GUI：ファイルマネージャを開き、「Documents」のアイコンをダブルクリックする
+  \item CLI：ターミナルに \cmd{ls \textasciitilde/Documents} と入力して \key{Enter} を押す
+\end{itemize}
+
+\begin{terminal}[CLI でディレクトリの中身を見る]
+$ ls ~/Documents
+memo.txt  report.pdf
+\end{terminal}
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：ファイルマネージャで Documents を開いた画面と、ターミナルで ls ~/Documents を実行した画面を左右に並べたスクリーンショット
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{ch03/gui_vs_cli.png}
+  \caption{同じディレクトリを GUI（左）と CLI（右）で表示した例}
+  \label{fig:terminal-gui-cli}
+\end{figure}
+
+図\ref{fig:terminal-gui-cli}は、同じディレクトリをファイルマネージャとターミナルで表示したところです。
+見た目はまったく違いますが、どちらも「ディレクトリの中身を一覧する」という同じ処理をコンピュータに頼んでいるだけです。
+GUI のファイルマネージャも、裏側では CLI のコマンドと同じように OS の機能を呼び出しています。
+つまり GUI と CLI は、同じコンピュータを操作するための 2 つの「窓口」だと考えることができます。
+
+\subsection{CLI のよいところ}
+
+初めて CLI を見ると、黒い画面に文字を打ち込む昔ながらの操作に見えるかもしれません。
+それでもロボット開発の現場で CLI が使われ続けているのには、次のような理由があります。
+
+\begin{description}
+  \item[手順を正確に伝えられる]
+    GUI の操作を人に伝えるには「右上のメニューから○○を選んで……」と言葉や画像で説明する必要があります。
+    CLI なら、入力するコマンドをそのまま文字で渡せば、誰がやっても同じ結果になります。
+    本書を含め、ROS の公式ドキュメントやインターネット上の情報の多くがコマンドで書かれているのはこのためです。
+  \item[自動化できる]
+    コマンドはファイルに書いておけば、まとめて何度でも実行できます（\ref{chap:shellscript}章で扱うシェルスクリプト）。
+    毎回同じ手順を手で繰り返す必要がなくなり、操作ミスも減ります。
+  \item[画面のないコンピュータを操作できる]
+    ロボットに載っているコンピュータには、モニタがつながっていないことがよくあります。
+    CLI なら、ネットワーク越しに別のコンピュータからログインして操作できます（\ref{chap:network}章で扱う SSH）。
+  \item[軽くて速い]
+    CLI は文字だけをやり取りするので、動作が軽く、性能の低いコンピュータや遅いネットワークでも快適に使えます。
+    慣れてしまえば、マウスでメニューをたどるよりも速く操作できます。
+  \item[ROS のツールの多くが CLI で提供されている]
+    ROS 2 では、ノードの起動やトピックの確認などを \cmd{ros2} というコマンドで行います（\ref{chap:ros2_concepts}章）。
+    ROS 2 を使うには、CLI に慣れておくことが欠かせません。
+\end{description}
+
+\subsection{GUI と CLI は使い分けるもの}
+
+CLI が便利だからといって、GUI を使ってはいけないわけではありません。
+画像や 3D モデルを見る、Web ページを閲覧する、ロボットのセンサデータを可視化する（\ref{chap:tf_viz}章で扱う RViz）といった作業は GUI のほうが向いています。
+
+実際の開発では、「ファイルマネージャで画像を確認しながら、ターミナルでプログラムを実行する」というように、両方を行き来しながら作業します。
+大切なのは、CLI を「怖いもの」「難しいもの」と思わずに、道具の 1 つとして選べるようになることです。
+
+\begin{point}[GUI と CLI]
+  \begin{itemize}
+    \item GUI はマウスで画面を見ながら操作する方式、CLI はキーボードでコマンドを入力して操作する方式
+    \item どちらも同じコンピュータを操作するための窓口で、できることの本質は変わらない
+    \item ロボット開発では、手順の共有・自動化・リモート操作のしやすさから CLI がよく使われる
+  \end{itemize}
+\end{point}
+
+\section{ターミナル・シェル・コマンドの関係}
+\label{sec:terminal-relation}
+
+それでは、実際に CLI を使ってみましょう。
+Ubuntu では、\key{Ctrl}+\key{Alt}+\key{T} を押すと \textbf{ターミナル}が起動します。
+アプリケーションの一覧から「端末」（英語表示では Terminal）を選んでも構いません。
+
+\begin{terminal}[ターミナルを起動した直後の画面]
+user@robot:~$
+\end{terminal}
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：Ubuntu 24.04 でターミナルを起動した直後のウィンドウのスクリーンショット
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{ch03/terminal_window.png}
+  \caption{Ubuntu のターミナル}
+  \label{fig:terminal-window}
+\end{figure}
+
+実際のターミナルは、図\ref{fig:terminal-window}のようなウィンドウです。
+この画面に文字を入力して \key{Enter} を押すと、コンピュータが命令を実行して結果を表示してくれます。
+試しに \cmd{date} と入力して \key{Enter} を押してみましょう。
+
+\begin{terminal}[はじめてのコマンド]
+$ date
+Tue Sep 29 18:33:12 JST 2026
+\end{terminal}
+
+現在の日時が表示されれば成功です。
+このとき裏側では、\textbf{ターミナル}・\textbf{シェル}・\textbf{コマンド}という 3 つのものが協力して動いています。
+
+\begin{description}
+  \item[ターミナル]
+    キーボードからの入力を受け取り、文字を画面に表示するアプリケーションです。
+    いわば文字の入出力を担当する「窓」で、ターミナル自身はコマンドの意味を理解していません。
+    Ubuntu に標準で入っているのは GNOME Terminal ですが、ほかにも多くのターミナルアプリがあります。
+  \item[シェル]
+    ターミナルから受け取った文字列を解釈し、どのプログラムをどのように実行するかを決めるプログラムです。
+    人間と OS（カーネル）の間に立つ「殻（shell）」なので、この名前がついています。
+    Ubuntu で標準的に使われるシェルは \textbf{bash}（Bourne Again SHell）です。
+  \item[コマンド]
+    実際に仕事をするプログラムです。
+    \cmd{date} は日時を表示するプログラム、\cmd{ls} はファイルの一覧を表示するプログラムです。
+\end{description}
+
+\cmd{date} と入力してから結果が表示されるまでの流れは、次のようになります。
+
+\begin{enumerate}
+  \item ターミナルが、キーボードから入力された \cmd{date} という文字列をシェルに渡す
+  \item シェルが文字列を解釈し、\cmd{date} というプログラムを探して実行する
+  \item \cmd{date} プログラムが現在の日時を調べて出力する
+  \item ターミナルが、その出力を画面に表示する
+\end{enumerate}
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：キーボード → ターミナル → シェル（bash）→ コマンド（date）→ ターミナル → 画面、という入出力の流れを矢印で示した図
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{ch03/terminal_shell_command.pdf}
+  \caption{ターミナル・シェル・コマンドの関係}
+  \label{fig:terminal-shell-command}
+\end{figure}
+
+この関係を図にすると、図\ref{fig:terminal-shell-command}のようになります。
+レストランにたとえると、ターミナルは注文を聞いて料理を運ぶ「客席とテーブル」、シェルは注文を厨房に伝える「ホール係」、コマンドは実際に料理を作る「料理人」にあたります。
+
+自分が使っているシェルは、次のコマンドで確認できます。
+\cmd{\$SHELL} は、ログイン時に使うシェルを表す\textbf{環境変数}です（環境変数は\ref{chap:env}章で詳しく扱います）。
+
+\begin{terminal}[使っているシェルを確認する]
+$ echo $SHELL
+/bin/bash
+\end{terminal}
+
+\cmd{echo} は、後ろに書いた文字列をそのまま表示するコマンドです。
+シェルが \cmd{\$SHELL} を中身の \cmd{/bin/bash} に置き換えてから \cmd{echo} に渡すので、このような結果になります。
+
+\subsection{コマンドの正体}
+
+コマンドの多くは、ディレクトリに置かれたプログラムのファイルです。
+\cmd{which} コマンドを使うと、コマンドのファイルがどこにあるかがわかります。
+
+\begin{terminal}[コマンドのファイルの場所を調べる]
+$ which date
+/usr/bin/date
+$ which ls
+/usr/bin/ls
+\end{terminal}
+
+\cmd{date} の正体は \cmd{/usr/bin/date} というファイルだとわかりました。
+ただし、\cmd{cd} のように、シェル自身に組み込まれているコマンド（\textbf{ビルトインコマンド}）もあります。
+\cmd{type} コマンドを使うと、そのコマンドがどちらなのかを確認できます。
+
+\begin{terminal}[コマンドの種類を調べる]
+$ type date
+date is /usr/bin/date
+$ type cd
+cd is a shell builtin
+\end{terminal}
+
+普段の操作で両者の違いを意識する必要はほとんどありませんが、後で説明するヘルプの調べ方が少し変わります。
+
+\begin{column}{「端末」という言葉}
+  ターミナル（terminal）は、もともとは大型のコンピュータにつながっていた、キーボードとディスプレイ（さらに昔はプリンタ）だけの「端末装置」を指す言葉でした。
+  いまのターミナルアプリは、その端末装置をソフトウェアで再現したものなので、正確には\textbf{ターミナルエミュレータ}と呼ばれます。
+  Ubuntu の日本語環境ではアプリ名が「端末」と表示されますが、本書では「ターミナル」と呼ぶことにします。
+\end{column}
 
 \section{プロンプトの読み方}
+\label{sec:terminal-prompt}
 
-TODO
+ターミナルを起動すると、行の先頭に次のような文字列が表示されます。
+これを\textbf{プロンプト}といい、「コマンドの入力を待っています」という合図です。
+
+\begin{terminal}[プロンプト]
+user@robot:~$
+\end{terminal}
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：user@robot:~$ の各部分（ユーザ名・ホスト名・カレントディレクトリ・$）に吹き出しで説明を付けた図
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{ch03/prompt.pdf}
+  \caption{プロンプトの各部分の意味}
+  \label{fig:terminal-prompt}
+\end{figure}
+
+Ubuntu の標準のプロンプトは、図\ref{fig:terminal-prompt}と次の表のような要素でできています。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    部分 & 意味 \\
+    \midrule
+    \cmd{user} & ログインしているユーザ名 \\
+    \cmd{@} & 区切り \\
+    \cmd{robot} & コンピュータの名前（ホスト名） \\
+    \cmd{:} & 区切り \\
+    \cmd{\textasciitilde} & 今いるディレクトリ（\cmd{\textasciitilde} はホームディレクトリ） \\
+    \cmd{\$} & 一般ユーザであることを表す記号 \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+ユーザ名とホスト名は、自分の環境に合わせて読み替えてください。
+プロンプトに表示される情報は、次のコマンドでも確認できます。
+
+\begin{terminal}[ユーザ名とホスト名を確認する]
+$ whoami
+user
+$ hostname
+robot
+\end{terminal}
+
+\subsection{今いるディレクトリ}
+
+\cmd{:} と \cmd{\$} の間には、今いるディレクトリ（\textbf{カレントディレクトリ}）が表示されます。
+\cmd{\textasciitilde} はホームディレクトリ（\cmd{/home/user}）を表す記号です。
+別のディレクトリに移動すると、この部分が変わります。
+
+\begin{terminal}[移動するとプロンプトが変わる]
+user@robot:~$ cd /etc
+user@robot:/etc$
+\end{terminal}
+
+ディレクトリの移動については、\ref{chap:files}章で詳しく説明します。
+ネットワーク越しに複数のコンピュータを操作していると、今どのコンピュータのどのディレクトリで作業しているのかがわからなくなりがちです。
+コマンドを入力する前にプロンプトを見る習慣をつけておくと、思わぬ事故を防げます。
+
+\subsection{\$ と \#}
+
+プロンプトの最後の記号は、一般ユーザなら \cmd{\$}、管理者（root）なら \cmd{\#} になります。
+root はシステムのどんな設定でも変更できる特別なユーザです（\ref{chap:permission}章）。
+プロンプトが \cmd{\#} になっているときは、操作を誤るとシステムを壊してしまう可能性があるので注意してください。
+
+\begin{point}[本書でのコマンドの表記]
+  本書のコマンド例では、プロンプトを省略して、一般ユーザで実行するコマンドの先頭に \cmd{\$}、root 権限で実行するコマンドの先頭に \cmd{\#} を付けています。
+  \cmd{\$} や \cmd{\#} は入力せず、その後ろの部分だけを入力してください。
+  \cmd{\$} や \cmd{\#} が付いていない行は、コマンドの実行結果です。
+\end{point}
+
+\begin{terminal}[本書の表記例]
+$ echo Hello    # 「echo Hello」と入力する
+Hello           # 実行結果（この行は入力しない）
+\end{terminal}
+
+\begin{caution}[表示される言語について]
+  Ubuntu を日本語でインストールした場合、コマンドの実行結果やエラーメッセージが日本語で表示されることがあります。
+  本書では英語の表示で掲載していますが、内容は同じです。
+  なお、エラーメッセージをインターネットで検索するときは、英語のメッセージのほうが多くの情報が見つかります。
+\end{caution}
 
 \section{コマンドの構造}
+\label{sec:terminal-command-structure}
 
-TODO
+コマンドは、基本的に次の形で入力します。
+それぞれの間は半角スペースで区切ります。
+\begin{terminal}[コマンドの基本形]
+\begin{terminal}
+$ コマンド名 オプション 引数
+\end{terminal}
+
+\begin{description}
+  \item[コマンド名] 実行するプログラムの名前です（\cmd{ls}, \cmd{date} など）。
+  \item[オプション] コマンドの動作を変える指定です。\cmd{-} や \cmd{--} で始まります。
+  \item[引数] コマンドが処理する対象です。ファイル名やディレクトリ名などを指定します。
+\end{description}
+
+オプションや引数は、必要がなければ省略できます。
+ファイルの一覧を表示する \cmd{ls} コマンドで試してみましょう。
+
+\begin{terminal}[オプションと引数]
+$ ls
+Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+$ ls -l Documents
+total 8
+-rw-rw-r-- 1 user user   42 Sep 29 18:40 memo.txt
+-rw-rw-r-- 1 user user 3120 Sep 29 18:41 report.pdf
+\end{terminal}
+
+1 つ目の \cmd{ls} は、オプションも引数もなしで実行しています。
+この場合、カレントディレクトリの中身が表示されます。
+2 つ目の \cmd{ls -l Documents} では、\cmd{-l}（詳しい情報を表示する）というオプションと、\cmd{Documents} という引数を指定しています。
+
+\subsection{短いオプションと長いオプション}
+
+オプションには、\cmd{-} とアルファベット 1 文字で書く\textbf{短いオプション}と、\cmd{--} と単語で書く\textbf{長いオプション}があります。
+同じ意味のオプションに、両方の書き方が用意されていることもよくあります。
+
+\begin{terminal}[同じ意味の短いオプションと長いオプション]
+$ ls -a
+$ ls --all
+\end{terminal}
+
+短いオプションは、まとめて書くこともできます。
+次の 3 つは、どれも同じ意味です。
+
+\begin{terminal}[短いオプションをまとめる]
+$ ls -l -a
+$ ls -la
+$ ls -al
+\end{terminal}
+
+長いオプションは入力が長くなりますが、意味がわかりやすいので、スクリプトに書くときや人に説明するときに便利です。
+
+\subsection{値をとるオプション}
+
+オプションの中には、値を指定するものもあります。
+たとえば、ファイルの先頭部分を表示する \cmd{head} コマンドでは、\cmd{-n} オプションで表示する行数を指定します。
+
+\begin{terminal}[値をとるオプション]
+$ head -n 3 /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+\end{terminal}
+
+長いオプションで値を指定するときは、\cmd{--lines=3} のように \cmd{=} でつなぐのが一般的です。
+
+\subsection{コマンド入力のルール}
+
+コマンドを入力するときは、次の点に気をつけてください。
+
+\begin{itemize}
+  \item \textbf{大文字と小文字は区別されます。}\cmd{ls} と \cmd{LS} は別のものとして扱われます。
+  \item \textbf{区切りは半角スペースです。}全角スペースを入れると、コマンドが正しく認識されません。
+  \item \textbf{スペースを含む引数はクォートで囲みます。}\cmd{"my file.txt"} のようにダブルクォートで囲まないと、\cmd{my} と \cmd{file.txt} の 2 つの引数だと解釈されます。
+\end{itemize}
+
+存在しないコマンドを入力すると、次のようなメッセージが表示されます。
+
+\begin{terminal}[コマンドが見つからない]
+$ LS
+LS: command not found
+\end{terminal}
+
+\cmd{command not found} と表示されたら、まずはスペルミスや大文字・小文字の間違いがないかを確認しましょう。
+Ubuntu では、打ち間違えたコマンドの候補や、インストールすれば使えるパッケージを教えてくれることもあります。
+
+\begin{point}[便りがないのはよい便り]
+  CLI のコマンドの多くは、成功したときには何も表示しません。
+  たとえば、ディレクトリを作る \cmd{mkdir} コマンドは、成功すると何も言わずに次のプロンプトを表示します。
+  何も表示されなかったら「失敗した」のではなく、「うまくいった」と考えてください。
+  失敗したときには、必ずエラーメッセージが表示されます。
+\end{point}
 
 \section{ヘルプの調べ方}
+\label{sec:terminal-help}
 
-TODO
+Linux には非常にたくさんのコマンドがあり、それぞれに多くのオプションがあります。
+それらをすべて覚える必要はありません。
+大切なのは、\textbf{わからないときに自分で調べる方法}を知っておくことです。
+
+\subsection{\cmd{-{}-help} オプション}
+
+多くのコマンドは、\cmd{--help} オプションを付けて実行すると、使い方の要約を表示します。
+
+\begin{terminal}[--help で使い方を表示する]
+$ ls --help
+Usage: ls [OPTION]... [FILE]...
+List information about the FILEs (the current directory by default).
+Sort entries alphabetically if none of -cftuvSUX nor --sort is specified.
+
+Mandatory arguments to long options are mandatory for short options too.
+  -a, --all                  do not ignore entries starting with .
+  -A, --almost-all           do not list implied . and ..
+...
+\end{terminal}
+
+1 行目の \cmd{Usage} は、コマンドの書き方を表しています。
+\cmd{[ ]} で囲まれた部分は省略できること、\cmd{...} は複数指定できることを意味します。
+つまり \cmd{ls [OPTION]... [FILE]...} は、「\cmd{ls} の後ろに、オプションとファイルをそれぞれ 0 個以上書ける」という意味です。
+
+表示が長くて画面からあふれてしまうときは、\cmd{ls --help | less} のように入力すると、1 画面ずつ読めます（\cmd{|} については\ref{chap:text_pipe}章で説明します）。
+
+\subsection{\cmd{man} コマンド}
+
+より詳しい説明が必要なときは、\cmd{man} コマンドでマニュアル（\textbf{man ページ}）を読みます。
+
+\begin{terminal}[ls のマニュアルを表示する]
+$ man ls
+\end{terminal}
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：man ls を実行したターミナルのスクリーンショット（NAME, SYNOPSIS, DESCRIPTION が見える状態）
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{ch03/man_ls.png}
+  \caption{\cmd{man ls} の表示画面}
+  \label{fig:terminal-man}
+\end{figure}
+
+\cmd{man ls} を実行すると、図\ref{fig:terminal-man}のような画面が表示されます。
+man ページは、次のキーで操作します。
+特に、\textbf{終了するときは \key{q}} は必ず覚えておきましょう。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    キー & 動作 \\
+    \midrule
+    \key{Space} / \key{b} & 1 画面進む / 1 画面戻る \\
+    \key{\(\downarrow\)} / \key{\(\uparrow\)} & 1 行進む / 1 行戻る \\
+    \key{/} 文字列 & 文字列を検索する \\
+    \key{n} / \key{N} & 次の検索結果 / 前の検索結果 \\
+    \key{q} & 終了する \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+man ページは、おおむね次のような見出しで構成されています。
+
+\begin{description}
+  \item[NAME] コマンドの名前と一行説明
+  \item[SYNOPSIS] コマンドの書き方（\cmd{--help} の \cmd{Usage} と同じ）
+  \item[DESCRIPTION] 詳しい説明と、オプションの一覧
+  \item[EXAMPLES] 使用例（ないコマンドもあります）
+  \item[SEE ALSO] 関連するコマンド
+\end{description}
+
+最初から全部を読む必要はありません。
+\key{/} で知りたいオプションを検索して、その部分だけを読むのが効率的です。
+
+\begin{column}{man ページが英語で読みにくいとき}
+  man ページの多くは英語で書かれています。
+  最初は読みにくいかもしれませんが、使われる単語はある程度決まっているので、読んでいるうちに慣れてきます。
+  どうしても読みにくいときは、次に紹介する \cmd{tldr} を使ったり、Web ブラウザで「コマンド名 使い方」と検索したりするとよいでしょう。
+\end{column}
+
+\subsection{\cmd{tldr} コマンド}
+
+\cmd{tldr}（Too Long; Didn't Read の略）は、よく使う使用例だけを簡潔にまとめて表示してくれるコマンドです。
+標準ではインストールされていないので、次のようにインストールします（\cmd{apt} については\ref{chap:package}章で説明します）。
+
+\begin{terminal}[tldr をインストールする]
+$ sudo apt install tldr
+$ tldr --update
+\end{terminal}
+
+\cmd{tldr} の後ろにコマンド名を書くと、使用例が表示されます。
+
+\begin{terminal}[tar コマンドの使用例を表示する]
+$ tldr tar
+tar
+Archiving utility.
+
+ - Create an archive and write it to a file:
+   tar cf path/to/target.tar path/to/file1 path/to/file2 ...
+
+ - Extract a (compressed) archive file into the current directory verbosely:
+   tar xvf path/to/source.tar[.gz|.bz2|.xz]
+...
+\end{terminal}
+
+「細かい説明はいいから、とりあえずよくある使い方を知りたい」というときに便利です。
+
+\subsection{ビルトインコマンドのヘルプ}
+
+\cmd{cd} のようなビルトインコマンドには、\cmd{man} ページがないことがあります。
+その場合は、bash の \cmd{help} コマンドを使います。
+
+\begin{terminal}[ビルトインコマンドのヘルプを表示する]
+$ help cd
+cd: cd [-L|[-P [-e]] [-@]] [dir]
+    Change the shell working directory.
+...
+\end{terminal}
+
+\begin{point}[ヘルプの調べ方のまとめ]
+  \begin{itemize}
+    \item まずは \cmd{コマンド名 --help} で使い方の要約を見る
+    \item 詳しく知りたいときは \cmd{man コマンド名} でマニュアルを読む（終了は \key{q}）
+    \item 使用例を知りたいときは \cmd{tldr コマンド名}
+    \item ビルトインコマンドは \cmd{help コマンド名}
+  \end{itemize}
+\end{point}
 
 \section{便利なキー操作}
+\label{sec:terminal-keys}
 
-TODO
+CLI では、すべてをキーボードで入力する必要があります。
+長いコマンドやファイル名を毎回すべて入力するのは大変ですが、シェルには入力を楽にするしくみがたくさん用意されています。
+ここで紹介する操作を覚えるだけで、CLI の使い心地は大きく変わります。
+
+\subsection{Tab 補完}
+
+コマンド名やファイル名を途中まで入力して \key{Tab} を押すと、残りをシェルが自動的に入力してくれます。
+これを \textbf{Tab 補完}といいます。
+
+\begin{terminal}[Tab 補完]
+$ cd Doc          # ここで Tab キーを押すと
+$ cd Documents/   # 残りが自動で入力される
+\end{terminal}
+
+候補が複数あって 1 つに決まらないときは、何も起きません。
+そのままもう一度 \key{Tab} を押すと、候補の一覧が表示されます。
+
+\begin{terminal}[候補が複数あるとき（Tab を 2 回押す）]
+$ cd D
+Desktop/   Documents/ Downloads/
+\end{terminal}
+
+候補を絞り込めるところまで文字を追加して、もう一度 \key{Tab} を押しましょう。
+
+Tab 補完を使うと入力が速くなるだけでなく、\textbf{打ち間違いを防げる}という大きな利点があります。
+補完されないということは、そのファイルやディレクトリが存在しないか、途中までの入力が間違っているということです。
+ファイル名を入力するときは、常に Tab 補完を使う習慣をつけましょう。
+
+\subsection{コマンド履歴}
+
+シェルは、過去に入力したコマンドを\textbf{履歴}として記録しています。
+\key{\(\uparrow\)} を押すと 1 つ前のコマンドが、さらに押すとその前のコマンドが呼び出されます。
+\key{\(\downarrow\)} で新しい方向に戻ります。
+呼び出したコマンドは、\key{\(\leftarrow\)} \key{\(\rightarrow\)} でカーソルを動かして編集してから実行することもできます。
+
+履歴の一覧は \cmd{history} コマンドで表示できます。
+
+\begin{terminal}[コマンド履歴を表示する]
+$ history
+    1  date
+    2  echo $SHELL
+    3  which date
+    4  ls -l Documents
+    5  history
+\end{terminal}
+
+\subsection{履歴の検索}
+
+ずっと前に入力したコマンドを \key{\(\uparrow\)} でたどるのは大変です。
+そんなときは \key{Ctrl}+\key{R} を押して、コマンドの一部を入力します。
+入力した文字列を含むコマンドが、新しいものから順に検索されます。
+
+\begin{terminal}[Ctrl+R で履歴を検索する]
+(reverse-i-search)`ls': ls -l Documents
+\end{terminal}
+
+\key{Ctrl}+\key{R} を続けて押すと、さらに古い候補に移ります。
+見つかったら \key{Enter} でそのまま実行し、編集したいときは \key{\(\leftarrow\)} や \key{\(\rightarrow\)} を押してから編集します。
+検索をやめるときは \key{Ctrl}+\key{G} を押します。
+
+ROS 2 では長いコマンドを何度も入力することが多いので、\key{Ctrl}+\key{R} は特に役立ちます。
+
+\subsection{実行中のコマンドを止める}
+
+コマンドの中には、止めるまで動き続けるものがあります。
+ROS 2 のノードも、基本的には止めるまで動き続けます。
+実行中のコマンドを止めるには、\key{Ctrl}+\key{C} を押します。
+
+\begin{terminal}[Ctrl+C でコマンドを止める]
+$ ping localhost
+PING localhost (127.0.0.1) 56(84) bytes of data.
+64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.030 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=2 ttl=64 time=0.045 ms
+^C
+--- localhost ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+\end{terminal}
+
+\cmd{\textasciicircum C} は、\key{Ctrl}+\key{C} を押したことを表しています。
+
+\begin{caution}[コピーは Ctrl+C ではない]
+  ターミナルでは \key{Ctrl}+\key{C} が「コマンドを止める」操作に割り当てられているため、コピーには使えません。
+  ターミナルで文字をコピー・貼り付けするときは、\key{Ctrl}+\key{Shift}+\key{C} と \key{Ctrl}+\key{Shift}+\key{V} を使います。
+  Web ページなどからコマンドを貼り付けるときは、意図しないコマンドが含まれていないかを確認してから \key{Enter} を押しましょう。
+\end{caution}
+
+\subsection{その他の便利なキー操作}
+
+ほかにも、次のようなキー操作がよく使われます。
+最初からすべてを覚える必要はないので、必要になったときにこの表を見返してください。
+
+\begin{center}
+  \begin{tabular}{lp{0.45\linewidth}}
+    \toprule
+    キー & 動作 \\
+    \midrule
+    \key{Tab} & コマンド名・ファイル名を補完する \\
+    \key{\(\uparrow\)} / \key{\(\downarrow\)} & 履歴をたどる \\
+    \key{Ctrl}+\key{R} & 履歴を検索する \\
+    \key{Ctrl}+\key{C} & 実行中のコマンドを止める \\
+    \key{Ctrl}+\key{D} & シェルを終了する（入力の終わりを伝える） \\
+    \key{Ctrl}+\key{L} & 画面をきれいにする（\cmd{clear} と同じ） \\
+    \key{Ctrl}+\key{A} / \key{Ctrl}+\key{E} & カーソルを行頭 / 行末に移動する \\
+    \key{Ctrl}+\key{U} & カーソルより前をすべて消す \\
+    \key{Ctrl}+\key{K} & カーソルより後ろをすべて消す \\
+    \key{Ctrl}+\key{Shift}+\key{C} / \key{V} & コピー / 貼り付け \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+ターミナルを閉じるときは、ウィンドウの閉じるボタンを押すか、\cmd{exit} と入力します。
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item GUI はマウスで、CLI はキーボードからコマンドを入力してコンピュータを操作する方式です。ロボット開発では、手順の共有・自動化・リモート操作のしやすさから CLI がよく使われます。
+  \item ターミナルは文字の入出力を担当するアプリ、シェルは入力を解釈してコマンドを実行するプログラム、コマンドは実際に仕事をするプログラムです。
+  \item プロンプト \cmd{user@robot:\textasciitilde\$} には、ユーザ名・ホスト名・カレントディレクトリが表示されます。
+  \item コマンドは「コマンド名 オプション 引数」の形で入力します。
+  \item 使い方がわからないときは \cmd{--help}、\cmd{man}、\cmd{tldr} で調べます。
+  \item Tab 補完、\key{\(\uparrow\)}、\key{Ctrl}+\key{R}、\key{Ctrl}+\key{C} を使いこなすと、CLI の操作がぐっと楽になります。
+\end{itemize}
