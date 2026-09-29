@@ -273,9 +273,9 @@ make clean    # 生成物を削除
 
 <https://github.com/trcp/erasers_book/releases/download/latest/erasers_book.pdf>
 
-Pull Request では PDF のビルドだけを行います。
+`draft` ブランチへの push と Pull Request では、PDF のビルドだけを行い、Releases には置きません。
 ビルドに失敗した PR はマージしないでください。
-生成された PDF は、その PR の Actions の実行結果ページ（Artifacts の `pdf`）からダウンロードできます。
+生成された PDF は、リポジトリの Actions タブで該当する実行結果を開き、Artifacts の `pdf` からダウンロードできます（zip 形式、GitHub へのログインが必要、保存期間は最長 90 日）。
 
 ## 章とファイルの対応
 

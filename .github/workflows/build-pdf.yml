@@ -2,7 +2,7 @@ name: Build PDF
 
 on:
   push:
-    branches: [master]
+    branches: [master, draft]
   pull_request:
   workflow_dispatch:
 
