@@ -132,6 +132,7 @@
 - [ ] 初回接続時のメッセージ、`ssh-keygen -t ed25519`、`ssh-copy-id` の出力
 - [ ] `ホスト名.local`（mDNS）が Ubuntu 24.04 の標準で使えること
 - [ ] `rsync -av` の出力の形式、`tmux ls` の出力の形式
+- [ ] コラム「ターミナルマルチプレクサのいろいろ」：herdr と cmux の説明（各リポジトリの README をもとに執筆。herdr は状態の表示・複数マシンの管理・Linux 対応、cmux は macOS 専用の GUI アプリで通知が特徴）が、出版時点の情報と合っているか
 
 ### 第2章 Linux とは（`chapters/linux/what_is_linux.tex`）
 
@@ -182,7 +183,7 @@
   - 第11章：パッケージ、依存関係、パッケージ管理システム、apt、リポジトリ、GPG 鍵、電子署名、.deb、snap、PPA、ビルド、make、Makefile、CMake
   - 第12章：テキストエディタ、テキストファイル、シンタックスハイライト、補完、ターミナルエディタ、GUI エディタ、nano、Vim、vi、モード、Emacs、VS Code、拡張機能、統合ターミナル、コマンドパレット、Remote - SSH、Dev Containers
   - 第13章：README、Markdown、バージョン管理システム、Git、リポジトリ、作業ディレクトリ、ステージングエリア、コミット、コミットハッシュ、差分、.gitignore、ブランチ、マージ、コンフリクト、GitHub、リモートリポジトリ、push、pull、clone、Pull Request、レビュー、Issue、GitHub Flow
-  - 第14章：IP アドレス、プライベートアドレス、localhost、DHCP、ホスト名、mDNS、ポート番号、SSH、公開鍵認証、秘密鍵、公開鍵、パスフレーズ、scp、rsync、tmux、セッション、デタッチ、アタッチ
+  - 第14章：IP アドレス、プライベートアドレス、localhost、DHCP、ホスト名、mDNS、ポート番号、SSH、公開鍵認証、秘密鍵、公開鍵、パスフレーズ、scp、rsync、tmux、セッション、デタッチ、アタッチ、ターミナルマルチプレクサ、screen、zellij、コーディングエージェント
   - 第4章：GUI、CUI、CLI、ターミナル、シェル、bash、プロンプト、ビルトインコマンド、man ページ、Tab 補完
   - 第5章：カレントディレクトリ、ホームディレクトリ、隠しファイル、パス、絶対パス、相対パス、ワイルドカード、ブレース展開
 - [ ] 付録A コマンド早見表に、第4章・第5章のコマンドを追加する
