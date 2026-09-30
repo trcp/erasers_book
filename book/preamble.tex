@@ -48,15 +48,32 @@
 %% ---------- 囲み ----------
 \usepackage[most]{tcolorbox}
 
-% ターミナル操作例:  \begin{terminal} $ ls -l \end{terminal}
+% ターミナル操作例:  \begin{terminal}[タイトル] $ ls -l \end{terminal}
+% Ubuntu（GNOME）のターミナル風：中央にタイトル、右上にウィンドウのボタン、明るい本文。
+% `$` から行末まで（入力するコマンド）を太字にする。
+\definecolor{ubuntuorange}{HTML}{E95420}
+\definecolor{ubuntutitlebar}{HTML}{3A3A3A}
+\newcommand{\terminalbuttons}{%
+  \begin{tikzpicture}[baseline=-0.6ex, line width=0.5pt]
+    \fill[white!55!ubuntutitlebar] (0,0) circle (1.5mm);
+    \draw[white] (-0.7mm,0) -- (0.7mm,0);
+    \fill[white!55!ubuntutitlebar] (4.2mm,0) circle (1.5mm);
+    \draw[white] (3.5mm,-0.7mm) rectangle (4.9mm,0.7mm);
+    \fill[ubuntuorange] (8.4mm,0) circle (1.5mm);
+    \draw[white] (7.8mm,-0.6mm) -- (9.0mm,0.6mm) (7.8mm,0.6mm) -- (9.0mm,-0.6mm);
+  \end{tikzpicture}}
 \newtcblisting{terminal}[1][]{
-  listing only,
-  colback=black!85, colupper=white, colframe=black!85,
-  arc=2pt, boxrule=0pt, left=4pt, right=4pt,
-  listing options={basicstyle=\ttfamily\small\color{white},
+  listing only, enhanced,
+  colback=black!3, colframe=ubuntutitlebar, arc=2pt, boxrule=0.6pt,
+  left=5pt, right=4pt, top=2pt, bottom=2pt,
+  listing options={basicstyle=\ttfamily\small,
     columns=fullflexible, keepspaces=true, breaklines=true,
-    numbers=none, frame=none, backgroundcolor={}},
-  title={#1}, fonttitle=\sffamily\small,
+    numbers=none, frame=none, backgroundcolor={}, aboveskip=0pt, belowskip=0pt,
+    morecomment={[l][\bfseries]{\$}}},
+  title={\makebox[\linewidth][c]{\strut#1}},
+  fonttitle=\sffamily\small\bfseries, colbacktitle=ubuntutitlebar, coltitle=white,
+  toptitle=0.8pt, bottomtitle=0.8pt,
+  overlay={\node[anchor=east, inner sep=0pt] at ([xshift=-2.5mm]title.east) {\terminalbuttons};},
 }
 
 % この章で学ぶこと

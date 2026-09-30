@@ -8,5 +8,5 @@ use File::Path qw(make_path);
 make_path(map { "$out_dir/$_" } qw(
   frontmatter appendix
   chapters/linux chapters/commandline
-  chapters/tools chapters/ros2
+  chapters/tools chapters/python chapters/ros2
 ));

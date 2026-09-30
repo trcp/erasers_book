@@ -494,7 +494,7 @@ $ find ~/practice -type d
 
 \cmd{find} は実際にディレクトリをたどって探すので、範囲が広いと時間がかかります。
 \cmd{locate} は、あらかじめ作っておいたファイル名のデータベースから探すので、システム全体からでも一瞬で見つけられます。
-Ubuntu 24.04 では標準でインストールされていないので、\cmd{plocate} パッケージをインストールして使います。
+Ubuntu 24.04 では標準でインストールされていないので、次のように \cmd{plocate} パッケージをインストールして使います（\cmd{sudo apt install} はソフトウェアをインストールするコマンドで、\ref{chap:package}章で詳しく説明します）。
 
 \begin{terminal}[locate を使う]
 $ sudo apt install plocate

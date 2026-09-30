@@ -12,7 +12,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 研究室やロボットチームに配属され、ROS を使う必要が出てきた人
 - Windows / macOS の GUI 操作には慣れているが、ターミナル操作に不安がある人
 
-プログラミング経験は必須ではありませんが、Python の基本文法（変数・条件分岐・関数・クラス）を知っていると後半の ROS の章がスムーズに読めます。
+プログラミング経験は必須ではありません。ROS 2 のプログラムを書くのに必要な Python の基本は、第IV部で説明します。
 
 ## この本のゴール
 
@@ -101,26 +101,25 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 8.4 ディスク・メモリの確認（`df`, `du`, `free`）
 - 8.5 ログの確認（`journalctl`, `dmesg`）
 
-#### 第9章 パッケージ管理
-- 9.1 `apt` によるソフトウェアのインストール・更新・削除
-- 9.2 リポジトリと GPG 鍵
-- 9.3 `pip` と Python 仮想環境（`venv`）
-- 9.4 ソースからのビルド（`make`, `cmake` の基礎）
+#### 第9章 環境変数とシェルの設定
+- 9.1 環境変数とは（`PATH`, `HOME` など）
+- 9.2 `export` と `source`
+- 9.3 `.bashrc` のカスタマイズ
+- 9.4 エイリアスと関数
 
-#### 第10章 環境変数とシェルの設定
-- 10.1 環境変数とは（`PATH`, `HOME` など）
-- 10.2 `export` と `source`
-- 10.3 `.bashrc` のカスタマイズ
-- 10.4 エイリアスと関数
-
-#### 第11章 シェルスクリプト入門
-- 11.1 はじめてのシェルスクリプト（shebang と実行権限）
-- 11.2 変数・引数・クォート
-- 11.3 条件分岐とループ
-- 11.4 終了ステータスとエラー処理
-- 11.5 実践：開発環境セットアップスクリプトを書く
+#### 第10章 シェルスクリプト入門
+- 10.1 はじめてのシェルスクリプト（shebang と実行権限）
+- 10.2 変数・引数・クォート
+- 10.3 条件分岐とループ
+- 10.4 終了ステータスとエラー処理
+- 10.5 実践：開発環境セットアップスクリプトを書く
 
 ### 第III部 開発のための周辺ツール
+
+#### 第11章 パッケージ管理
+- 11.1 `apt` によるソフトウェアのインストール・更新・削除
+- 11.2 リポジトリと GPG 鍵
+- 11.3 ソースからのビルド（`make`, `cmake` の基礎）
 
 #### 第12章 エディタ
 - 12.1 ターミナルエディタ（`nano`, `vim` の最低限の操作）
@@ -148,78 +147,108 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 15.4 GUI アプリやデバイスをコンテナで使う
 - 15.5 ROS 開発環境をコンテナで構築する
 
-### 第IV部 ROS 2 入門
+### 第IV部 Python 入門
 
-#### 第16章 ROS とは
-- 16.1 ロボットソフトウェアの構成要素
-- 16.2 ROS の歴史と ROS 1 / ROS 2 の違い
-- 16.3 ROS 2 のアーキテクチャと DDS
-- 16.4 ディストリビューションとサポート期間
+#### 第16章 Python とは
+- 16.1 コンパイラ型とインタプリタ型
+- 16.2 C 言語と比べてみる
+- 16.3 Python の特徴
+- 16.4 メリットとデメリット
+- 16.5 Python のバージョン
 
-#### 第17章 ROS 2 のインストールと環境構築
-- 17.1 ROS 2 Jazzy のインストール
-- 17.2 環境のセットアップ（`source /opt/ros/jazzy/setup.bash`）
-- 17.3 turtlesim で動作確認
-- 17.4 `ROS_DOMAIN_ID` とネットワーク設定
+#### 第17章 Python の開発環境
+- 17.1 プログラムの実行方法
+- 17.2 pip によるパッケージのインストール
+- 17.3 venv による仮想環境
+- 17.4 Ubuntu 24.04 での注意点（PEP 668）
 
-#### 第18章 ROS 2 の基本概念とコマンドラインツール
-- 18.1 ノード（`ros2 node`）
-- 18.2 トピック（`ros2 topic`）とメッセージ型（`ros2 interface`）
-- 18.3 サービス（`ros2 service`）
-- 18.4 アクション（`ros2 action`）
-- 18.5 パラメータ（`ros2 param`）
-- 18.6 `rqt` と `rqt_graph` による可視化
+#### 第18章 Python の基本
+- 18.1 変数と型
+- 18.2 リスト・タプル・辞書
+- 18.3 条件分岐とループ
+- 18.4 関数
 
-#### 第19章 ワークスペースとパッケージ
-- 19.1 ワークスペースの構成（`src`, `build`, `install`, `log`）
-- 19.2 `colcon` によるビルド
-- 19.3 パッケージの作成（`ros2 pkg create`）
-- 19.4 `package.xml` と `setup.py` / `CMakeLists.txt`
-- 19.5 依存関係の解決（`rosdep`）
-- 19.6 オーバーレイとアンダーレイ
+#### 第19章 クラスとモジュール
+- 19.1 クラスとオブジェクト
+- 19.2 継承
+- 19.3 関数を渡す（コールバック）
+- 19.4 モジュールと import
+- 19.5 例外処理
+- 19.6 読みやすいコードを書く（PEP 8・フォーマッタ）
+- 19.7 デバッグの基本
 
-#### 第20章 Python でノードを書く
-- 20.1 はじめてのノード（`rclpy` の基本）
-- 20.2 パブリッシャとサブスクライバ
-- 20.3 タイマとコールバック
-- 20.4 サービスサーバとクライアント
-- 20.5 アクションサーバとクライアント
-- 20.6 パラメータの宣言と利用
-- 20.7 カスタムメッセージ・サービスの定義
-- 20.8 （コラム）C++ で書く場合（`rclcpp`）
+### 第V部 ROS 2 入門
 
-#### 第21章 launch と設定ファイル
-- 21.1 launch ファイルとは
-- 21.2 Python launch ファイルの書き方
-- 21.3 YAML によるパラメータ設定
-- 21.4 名前空間とリマップ
-- 21.5 複数ノードをまとめて起動する
+#### 第20章 ROS とは
+- 20.1 ロボットソフトウェアの構成要素
+- 20.2 ROS の歴史と ROS 1 / ROS 2 の違い
+- 20.3 ROS 2 のアーキテクチャと DDS
+- 20.4 ディストリビューションとサポート期間
 
-#### 第22章 座標変換と可視化
-- 22.1 ロボットにおける座標系
-- 22.2 tf2 の仕組み（`static_transform_publisher`, `tf2_ros`）
-- 22.3 URDF によるロボットモデルの記述
-- 22.4 `robot_state_publisher` と `joint_state_publisher`
-- 22.5 RViz2 の使い方
+#### 第21章 ROS 2 のインストールと環境構築
+- 21.1 ROS 2 Jazzy のインストール
+- 21.2 環境のセットアップ（`source /opt/ros/jazzy/setup.bash`）
+- 21.3 turtlesim で動作確認
+- 21.4 `ROS_DOMAIN_ID` とネットワーク設定
 
-#### 第23章 シミュレーション
-- 23.1 Gazebo の概要
-- 23.2 Gazebo と ROS 2 の連携（`ros_gz_bridge`）
-- 23.3 移動ロボットをシミュレーションで動かす
-- 23.4 センサ（LiDAR・カメラ・IMU）のシミュレーション
+#### 第22章 ROS 2 の基本概念とコマンドラインツール
+- 22.1 ノード（`ros2 node`）
+- 22.2 トピック（`ros2 topic`）とメッセージ型（`ros2 interface`）
+- 22.3 サービス（`ros2 service`）
+- 22.4 アクション（`ros2 action`）
+- 22.5 パラメータ（`ros2 param`）
+- 22.6 `rqt` と `rqt_graph` による可視化
 
-#### 第24章 データの記録とデバッグ
-- 24.1 rosbag2 による記録と再生
-- 24.2 ログ出力とログレベル
-- 24.3 よくあるトラブルと対処法（ノードが見えない、トピックが届かない等）
-- 24.4 QoS 設定の基礎
+#### 第23章 ワークスペースとパッケージ
+- 23.1 ワークスペースの構成（`src`, `build`, `install`, `log`）
+- 23.2 `colcon` によるビルド
+- 23.3 パッケージの作成（`ros2 pkg create`）
+- 23.4 `package.xml` と `setup.py` / `CMakeLists.txt`
+- 23.5 依存関係の解決（`rosdep`）
+- 23.6 オーバーレイとアンダーレイ
 
-#### 第25章 実践：移動ロボットを動かす
-- 25.1 キーボードでロボットを操作する（`teleop_twist_keyboard`）
-- 25.2 センサデータを読んで障害物を避けるノードを作る
-- 25.3 SLAM による地図作成の体験（`slam_toolbox`）
-- 25.4 Navigation2 による自律移動の体験
-- 25.5 次のステップへ
+#### 第24章 Python でノードを書く
+- 24.1 はじめてのノード（`rclpy` の基本）
+- 24.2 パブリッシャとサブスクライバ
+- 24.3 タイマとコールバック
+- 24.4 サービスサーバとクライアント
+- 24.5 アクションサーバとクライアント
+- 24.6 パラメータの宣言と利用
+- 24.7 カスタムメッセージ・サービスの定義
+- 24.8 （コラム）C++ で書く場合（`rclcpp`）
+
+#### 第25章 launch と設定ファイル
+- 25.1 launch ファイルとは
+- 25.2 Python launch ファイルの書き方
+- 25.3 YAML によるパラメータ設定
+- 25.4 名前空間とリマップ
+- 25.5 複数ノードをまとめて起動する
+
+#### 第26章 座標変換と可視化
+- 26.1 ロボットにおける座標系
+- 26.2 tf2 の仕組み（`static_transform_publisher`, `tf2_ros`）
+- 26.3 URDF によるロボットモデルの記述
+- 26.4 `robot_state_publisher` と `joint_state_publisher`
+- 26.5 RViz2 の使い方
+
+#### 第27章 シミュレーション
+- 27.1 Gazebo の概要
+- 27.2 Gazebo と ROS 2 の連携（`ros_gz_bridge`）
+- 27.3 移動ロボットをシミュレーションで動かす
+- 27.4 センサ（LiDAR・カメラ・IMU）のシミュレーション
+
+#### 第28章 データの記録とデバッグ
+- 28.1 rosbag2 による記録と再生
+- 28.2 ログ出力とログレベル
+- 28.3 よくあるトラブルと対処法（ノードが見えない、トピックが届かない等）
+- 28.4 QoS 設定の基礎
+
+#### 第29章 実践：移動ロボットを動かす
+- 29.1 キーボードでロボットを操作する（`teleop_twist_keyboard`）
+- 29.2 センサデータを読んで障害物を避けるノードを作る
+- 29.3 SLAM による地図作成の体験（`slam_toolbox`）
+- 29.4 Navigation2 による自律移動の体験
+- 29.5 次のステップへ
 
 ### 付録
 
@@ -251,7 +280,8 @@ Linux とは何かというところから始め、コマンドラインの基�
     │   ├── linux/         # 第I部 Linux 入門
     │   ├── commandline/   # 第II部 コマンドラインの基本
     │   ├── tools/         # 第III部 開発のための周辺ツール
-    │   └── ros2/          # 第IV部 ROS 2 入門
+    │   ├── python/        # 第IV部 Python 入門
+    │   └── ros2/          # 第V部 ROS 2 入門
     ├── appendix/          # 付録
     ├── samples/           # 各章のサンプルコード・ROS 2 パッケージ（章ごとにサブディレクトリ）
     └── images/            # 図版（章ごとにサブディレクトリ）
@@ -296,23 +326,27 @@ make clean    # 生成物を削除
 | 6 | パーミッションとユーザ管理 | `chapters/commandline/permission.tex` |
 | 7 | テキスト処理とパイプ | `chapters/commandline/text_pipe.tex` |
 | 8 | プロセスとシステム管理 | `chapters/commandline/process.tex` |
-| 9 | パッケージ管理 | `chapters/commandline/package.tex` |
-| 10 | 環境変数とシェルの設定 | `chapters/commandline/env.tex` |
-| 11 | シェルスクリプト入門 | `chapters/commandline/shellscript.tex` |
+| 9 | 環境変数とシェルの設定 | `chapters/commandline/env.tex` |
+| 10 | シェルスクリプト入門 | `chapters/commandline/shellscript.tex` |
+| 11 | パッケージ管理 | `chapters/tools/package.tex` |
 | 12 | エディタ | `chapters/tools/editor.tex` |
 | 13 | Git によるバージョン管理 | `chapters/tools/git.tex` |
 | 14 | ネットワークとリモート操作 | `chapters/tools/network.tex` |
 | 15 | Docker 入門 | `chapters/tools/docker.tex` |
-| 16 | ROS とは | `chapters/ros2/what_is_ros.tex` |
-| 17 | ROS 2 のインストールと環境構築 | `chapters/ros2/ros2_install.tex` |
-| 18 | ROS 2 の基本概念とコマンドラインツール | `chapters/ros2/ros2_concepts.tex` |
-| 19 | ワークスペースとパッケージ | `chapters/ros2/workspace.tex` |
-| 20 | Python でノードを書く | `chapters/ros2/rclpy.tex` |
-| 21 | launch と設定ファイル | `chapters/ros2/launch.tex` |
-| 22 | 座標変換と可視化 | `chapters/ros2/tf_viz.tex` |
-| 23 | シミュレーション | `chapters/ros2/simulation.tex` |
-| 24 | データの記録とデバッグ | `chapters/ros2/debug.tex` |
-| 25 | 実践：移動ロボットを動かす | `chapters/ros2/practice.tex` |
+| 16 | Python とは | `chapters/python/what_is_python.tex` |
+| 17 | Python の開発環境 | `chapters/python/python_env.tex` |
+| 18 | Python の基本 | `chapters/python/python_basics.tex` |
+| 19 | クラスとモジュール | `chapters/python/python_class.tex` |
+| 20 | ROS とは | `chapters/ros2/what_is_ros.tex` |
+| 21 | ROS 2 のインストールと環境構築 | `chapters/ros2/ros2_install.tex` |
+| 22 | ROS 2 の基本概念とコマンドラインツール | `chapters/ros2/ros2_concepts.tex` |
+| 23 | ワークスペースとパッケージ | `chapters/ros2/workspace.tex` |
+| 24 | Python でノードを書く | `chapters/ros2/rclpy.tex` |
+| 25 | launch と設定ファイル | `chapters/ros2/launch.tex` |
+| 26 | 座標変換と可視化 | `chapters/ros2/tf_viz.tex` |
+| 27 | シミュレーション | `chapters/ros2/simulation.tex` |
+| 28 | データの記録とデバッグ | `chapters/ros2/debug.tex` |
+| 29 | 実践：移動ロボットを動かす | `chapters/ros2/practice.tex` |
 | 付録A | コマンド早見表 | `appendix/cheatsheet.tex` |
 | 付録B | よく使うキーボードショートカット | `appendix/shortcuts.tex` |
 | 付録C | トラブルシューティング集 | `appendix/troubleshooting.tex` |
@@ -384,6 +418,7 @@ make clean    # 生成物を削除
 ### コマンド例の書き方
 
 - `terminal` 環境の中では、一般ユーザで実行するコマンドの先頭に `$ `、root 権限で実行するコマンドの先頭に `# ` を付けます。
+- `terminal` 環境は Ubuntu のターミナル風の枠で表示され、`$` から行末まで（入力するコマンド）が自動で太字になります。実行結果の行に `$` が含まれると、そこから行末までも太字になるので注意してください。
 - 実行結果は `$` を付けずにそのまま書きます。長い出力は途中を `...` で省略して構いません。
 - 読者が自分の環境に合わせて置き換える部分は `<ファイル名>` のように山括弧で囲みます。
 - コマンドに説明を添えるときは、行末に `# 説明` の形でコメントを書きます（例：`$ cd ~/Documents     # ホームの Documents に移動`）。
