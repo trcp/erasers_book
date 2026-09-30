@@ -166,19 +166,7 @@ Tue Sep 29 18:33:12 JST 2026
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：キーボード → ターミナル → シェル（bash）→ コマンド（date）→ ターミナル → 画面、という入出力の流れを矢印で示した図
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{terminal_shell/terminal_shell_command.pdf}
+  \input{images/terminal_shell/terminal_shell_command}
   \caption{ターミナル・シェル・コマンドの関係}
   \label{fig:terminal-shell-command}
 \end{figure}
@@ -240,19 +228,7 @@ user@robot:~$
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：user@robot:~$ の各部分（ユーザ名・ホスト名・カレントディレクトリ・$）に吹き出しで説明を付けた図
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{terminal_shell/prompt.pdf}
+  \input{images/terminal_shell/prompt}
   \caption{プロンプトの各部分の意味}
   \label{fig:terminal-prompt}
 \end{figure}

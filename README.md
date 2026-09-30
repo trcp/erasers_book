@@ -236,6 +236,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 ```
 .
 ├── README.md              # このファイル
+├── check_list.md          # 確認事項リスト（動作確認・事実確認・未執筆箇所など）
 ├── .github/
 │   └── workflows/
 │       └── build-pdf.yml  # PDF の自動ビルドと Releases への公開
@@ -409,9 +410,39 @@ make clean    # 生成物を削除
 
 - 画像は、章のファイル名と同じ名前のディレクトリ `images/<章のファイル名>/` に置きます（例：`ros2_concepts.tex` の図なら `images/ros2_concepts/rqt_graph.png`）。`\includegraphics{ros2_concepts/rqt_graph.png}` のように `images/` を省略して参照できます。
 - ファイル名は半角英数字・ハイフン・アンダースコアのみとし、日本語や空白は使いません。
-- スクリーンショットは PNG、図は可能な限り PDF か SVG から変換した PDF を使います。
+- スクリーンショットは PNG を使います。
+- 図（ブロック図・流れ図・状態遷移図・木構造など）は、なるべく TikZ で描きます（次の「TikZ で描く図」を参照）。TikZ で描きにくい図は、PDF か、SVG から変換した PDF を使います。
 - 図には必ず `\caption` と `\label` を付け、本文から `\ref` で参照します。
 - 外部から引用する図は出典とライセンスを確認し、キャプションに出典を明記してください。
+
+#### TikZ で描く図
+
+TikZ で描く図は、図ごとに `images/<章のファイル名>/<図の名前>.tex` というファイルに `tikzpicture` 環境だけを書き、本文からは `\input` で読み込みます。
+図の中身を別ファイルにすることで、本文の差分が読みやすくなり、図だけを修正・レビューしやすくなります。
+
+```latex
+\begin{figure}[tb]
+  \centering
+  \input{images/terminal_shell/terminal_shell_command}
+  \caption{ターミナル・シェル・コマンドの関係}
+  \label{fig:terminal-shell-command}
+\end{figure}
+```
+
+- `\input` では `\includegraphics` と違って `images/` を省略できないので、`images/` から書きます。
+- 図の幅は本文の幅（約 109 mm）に収めます。目安として、横幅 10 cm 以内で描いてください。
+- 見た目をそろえるため、`preamble.tex` で定義している次のスタイルを使います。
+
+| スタイル | 用途 |
+| --- | --- |
+| `figbox` | 枠付きの箱（白地） |
+| `figpart` | 主役となる箱（薄い青地） |
+| `figarrow` | 矢印 |
+| `figlabel` | 矢印や箱に添える小さな説明文 |
+| `fignum` | 丸囲みの番号（`\tikz\node[fignum]{1};` のように使う） |
+
+- 状態遷移図には `automata` ライブラリ、配置には `positioning` ライブラリなどが使えます（`preamble.tex` で読み込み済み）。
+- 既存の図（`images/computer/flow.tex` など）を参考にしてください。
 
 #### 画像がまだないときのプレースホルダ
 
@@ -443,6 +474,7 @@ PDF 上には「Sample」と書かれた枠が表示されます（TikZ は `pre
 - `\includegraphics` の行には、置く予定のファイル名を書いておきます。
 - プレースホルダの段階でも `\caption` と `\label` を付け、本文から `\ref` で参照しておきます。
 - 画像ができたら `images/<章のファイル名>/` に置き、`tikzpicture` 環境を削除して `\includegraphics` の行のコメントを外します。
+- TikZ で描く場合は、プレースホルダの `tikzpicture` 環境とコメントを消して、`\input{images/<章のファイル名>/<図の名前>}` に置き換えます。
 
 プレースホルダが残っている箇所は、`grep -rn '入れる画像' book/` で一覧できます。
 

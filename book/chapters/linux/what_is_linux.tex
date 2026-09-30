@@ -4,13 +4,99 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item Linux が生まれた歴史と、その土台にある UNIX 哲学
+    \item オープンソースソフトウェア（OSS）の考え方とライセンス
+    \item ディストリビューションとは何か、Ubuntu のバージョンの読み方
+    \item ロボット開発で Linux が使われる理由
+    \item Ubuntu 環境の用意の仕方と、デスクトップ環境の基本操作
   \end{itemize}
 \end{goalbox}
 
-\section{Linux の歴史と UNIX 哲学}
+\ref{chap:computer}章では、コンピュータを管理する基本ソフトウェアとして OS を紹介しました。
+この章では、本書で使う OS である \textbf{Linux} について、その成り立ちや考え方、そしてロボット開発で使われている理由を見ていきます。
 
-TODO
+\section{Linux の歴史と UNIX 哲学}
+\label{sec:linux-history}
+
+Linux は、ある日突然生まれたわけではありません。
+その背景には、半世紀以上前に生まれた UNIX という OS と、ソフトウェアを自由に共有しようとした人々の歴史があります（図\ref{fig:linux-history}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/what_is_linux/history}
+  \caption{UNIX から Linux への流れ}
+  \label{fig:linux-history}
+\end{figure}
+
+\subsection{UNIX の誕生}
+
+1969 年、アメリカの AT\&T ベル研究所で、Ken Thompson と Dennis Ritchie らによって \textbf{UNIX} という OS が作られました。
+UNIX は、その後 C 言語で書き直されたことで、さまざまなコンピュータに移植しやすくなりました。
+大学や研究機関にも広く配られ、カリフォルニア大学バークレー校で作られた BSD をはじめ、多くの派生版が生まれました。
+
+一方で、UNIX は企業の製品でもあったため、次第にソースコードを自由に読んだり改良したりすることが難しくなっていきました。
+
+\subsection{GNU プロジェクト}
+
+こうした状況に対して、1983 年に Richard Stallman が始めたのが \textbf{GNU プロジェクト}です。
+GNU は「GNU's Not UNIX」の略で、UNIX と同じように使えて、誰もが自由に使い、改良し、共有できる OS を一から作ることを目指しました（この考え方については\ref{sec:linux-oss}節で詳しく説明します）。
+
+GNU プロジェクトは、コンパイラ（GCC）やシェル（bash）、エディタ（Emacs）、さまざまなコマンドなど、OS を構成するソフトウェアを次々に作っていきました。
+しかし、OS の中心となる\textbf{カーネル}（ハードウェアを直接管理する部分）の開発は難航していました。
+
+\subsection{Linux の誕生}
+
+1991 年、フィンランドのヘルシンキ大学の学生だった \textbf{Linus Torvalds} は、趣味として自分のパソコンで動く OS のカーネルを作り始めました。
+Torvalds はそのソースコードをインターネット上で公開し、ほかの開発者に意見や協力を求めました。
+これが \textbf{Linux} カーネルの始まりです。
+
+Linux カーネルは、1992 年に GNU の GPL ライセンス（\ref{sec:linux-oss}節）で配布されるようになりました。
+GNU プロジェクトが作ってきたソフトウェアと Linux カーネルを組み合わせることで、誰もが自由に使える UNIX のような OS がついに完成したのです。
+その後、Linux はインターネットを通じて世界中の開発者の協力を得て、急速に成長していきました。
+
+\begin{point}[「Linux」という言葉の 2 つの意味]
+  厳密には、Linux は OS の中心部分である\textbf{カーネル}だけを指す名前です。
+  しかし一般には、Linux カーネルに GNU のソフトウェアなどを組み合わせた OS 全体を「Linux」と呼ぶことがほとんどです。
+  本書でも、特に断らない限り、OS 全体を指して Linux と呼びます。
+  なお、GNU プロジェクトの貢献を明確にするため、OS 全体を「GNU/Linux」と呼ぶ人もいます。
+\end{point}
+
+\subsection{現在の Linux}
+
+現在、Linux は私たちの身の回りのあらゆるところで使われています。
+
+\begin{itemize}
+  \item インターネット上の Web サーバやクラウドサービスの多く
+  \item 世界の最先端のスーパーコンピュータ（性能上位のほぼすべて）
+  \item スマートフォンの Android（Linux カーネルを使っています）
+  \item テレビや家電、自動車などの組込み機器
+  \item そして、多くのロボット
+\end{itemize}
+
+パソコン用の OS としては Windows や macOS に比べて利用者は少ないものの、コンピュータの世界全体で見れば、Linux は最も広く使われている OS の 1 つです。
+
+\subsection{UNIX 哲学}
+
+UNIX の開発者たちは、ソフトウェアをどのように作るべきかについて、ある共通の考え方を持っていました。
+これは \textbf{UNIX 哲学}と呼ばれ、UNIX の流れをくむ Linux にも受け継がれています。
+UNIX 哲学にはいくつかの表現がありますが、よく知られているのは Doug McIlroy による次の言葉です。
+
+\begin{enumerate}
+  \item 1 つのことをうまくやるプログラムを書け
+  \item 協調して動くプログラムを書け
+  \item テキストを扱うプログラムを書け。テキストは万能のインターフェースだからである
+\end{enumerate}
+
+たとえば Linux には、「ファイルの一覧を表示する」「文字列を検索する」「行を並べ替える」「行数を数える」といった、それぞれ 1 つの仕事だけをする小さなコマンドがたくさんあります。
+これらのコマンドは、テキストを受け渡すことで組み合わせて使えるようになっていて、小さな部品を組み合わせることで複雑な処理を実現できます（\ref{chap:text_pipe}章で扱うパイプ）。
+また、デバイスなどもファイルとして扱う「すべてはファイル」という考え方も、UNIX から受け継がれたものです（\ref{chap:linux_internals}章）。
+
+\begin{column}{ROS と UNIX 哲学}
+  実は、本書の後半で学ぶ ROS 2 の設計にも、UNIX 哲学に通じる考え方が見られます。
+  ROS 2 では、「カメラの画像を取得する」「画像から物体を見つける」「モータを制御する」といった 1 つ 1 つの機能を、\textbf{ノード}という小さなプログラムとして作ります。
+  そして、ノード同士がメッセージをやり取りすることで、ロボット全体として複雑な動きを実現します（\ref{chap:ros2_concepts}章）。
+  「小さな部品を作り、それらを組み合わせる」という考え方を身につけておくと、ROS 2 の理解にも役立ちます。
+\end{column}
 
 \section{オープンソースソフトウェア}
 \label{sec:linux-oss}
@@ -105,19 +191,7 @@ OSS の開発には、誰でも参加できます。
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：利用者が不具合を Issue で報告 → 開発者や利用者が修正して Pull Request → レビューを経て取り込まれ、新しい版が配布される、という循環の図
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{what_is_linux/oss_community.pdf}
+  \input{images/what_is_linux/oss_community}
   \caption{Issue と Pull Request による OSS 開発の流れ}
   \label{fig:linux-oss-community}
 \end{figure}
@@ -144,21 +218,149 @@ ROS は、世界中の研究者や開発者が作ったソフトウェアを OSS
 \end{column}
 
 \section{ディストリビューション}
+\label{sec:linux-distribution}
 
-TODO
+Linux カーネルだけでは、コンピュータを便利に使うことはできません。
+実際に使うには、カーネルに加えて、コマンドやライブラリ、デスクトップ環境、アプリケーション、そしてソフトウェアをインストールするためのしくみなどが必要です。
+これらをまとめて、すぐに使える形で配布しているものを \textbf{ディストリビューション}（distribution、略して\textbf{ディストロ}）といいます（図\ref{fig:linux-distribution}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/what_is_linux/distribution}
+  \caption{ディストリビューションの構成}
+  \label{fig:linux-distribution}
+\end{figure}
+
+Linux カーネルと多くのソフトウェアは OSS なので、誰でも自由に組み合わせてディストリビューションを作ることができます。
+そのため、世界には数百ものディストリビューションが存在します。
+ディストリビューションごとに、対象とする利用者や、ソフトウェアの更新の方針、標準の見た目などが異なります。
+
+\subsection{主なディストリビューション}
+
+ディストリビューションは、元になったディストリビューションによっていくつかの系統に分けられます。
+同じ系統のディストリビューションは、ソフトウェアのインストール方法（\textbf{パッケージ管理システム}）などが共通しています（\ref{chap:package}章）。
+
+\begin{center}
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    系統 & 主なディストリビューションと特徴 \\
+    \midrule
+    Debian 系 & Debian、Ubuntu、Linux Mint、Raspberry Pi OS など。\cmd{apt} コマンドでソフトウェアを管理する \\
+    Red Hat 系 & Red Hat Enterprise Linux、Fedora、Rocky Linux など。\cmd{dnf} コマンドでソフトウェアを管理する。企業のサーバで多く使われる \\
+    その他 & Arch Linux、openSUSE など \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\subsection{Ubuntu}
+
+本書では、Debian 系のディストリビューションである \textbf{Ubuntu} を使います。
+Ubuntu は、Canonical 社が中心となって開発しているディストリビューションで、2004 年に最初のバージョンが公開されました。
+初心者にも使いやすいことを目標にしていて、デスクトップ用としてもサーバ用としても、世界で最も広く使われているディストリビューションの 1 つです。
+利用者が多いため、困ったときにインターネット上で情報を見つけやすいのも大きな利点です。
+
+\subsection{Ubuntu のバージョン}
+
+Ubuntu のバージョン番号は、リリースされた年の下 2 桁と月を \cmd{.} でつないだものです。
+たとえば、本書で使う \textbf{Ubuntu 24.04} は、2024 年 4 月にリリースされたバージョンです。
+Ubuntu は毎年 4 月と 10 月の 2 回、新しいバージョンがリリースされます。
+
+また、各バージョンには、形容詞と動物の名前を組み合わせたコードネームが付いています。
+コードネームの頭文字は、バージョンが上がるごとにアルファベット順に進んでいきます。
+
+\begin{center}
+  \begin{tabular}{lll}
+    \toprule
+    バージョン & コードネーム & 対応する主な ROS 2 \\
+    \midrule
+    Ubuntu 20.04 LTS & Focal Fossa & ROS 2 Foxy（サポート終了） \\
+    Ubuntu 22.04 LTS & Jammy Jellyfish & ROS 2 Humble \\
+    Ubuntu 24.04 LTS & Noble Numbat & ROS 2 Jazzy \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+コマンドやインターネット上の情報では、\cmd{noble} や \cmd{jammy} のように、コードネームの最初の単語を小文字にしてバージョンを表すことがよくあります。
+
+\subsection{LTS 版}
+
+2 年に 1 度、偶数年の 4 月にリリースされるバージョンは \textbf{LTS}（Long Term Support、長期サポート）版と呼ばれます。
+LTS 版は 5 年間にわたって、セキュリティの修正などのアップデートが提供されます（Ubuntu Pro を使うと、さらに延長できます）。
+それ以外のバージョンのサポート期間は 9 か月しかありません。
+
+ロボットのように、一度環境を整えたら長く安定して使い続けたい用途では、LTS 版を使うのが基本です。
+ROS 2 の主要なバージョンも、Ubuntu の LTS 版に合わせてリリースされています（\ref{chap:what_is_ros}章）。
+本書で使う ROS 2 Jazzy は、Ubuntu 24.04 LTS で動かすことを前提に作られているため、本書でも Ubuntu 24.04 LTS を使います。
+
+\begin{caution}[Ubuntu と ROS 2 のバージョンの組み合わせ]
+  ROS 2 のバージョンごとに、対応する Ubuntu のバージョンが決まっています。
+  たとえば、ROS 2 Jazzy を Ubuntu 22.04 にインストールすることは、公式にはサポートされていません。
+  インターネット上の情報を参考にするときは、それがどの Ubuntu と ROS 2 の組み合わせで書かれたものかを確認するようにしましょう。
+\end{caution}
 
 \section{なぜロボット開発で Linux が使われるのか}
+\label{sec:linux-why-robot}
 
-TODO
+パソコンでは Windows や macOS を使っている人が多いのに、なぜロボット開発では Linux が使われるのでしょうか。
+主な理由は、次のとおりです。
+
+\subsection{ROS 2 が Linux を中心に開発されている}
+
+最も直接的な理由は、ロボット開発で広く使われている ROS 2 が、Linux（特に Ubuntu）を中心に開発・テストされていることです。
+ROS 2 は Windows や macOS でも動かせるように作られていますが、最も手厚くサポートされているのは Ubuntu です。
+ROS 2 の上で公開されている多くのパッケージも Ubuntu での利用を前提としており、公式のドキュメントや解説記事の多くも Ubuntu を使って書かれています。
+
+\subsection{オープンソースで自由に使える}
+
+\ref{sec:linux-oss}節で説明したように、Linux は OSS です。
+無料で使えるうえ、ソースコードを読んで動きを確かめたり、ロボットに合わせて改良したりできます。
+画像処理の OpenCV、点群処理の PCL、シミュレータの Gazebo など、ロボット開発で使われる多くのソフトウェアも OSS として Linux 向けに提供されています。
+
+\subsection{さまざまなハードウェアで動く}
+
+Linux は、一般的なパソコンだけでなく、Raspberry Pi のようなシングルボードコンピュータや、NVIDIA Jetson のような GPU を搭載した組込み向けコンピュータでも動きます（\ref{sec:computer-robot}節）。
+開発用のパソコンで作ったプログラムを、ほぼそのままロボットに載せたコンピュータで動かせるのは、大きな利点です。
+また、不要な機能を省いて軽く動かすこともできるので、性能や電力が限られたロボットのコンピュータにも向いています。
+
+\subsection{画面がなくても操作しやすい}
+
+Linux は、もともとサーバのように画面のないコンピュータで使われることが多かったため、CLI でほとんどすべての操作ができるようになっています。
+ロボットに載せたコンピュータにモニタやキーボードをつながなくても、ネットワーク越しに別のコンピュータから操作できます（\ref{chap:network}章）。
+
+\subsection{センサやモータを扱いやすい}
+
+Linux では、USB でつないだセンサやモータのコントローラなどのデバイスを、ファイルと同じように読み書きできます（\ref{chap:linux_internals}章）。
+デバイスを扱うためのドライバやツールも豊富で、ロボットのハードウェアをプログラムから直接扱いやすくなっています。
+また、決められた時間内に確実に処理を行う\textbf{リアルタイム性}が求められる場面に向けて、そのための機能も用意されています。
+
+\subsection{開発のための道具と情報が充実している}
+
+Linux には、プログラミング言語の開発環境、バージョン管理システムの Git、コンテナ技術の Docker など、ソフトウェア開発に必要な道具が揃っています（第III部）。
+ロボットに限らず、サーバやクラウド、AI の分野でも Linux が標準的に使われているため、ここで身につけた Linux の知識は、ロボット開発以外の場面でも役に立ちます。
+
+\begin{point}[Windows や macOS を使っている人へ]
+  ふだん Windows や macOS を使っている人も、Linux のためにパソコンを買い替える必要はありません。
+  仮想マシンや WSL2、Docker などを使えば、今のパソコンの上で Ubuntu を動かすことができます。
+  具体的な方法は、次の\ref{sec:linux-setup}節で説明します。
+\end{point}
 
 \section{Ubuntu 環境の用意}
+\label{sec:linux-setup}
 
 TODO
 
 \section{デスクトップ環境の基本操作}
+\label{sec:linux-desktop}
 
 TODO
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item Linux は、1991 年に Linus Torvalds が公開したカーネルに、GNU プロジェクトのソフトウェアなどを組み合わせた、UNIX の流れをくむ OS です。
+  \item 「1 つのことをうまくやる小さなプログラムを組み合わせる」という UNIX 哲学は、Linux のコマンドや ROS 2 の設計にも通じています。
+  \item Linux は OSS であり、ソースコードを読み、改良し、共有する自由があります。他人のコードを使うときはライセンスを確認します。
+  \item Linux カーネルにさまざまなソフトウェアを組み合わせて配布しているものをディストリビューションといいます。本書では Ubuntu 24.04 LTS を使います。
+  \item ROS 2 が Ubuntu を中心に開発されていること、さまざまなハードウェアで動くこと、リモートから操作しやすいことなどから、ロボット開発では Linux が広く使われています。
+  \item \todo{Ubuntu 環境の用意とデスクトップ環境の基本操作のまとめを追加}
+\end{itemize}

@@ -4,7 +4,17 @@
 \usepackage{luatexja-fontspec}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
-\usepackage{tikz}  % 図版のプレースホルダ用
+\usepackage{tikz}  % 図版（images/ 以下の .tex）とプレースホルダ用
+\usetikzlibrary{positioning,arrows.meta,fit,calc,backgrounds,automata}
+% 図で共通して使うスタイル
+\tikzset{
+  figbox/.style={draw, rounded corners=2pt, align=center, font=\small,
+    minimum height=8mm, inner sep=3pt, fill=white},
+  figpart/.style={figbox, fill=blue!6},
+  figarrow/.style={-{Stealth[length=2mm]}, thick},
+  figlabel/.style={font=\footnotesize, align=center},
+  fignum/.style={circle, draw, fill=white, inner sep=0.8pt, font=\scriptsize\bfseries},
+}
 \usepackage{xcolor}
 \usepackage{booktabs}
 \usepackage{url}

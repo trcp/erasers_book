@@ -24,19 +24,7 @@
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：CPU・メモリ・ストレージ・GPU・入出力装置（キーボード、ディスプレイ、カメラ、モータなど）が、マザーボード上の配線（バス）でつながっている様子を示したブロック図
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{computer/computer_parts.pdf}
+  \input{images/computer/parts}
   \caption{コンピュータの主な構成要素}
   \label{fig:computer-parts}
 \end{figure}
@@ -107,19 +95,7 @@ GPU は、CPU に比べて 1 つ 1 つのコアの能力は低いものの、数
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：少数の高性能なコアを持つ CPU（数人の熟練した職人）と、多数の単純なコアを持つ GPU（大勢の作業員）を対比した図。同じ量の単純計算を、CPU は順番に、GPU は一斉に処理する様子
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{computer/cpu_vs_gpu.pdf}
+  \input{images/computer/cpu_gpu}
   \caption{CPU と GPU の違い}
   \label{fig:computer-cpu-gpu}
 \end{figure}
@@ -166,19 +142,7 @@ GPU で計算するときは、データをメモリから VRAM に送り、計�
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：(1) ストレージからメモリへプログラムを読み込む → (2) CPU がメモリから命令を読んで実行 → (3) カメラの画像がメモリに届く → (4) 画像を GPU（VRAM）に送って認識処理 → (5) 結果をメモリに戻し、CPU が判断して画面やモータに出力する、という流れを番号付きの矢印で示した図
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{computer/computer_flow.pdf}
+  \input{images/computer/flow}
   \caption{プログラムが実行されるときのデータの流れ}
   \label{fig:computer-flow}
 \end{figure}
@@ -252,19 +216,7 @@ CPU が直接理解できるのは、0 と 1 の並びで表された\textbf{機
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：下から順にハードウェア（CPU・メモリ・ストレージ・GPU・入出力装置）、OS、アプリケーション（ブラウザ・エディタ・ROS 2 のプログラムなど）、一番上に利用者を積み重ねた階層図
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{computer/os_layer.pdf}
+  \input{images/computer/os_layer}
   \caption{ハードウェア・OS・アプリケーションの関係}
   \label{fig:computer-os-layer}
 \end{figure}
@@ -307,19 +259,7 @@ ROS 2 は主に Linux の上で開発されており、本書でも Linux（Ubun
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：カメラ・LiDAR が USB や LAN でメインのコンピュータ（Linux + ROS 2、GPU 付き）につながり、メインのコンピュータが USB でマイコンに指令を送り、マイコンがモータを制御する構成のブロック図
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{computer/robot_computers.pdf}
+  \input{images/computer/robot}
   \caption{ロボットに載っているコンピュータの構成例}
   \label{fig:computer-robot}
 \end{figure}
