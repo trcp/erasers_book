@@ -1,0 +1,63 @@
+# 本書の執筆用の Docker Compose の設定
+#
+#   docker compose up -d dev             # 執筆用のコンテナを起動する（初回はイメージを作る）
+#   docker compose down                  # コンテナを止めて削除する
+#
+#   docker compose run --rm pdf          # PDF を 1 回だけビルドする（book/build/main.pdf）
+#
+# ファイルの所有者をホストのユーザにそろえるため、UID と GID をイメージに渡す。
+# 自分の UID が 1000 でない場合は、`export UID GID=$(id -g)` してから実行する。
+
+x-common: &common
+  build:
+    context: .
+    args:
+      USER_UID: ${UID:-1000}
+      USER_GID: ${GID:-1000}
+  image: erasers-book-dev
+  working_dir: /workspace/book
+  volumes:
+    - .:/workspace
+    # フォントのキャッシュを残して、2 回目以降のビルドを速くする
+    - texmf-var:/tmp/texmf-var
+
+services:
+  # 執筆用（Emacs・Claude Code・tmux・Git）
+  dev:
+    <<: *common
+    command: sleep infinity
+    stdin_open: true
+    tty: true
+    environment:
+      SSH_AUTH_SOCK: /ssh-agent
+    volumes:
+      - .:/workspace
+      - texmf-var:/tmp/texmf-var
+      # --- Git（SSH で push する） ---
+      # ホストの SSH エージェント（パスフレーズ付きの鍵もそのまま使える）
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
+      # 鍵・known_hosts・config（読み取り専用）
+      - ${HOME}/.ssh:/home/texlive/.ssh:ro
+      # 名前・メールアドレスなどの Git の設定（読み取り専用）
+      - ${HOME}/.gitconfig:/home/texlive/.gitconfig:ro
+      # --- Claude Code の認証と設定（ホストと共有する） ---
+      - ${HOME}/.claude:/home/texlive/.claude
+      - ${HOME}/.claude.json:/home/texlive/.claude.json
+      # --- tmux の設定（読み取り専用） ---
+      - ${HOME}/.tmux.conf:/home/texlive/.tmux.conf:ro
+      # --- Emacs の設定もホストと共有したい場合は、次の行のコメントを外す ---
+      # （ホストとコンテナで Emacs のバージョンが違うと、パッケージが動かないことがある）
+      - ${HOME}/.emacs.d:/home/texlive/.emacs.d
+
+  # PDF を 1 回だけビルドする
+  pdf:
+    <<: *common
+    command: make
+
+  # 原稿を保存するたびに自動でビルドし直す（Emacs を使わずにビルドだけしたいとき）
+  watch:
+    <<: *common
+    command: latexmk -pvc -view=none main.tex
+
+volumes:
+  texmf-var:

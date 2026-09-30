@@ -268,6 +268,9 @@ Linux とは何かというところから始め、コマンドラインの基�
 .
 ├── README.md              # このファイル
 ├── check_list.md          # 確認事項リスト（動作確認・事実確認・未執筆箇所など）
+├── Dockerfile             # 執筆用の Docker イメージ（TeX Live・Emacs・Claude Code・tmux）
+├── compose.yaml           # 執筆用コンテナの設定
+├── docker/                # 執筆用の tmux セッションの起動スクリプト
 ├── .github/
 │   └── workflows/
 │       └── build-pdf.yml  # PDF の自動ビルドと Releases への公開
@@ -304,6 +307,54 @@ make clean    # 生成物を削除
 ```
 
 特定の章だけを確認したいときは、`main.tex` の先頭に `\includeonly{chapters/ros2/rclpy}` のように書くと、その章だけを組版できます。
+
+### Docker の中で執筆する
+
+TeX Live・Emacs・Claude Code・tmux・Git が入った執筆用の Docker イメージを用意しています。
+Docker（Docker Compose）があれば、手元に TeX Live などをインストールしなくても、コンテナの中で原稿の編集からビルド、`git push` まで行えます。
+TeX Live は GitHub Actions と同じイメージを使うので、手元と CI で組版結果がそろいます。
+リポジトリの一番上のディレクトリで、次のコマンドを実行します。
+
+```bash
+docker compose up -d dev            # 執筆用のコンテナを起動する（初回はイメージを作るので時間がかかる）
+docker compose exec dev dev-tmux    # tmux のセッションに入る
+docker compose down                 # コンテナを止めて削除する
+```
+
+`dev-tmux` を実行すると、次の 3 つのウィンドウを持つ tmux のセッション `book` に入ります。
+セッションから離れる（プレフィックスキー → `d`）と、コンテナの中でセッションが動き続け、次に `dev-tmux` を実行したときに続きから作業できます。
+
+| ウィンドウ | 内容 |
+| --- | --- |
+| 1: emacs | `book/` を開いた Emacs |
+| 2: claude | リポジトリの一番上で起動した Claude Code |
+| 3: build | 原稿を保存するたびに自動でビルドし直す `latexmk -pvc`（PDF は `book/build/main.pdf`） |
+
+ウィンドウはプレフィックスキー → 数字キーで切り替えられます（プレフィックスキーは、下のとおりホストの `~/.tmux.conf` の設定に従います。標準では `Ctrl+B`）。
+PDF は、ホストの PDF ビューアで `book/build/main.pdf` を開いておくと、ビルドのたびに再読み込みされます。
+
+ホストの次のファイルを、コンテナの中から使えるようにしています（`compose.yaml` の `dev` を参照）。
+
+| ホスト | 用途 |
+| --- | --- |
+| SSH エージェント（`$SSH_AUTH_SOCK`） | `git push` のときの SSH の認証（パスフレーズ付きの鍵もそのまま使える） |
+| `~/.ssh`（読み取り専用） | SSH の鍵・`known_hosts`・設定 |
+| `~/.gitconfig`（読み取り専用） | コミットに記録する名前やメールアドレス |
+| `~/.tmux.conf`（読み取り専用） | tmux の設定（プレフィックスキーなど） |
+| `~/.claude`, `~/.claude.json` | Claude Code の認証情報と設定（ホストでログイン済みなら、コンテナの中でログインし直す必要はない） |
+
+- 生成されるファイルの所有者がホストのユーザになるよう、コンテナの中の作業用ユーザ（元のイメージにいる `texlive`）の UID と GID をホストに合わせています。自分の UID（`id -u` で確認できます）が 1000 でない場合は、`export UID GID=$(id -g)` を実行してから `docker compose up -d dev` を実行してください。
+- マウントするファイル（`~/.claude.json`, `~/.gitconfig`, `~/.tmux.conf`）がホストにないと、Docker が同じ名前のディレクトリを作ってしまいます。`~/.claude.json` は先にホストで Claude Code にログインしておけば作られます。ほかのファイルは、使っていなければ `touch ~/.tmux.conf` のように空のファイルを作っておいてください。
+- Claude Code の会話の履歴やメモリは、作業しているディレクトリのパスごとに分かれて保存されます。コンテナの中のパス（`/workspace`）はホストのパスと違うので、ホストの Claude Code とは別のプロジェクトとして扱われます。
+- Emacs の設定（`~/.emacs.d`）もホストと共有したい場合は、`compose.yaml` のコメントを外してください。ホストとコンテナで Emacs のバージョンが違うと、パッケージが動かないことがあります。
+- Claude Code と Emacs は、イメージを作ったときの最新版が入ります。更新するときは `docker compose build --no-cache dev` でイメージを作り直します。
+
+PDF をビルドするだけなら、Emacs などを起動せずに次のコマンドでも実行できます。
+
+```bash
+docker compose run --rm pdf         # 1 回だけビルドする
+docker compose up watch             # 原稿を保存するたびに自動でビルドし直す（Ctrl+C で終了）
+```
 
 ### 最新版 PDF
 
