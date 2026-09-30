@@ -1,0 +1,14 @@
+% 図：Vim のモードの切り替え（chapters/tools/editor.tex）
+\begin{tikzpicture}[
+    >=Stealth, auto, node distance=28mm and 46mm, on grid,
+    every state/.style={draw, rounded corners, rectangle, fill=blue!6,
+      minimum width=26mm, minimum height=11mm, font=\small, align=center}]
+  \node[state, initial, initial where=above, initial text={\footnotesize 起動}, fill=blue!15] (normal) {\textbf{ノーマルモード}\\{\footnotesize 移動・コピー・削除}};
+  \node[state, right=of normal, fill=green!8] (insert) {\textbf{インサートモード}\\{\footnotesize 文字を入力する}};
+  \node[state, below=of normal, fill=orange!10] (cmd) {\textbf{コマンドライン}\\\textbf{モード}\\{\footnotesize 保存・終了など}};
+  \path[->, thick]
+    (normal) edge[bend left=20]  node[font=\footnotesize]{\texttt{i}} (insert)
+    (insert) edge[bend left=20]  node[font=\footnotesize]{\texttt{Esc}} (normal)
+    (normal) edge[bend left=30]  node[font=\footnotesize]{\texttt{:}} (cmd)
+    (cmd)    edge[bend left=30]  node[font=\footnotesize, align=right]{\texttt{Enter}（実行）\\\texttt{Esc}（取り消し）} (normal);
+\end{tikzpicture}

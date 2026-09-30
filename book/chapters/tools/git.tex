@@ -4,30 +4,549 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item バージョン管理の考え方と、Git の基本的なしくみ
+    \item \cmd{git add}, \cmd{git commit} などを使った変更の記録と確認
+    \item ブランチを使った並行作業と、マージ
+    \item GitHub を使った共有と、Pull Request による共同開発
+    \item チームで開発するときの進め方
   \end{itemize}
 \end{goalbox}
 
-\section{バージョン管理とは}
+ロボットのプログラムは、一度書いたら終わりではありません。
+パラメータを調整したり、新しい機能を試したり、不具合を直したりと、何度も書き換えながら育てていくものです。
+この章では、その変更の歴史を記録し、チームで共有するための道具である \textbf{Git} の使い方を学びます。
+Git は、ROS 2 を含む世界中のソフトウェア開発で使われている、エンジニアにとって必須の道具です。
 
-TODO
+\section{バージョン管理とは}
+\label{sec:git-vcs}
+
+\subsection{バージョン管理の必要性}
+
+レポートを書くときに、\cmd{report.docx}, \cmd{report\_v2.docx}, \cmd{report\_final.docx}, \cmd{report\_final\_修正版.docx} のように、ファイルをコピーして残していった経験はないでしょうか。
+この方法では、どれが最新なのか、それぞれ何を変えたのかがすぐにわからなくなります。
+複数人で同じファイルを編集すれば、誰かの変更を上書きしてしまうこともあります。
+
+\textbf{バージョン管理システム}は、ファイルの変更の歴史を記録し、管理するためのソフトウェアです。
+バージョン管理システムを使うと、次のことができるようになります。
+
+\begin{itemize}
+  \item いつ、誰が、どのファイルの、どこを、なぜ変更したのかを記録できる
+  \item 過去の任意の時点の状態に戻せる
+  \item 「昨日までは動いていたのに」というときに、何を変えたのかを調べられる
+  \item 複数人で同じプログラムを、互いの変更を壊さずに開発できる
+\end{itemize}
+
+ロボット開発では、「パラメータを変えたら動かなくなったので、前の状態に戻したい」という場面が頻繁にあります。
+バージョン管理をしていれば、安心していろいろな変更を試すことができます。
+
+\subsection{Git}
+
+\textbf{Git} は、現在最も広く使われているバージョン管理システムです。
+Git は、Linux カーネル（\ref{sec:linux-history}節）の開発を管理するために、2005 年に Linus Torvalds によって作られました。
+世界中の開発者が参加する巨大なプロジェクトを管理するために作られただけあって、高速で、多人数での開発に強いのが特徴です。
+Git 自体も OSS として公開されています。
+
+Git は、Ubuntu では次のコマンドでインストールできます（\ref{chap:package}章）。
+
+\begin{terminal}[Git をインストールする]
+$ sudo apt install git
+$ git --version
+git version 2.43.0
+\end{terminal}
+
+\subsection{Git の基本的なしくみ}
+
+Git を使ううえで、まず押さえておきたい言葉があります（図\ref{fig:git-areas}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/git/areas}
+  \caption{Git の 4 つの領域とコマンドの関係}
+  \label{fig:git-areas}
+\end{figure}
+
+\begin{description}
+  \item[リポジトリ]
+    ファイルの変更の歴史を保存しておく場所です。
+    Git で管理しているディレクトリの中の \cmd{.git} という隠しディレクトリが、リポジトリの実体です。
+  \item[作業ディレクトリ]
+    ふだんファイルを編集している、ディレクトリそのものです。
+  \item[コミット]
+    ある時点のファイルの状態を、リポジトリに記録することです。記録された 1 つ 1 つの状態のこともコミットと呼びます。
+    ゲームのセーブのようなもので、いつでもその時点に戻ることができます。
+  \item[ステージングエリア]
+    次のコミットに含める変更を選んで置いておく、準備の場所です。
+    Git では、変更したファイルをまずステージングエリアに登録し（\cmd{git add}）、それからまとめてコミットします（\cmd{git commit}）。
+  \item[リモートリポジトリ]
+    GitHub などのサーバの上に置いたリポジトリです。
+    自分のコンピュータの中のリポジトリ（\textbf{ローカルリポジトリ}）の内容を送ったり（\cmd{git push}）、ほかの人の変更を取り込んだり（\cmd{git pull}）して、チームで共有します（\ref{sec:git-github}節）。
+\end{description}
+
+\subsection{最初の設定}
+
+Git を使い始める前に、コミットに記録する名前とメールアドレスを設定します。
+これは最初に 1 回だけ行えば十分です。
+
+\begin{terminal}[Git の初期設定をする]
+$ git config --global user.name "Taro Robot"
+$ git config --global user.email "taro@example.com"
+$ git config --global init.defaultBranch main
+\end{terminal}
+
+3 行目は、新しく作るリポジトリの最初のブランチ（\ref{sec:git-branch}節）の名前を \cmd{main} にする設定です。
+GitHub で公開するつもりなら、メールアドレスは公開されても困らないものにしておきましょう。
 
 \section{基本操作}
+\label{sec:git-basic}
 
-TODO
+\subsection{リポジトリを作る}
+
+練習用のディレクトリを作り、\cmd{git init} で Git の管理を始めます。
+
+\begin{terminal}[リポジトリを作る]
+$ mkdir ~/my_robot
+$ cd ~/my_robot
+$ git init
+Initialized empty Git repository in /home/user/my_robot/.git/
+\end{terminal}
+
+\cmd{.git} というディレクトリが作られ、このディレクトリが Git で管理されるようになりました。
+
+\subsection{状態を確認する}
+
+エディタで \cmd{README.md} というファイルを作り、次の内容を書いて保存しましょう。
+
+\begin{lstlisting}[caption={README.md}, label={lst:git-readme}]
+# My Robot
+
+ロボットを動かすプログラムです。
+\end{lstlisting}
+
+\begin{column}{README.md はなぜ必要か}
+  \cmd{README}（read me、「私を読んで」）は、そのディレクトリやソフトウェアについて、最初に読んでほしいことを書いておくファイルです。
+  ほとんどのリポジトリには、一番上のディレクトリに \cmd{README.md} が置かれています。
+  名前を大文字にするのは、ファイルの一覧の中で目立たせるための昔からの習慣です。
+
+  プログラムのファイルだけが並んでいても、ほかの人には、それが何のためのもので、どうやって動かせばよいのかがわかりません。
+  半年後の自分も、書いた本人とはいえ、細かいことはほとんど覚えていないものです。
+  そこで README には、たとえば次のようなことを書いておきます。
+  \begin{itemize}
+    \item このソフトウェアは何をするものか
+    \item 動かすのに必要な環境（Ubuntu 24.04、ROS 2 Jazzy など）と、インストールやビルドの手順
+    \item 使い方（実行するコマンドの例）
+    \item ライセンス（\ref{sec:linux-oss}節）や、問い合わせ先
+  \end{itemize}
+  GitHub では、リポジトリのページを開くと \cmd{README.md} の内容が自動で表示されるので、README はそのリポジトリの「表紙」の役割も果たします。
+  他人のソフトウェアを使うときも、まず README を読むのが基本です（\ref{sec:package-build}節）。
+
+  拡張子の \cmd{.md} は、\textbf{Markdown}（マークダウン）という書き方で書かれていることを表しています。
+  Markdown では、行頭に \cmd{\#} を付けると見出し、\cmd{-} を付けると箇条書きになるなど、簡単な記号で読みやすい文書を書くことができ、GitHub の上ではきれいに整形されて表示されます。
+\end{column}
+
+\cmd{git status} で、リポジトリの状態を確認します。
+\cmd{git status} は、Git を使っていて迷ったときにまず実行するコマンドです。
+
+\begin{terminal}[リポジトリの状態を確認する]
+$ git status
+On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        README.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+\end{terminal}
+
+\cmd{Untracked files} は、「Git がまだ管理していないファイル」という意味です。
+
+\subsection{変更を記録する}
+
+\cmd{git add} で、\cmd{README.md} をステージングエリアに登録します。
+
+\begin{terminal}[ステージングエリアに登録する]
+$ git add README.md
+$ git status
+On branch main
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   README.md
+\end{terminal}
+
+\cmd{Changes to be committed}（コミットされる変更）に \cmd{README.md} が入りました。
+続いて、\cmd{git commit} でコミットします。
+\cmd{-m} の後ろには、何を変更したのかを説明する\textbf{コミットメッセージ}を書きます。
+
+\begin{terminal}[コミットする]
+$ git commit -m "Add README"
+[main (root-commit) 1a2b3c4] Add README
+ 1 file changed, 3 insertions(+)
+ create mode 100644 README.md
+\end{terminal}
+
+これで、最初のコミットができました。
+\cmd{1a2b3c4} は、このコミットを識別するための ID（\textbf{コミットハッシュ}）の先頭部分です。
+
+\subsection{変更の差分を確認する}
+
+\cmd{README.md} に、次の 2 行を書き足して保存してみましょう。
+
+\begin{lstlisting}[caption={README.md（書き足した後）}, label={lst:git-readme2}]
+# My Robot
+
+ロボットを動かすプログラムです。
+
+## 使い方
+\end{lstlisting}
+
+\cmd{git diff} を使うと、最後のコミットから何が変わったのか（\textbf{差分}）を確認できます。
+
+\begin{terminal}[変更の差分を確認する]
+$ git diff
+diff --git a/README.md b/README.md
+index 3b18e51..a3c9d2f 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,5 @@
+ # My Robot
+
+ ロボットを動かすプログラムです。
++
++## 使い方
+\end{terminal}
+
+行頭の \cmd{+} は追加された行、\cmd{-} は削除された行を表しています。
+コミットする前に \cmd{git diff} で変更内容を見直す習慣をつけると、意図しない変更をコミットしてしまうのを防げます。
+
+確認できたら、先ほどと同じように \cmd{git add} と \cmd{git commit} を行います。
+\cmd{git add .} と書くと、カレントディレクトリの下にある、変更されたすべてのファイルをまとめて登録できます。
+
+\begin{terminal}[変更をまとめてコミットする]
+$ git add .
+$ git commit -m "Add usage section to README"
+\end{terminal}
+
+\subsection{履歴を見る}
+
+これまでのコミットの履歴は、\cmd{git log} で確認できます。
+\cmd{--oneline} を付けると、1 つのコミットを 1 行で簡潔に表示します。
+
+\begin{terminal}[コミットの履歴を見る]
+$ git log --oneline
+5d6e7f8 (HEAD -> main) Add usage section to README
+1a2b3c4 Add README
+\end{terminal}
+
+新しいコミットが上に表示されます。
+\cmd{HEAD} は、今の作業ディレクトリがどのコミットを元にしているかを表す目印です。
+
+\subsection{変更を取り消す}
+
+ファイルを編集したものの、やはり変更をなかったことにしたいときは、\cmd{git restore} で最後のコミットの状態に戻せます。
+ステージングエリアに登録した変更を取り消したい（ステージングエリアから外したい）ときは、\cmd{--staged} を付けます。
+
+\begin{terminal}[変更を取り消す]
+$ git restore README.md             # 編集した内容を捨てる
+$ git restore --staged README.md    # git add を取り消す
+\end{terminal}
+
+\begin{caution}[git restore で捨てた変更は戻らない]
+  \cmd{git restore ファイル名} を実行すると、コミットしていない編集内容は失われ、元に戻せません。
+  一方、一度コミットしたものは、後からいつでも取り出せます。
+  区切りのよいところで、こまめにコミットしておきましょう。
+\end{caution}
+
+\subsection{管理しないファイルを指定する}
+
+プログラムをビルドしたときにできるファイルや、ログファイル、Python の仮想環境（\ref{sec:python-venv}節）のように、Git で管理する必要のないファイルもあります。
+これらは、リポジトリの一番上に \cmd{.gitignore} というファイルを作って、名前やパターンを書いておくと、Git に無視させることができます。
+
+\begin{lstlisting}[caption={.gitignore の例}, label={lst:git-gitignore}]
+# ROS 2 のビルドで作られるディレクトリ
+build/
+install/
+log/
+
+# Python
+__pycache__/
+.venv/
+
+# ログやデータ
+*.log
+\end{lstlisting}
+
+\cmd{\#} で始まる行はコメントです。
+\cmd{*} などのワイルドカード（\ref{sec:files-wildcard}節）も使えます。
+
+\begin{point}[よいコミットのコツ]
+  \begin{itemize}
+    \item 1 つのコミットには、1 つのまとまった変更だけを入れる（「LiDAR の設定を追加」「速度の上限を変更」など）
+    \item コミットメッセージには、何を変えたのかが一目でわかる短い説明を書く
+    \item 動く状態でコミットする
+    \item パスワードや API キーなどの秘密の情報や、センサの記録データのような大きなファイルはコミットしない
+  \end{itemize}
+\end{point}
+
+\subsection{基本操作のまとめ}
+
+ここまでに紹介したコマンドを、表にまとめておきます。
+
+\begin{center}
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    コマンド & 動作 \\
+    \midrule
+    \cmd{git init} & リポジトリを作る \\
+    \cmd{git status} & 状態を確認する \\
+    \cmd{git add ファイル} & 変更をステージングエリアに登録する \\
+    \cmd{git commit -m "説明"} & コミットする \\
+    \cmd{git diff} & コミットしていない変更の差分を見る \\
+    \cmd{git log --oneline} & コミットの履歴を見る \\
+    \cmd{git restore ファイル} & 編集した内容を捨てる \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{column}{エディタから Git を使う}
+  VS Code（\ref{chap:editor}章）には Git の機能が組み込まれていて、変更されたファイルの一覧や差分を画面で見ながら、ボタン操作でコミットすることもできます。
+  ただし、画面の操作の裏側で実行されているのは、この章で学ぶコマンドと同じです。
+  まずはコマンドで Git のしくみを理解しておくと、エディタの画面の意味もよくわかるようになります。
+\end{column}
 
 \section{ブランチとマージ}
+\label{sec:git-branch}
 
-TODO
+\subsection{ブランチとは}
+
+新しい機能を試しているうちに、プログラムが動かなくなってしまうことがあります。
+ほかの人と共有しているプログラムでそれが起きると、みんなが困ってしまいます。
+そこで Git では、\textbf{ブランチ}（枝）を使って、元のプログラムに影響を与えずに、別の流れで作業を進めることができます（図\ref{fig:git-branch}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/git/branch}
+  \caption{ブランチとマージ}
+  \label{fig:git-branch}
+\end{figure}
+
+リポジトリを作ると、最初は \cmd{main} というブランチが 1 つだけあります。
+\cmd{main} ブランチは、常に動く状態に保っておくのが一般的です。
+新しい機能を作るときは、\cmd{main} から新しいブランチを作り、そこで作業します。
+うまくいったら、そのブランチの変更を \cmd{main} に取り込みます。
+これを\textbf{マージ}といいます。
+うまくいかなかったら、そのブランチを捨ててしまえば、\cmd{main} には何の影響も残りません。
+
+\subsection{ブランチを作って切り替える}
+
+\cmd{git switch -c ブランチ名} で、新しいブランチを作って切り替えます。
+\cmd{git branch} で、ブランチの一覧と、今いるブランチ（\cmd{*} が付いたもの）を確認できます。
+
+\begin{terminal}[ブランチを作って切り替える]
+$ git switch -c feature/lidar
+Switched to a new branch 'feature/lidar'
+$ git branch
+* feature/lidar
+  main
+\end{terminal}
+
+このブランチの上で、ファイルを作ったり編集したりしてコミットしてみましょう。
+
+\begin{terminal}[ブランチの上でコミットする]
+$ echo "lidar_port: /dev/ttyUSB0" > lidar.yaml
+$ git add lidar.yaml
+$ git commit -m "Add LiDAR config"
+\end{terminal}
+
+\cmd{git switch main} で \cmd{main} ブランチに戻ると、\cmd{lidar.yaml} は作業ディレクトリから消えます。
+\cmd{main} ブランチには、まだこのコミットが含まれていないからです。
+
+\begin{terminal}[main ブランチに戻る]
+$ git switch main
+$ ls
+README.md
+\end{terminal}
+
+\subsection{マージする}
+
+\cmd{feature/lidar} ブランチの変更を \cmd{main} に取り込むには、\cmd{main} ブランチにいる状態で \cmd{git merge} を実行します。
+
+\begin{terminal}[ブランチをマージする]
+$ git merge feature/lidar
+Updating 5d6e7f8..9a8b7c6
+Fast-forward
+ lidar.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 lidar.yaml
+$ ls
+README.md  lidar.yaml
+\end{terminal}
+
+マージが終わって不要になったブランチは、\cmd{git branch -d ブランチ名} で削除できます。
+
+\subsection{コンフリクト}
+
+2 つのブランチで同じファイルの同じ場所を別々に書き換えていると、Git はどちらの変更を採用すればよいか判断できません。
+これを\textbf{コンフリクト}（衝突）といいます。
+コンフリクトが起きると、Git はマージを途中で止めて、ファイルの中に両方の内容を書き込みます。
+
+\begin{terminal}[コンフリクトが起きたときのファイルの中身]
+<<<<<<< HEAD
+max_speed: 0.5
+=======
+max_speed: 1.0
+>>>>>>> feature/speed
+\end{terminal}
+
+\cmd{<<<<<<< HEAD} から \cmd{=======} までが今のブランチの内容、\cmd{=======} から \cmd{>>>>>>>} までがマージしようとしたブランチの内容です。
+エディタでこのファイルを開き、正しい内容になるように書き直して、\cmd{<<<<<<<} などの印の行も消します。
+その後、\cmd{git add} と \cmd{git commit} を行えば、マージが完了します。
+
+\begin{terminal}[コンフリクトを解決してマージを完了する]
+$ git add params.yaml
+$ git commit -m "Merge feature/speed"
+\end{terminal}
+
+コンフリクトは失敗ではなく、Git が「人間が判断してください」と教えてくれている状態です。
+落ち着いて、どちらの内容を残すべきかを考えましょう。
 
 \section{GitHub との連携}
+\label{sec:git-github}
 
-TODO
+\subsection{GitHub とは}
+
+\textbf{GitHub} は、Git のリポジトリをインターネット上で保管・共有するための Web サービスです。
+自分のリポジトリを置いてバックアップしたり、ほかのコンピュータと共有したり、チームで共同開発したりできます。
+また、Linux カーネルや ROS 2 をはじめ、世界中の多くの OSS が GitHub で開発されています（\ref{sec:linux-oss}節）。
+ROS 2 の本体も、\url{https://github.com/ros2} で公開されています。
+
+GitHub を使うには、\url{https://github.com} でアカウントを作成します。
+
+\begin{point}[Git と GitHub の違い]
+  Git はバージョン管理のためのソフトウェアで、自分のコンピュータの中だけでも使えます。
+  GitHub は、Git のリポジトリを置いておくためのインターネット上のサービスです。
+  Git のリポジトリを置けるサービスには、GitHub のほかに GitLab などもあります。
+\end{point}
+
+\subsection{GitHub にログインする}
+
+コマンドから GitHub を使うには、自分のアカウントであることを GitHub に証明する（認証する）必要があります。
+最も手軽なのは、GitHub の公式のコマンドラインツール \cmd{gh} を使う方法です。
+
+\begin{terminal}[gh を使って GitHub にログインする]
+$ sudo apt install gh
+$ gh auth login
+? Where do you use GitHub? GitHub.com
+? What is your preferred protocol for Git operations on this host? HTTPS
+? Authenticate Git with your GitHub credentials? Yes
+? How would you like to authenticate GitHub CLI? Login with a web browser
+...
+\end{terminal}
+
+質問にはそれぞれ矢印キーで選んで \key{Enter} を押して答えます。
+最後に表示されるコードを、自動で開く Web ブラウザの画面に入力すると、ログインが完了します。
+SSH の鍵（\ref{sec:network-ssh}節）を GitHub に登録して認証する方法もよく使われます。
+
+\subsection{リモートリポジトリに送る}
+
+GitHub の Web ページで、新しいリポジトリ（ここでは \cmd{my\_robot}）を作成します。
+作成したら、ローカルリポジトリにリモートリポジトリの場所を登録し、\cmd{git push} でコミットを送ります。
+
+\begin{terminal}[GitHub のリポジトリにコミットを送る]
+$ git remote add origin https://github.com/<ユーザ名>/my_robot.git
+$ git push -u origin main
+...
+To https://github.com/<ユーザ名>/my_robot.git
+ * [new branch]      main -> main
+\end{terminal}
+
+\cmd{origin} は、リモートリポジトリに付ける名前で、慣例として \cmd{origin} が使われます。
+\cmd{-u} は、今後は \cmd{git push} だけで \cmd{origin} の \cmd{main} に送れるようにするオプションで、最初の 1 回だけ付けます。
+GitHub のリポジトリのページを開くと、\cmd{README.md} などが表示されているはずです。
+
+\subsection{リポジトリをコピーする・変更を取り込む}
+
+GitHub にあるリポジトリを自分のコンピュータにコピーするには、\cmd{git clone} を使います。
+ほかの人が公開しているロボットのプログラムを使うときや、別のコンピュータ（ロボットの PC など）で同じリポジトリを使うときに使います。
+
+\begin{terminal}[リポジトリをコピーする]
+$ git clone https://github.com/<ユーザ名>/my_robot.git
+$ cd my_robot
+\end{terminal}
+
+リモートリポジトリに、ほかの人（または別のコンピュータの自分）が送った新しいコミットがあるときは、\cmd{git pull} で取り込みます。
+
+\begin{terminal}[リモートリポジトリの変更を取り込む]
+$ git pull
+\end{terminal}
+
+\subsection{Pull Request}
+
+チームで開発するときや、ほかの人の OSS に貢献するときには、\textbf{Pull Request}（プルリクエスト、略して PR）という GitHub の機能を使います。
+Pull Request は、「自分のブランチの変更を、\cmd{main} に取り込んでください」とお願いするための機能です。
+
+\begin{enumerate}
+  \item 作業用のブランチを作り、変更をコミットする
+  \item \cmd{git push -u origin ブランチ名} で、ブランチを GitHub に送る
+  \item GitHub の Web ページで、そのブランチから Pull Request を作成し、変更の内容や目的を説明する
+  \item チームのメンバーが変更の内容を確認し（\textbf{レビュー}）、コメントを付ける
+  \item 指摘があれば修正してコミットし、同じブランチに push する（Pull Request にも自動で反映される）
+  \item 問題がなければ、GitHub の画面で \cmd{main} にマージする
+\end{enumerate}
+
+また、GitHub には、不具合の報告や改善の提案を書き込む \textbf{Issue} という機能もあります。
+OSS を使っていて不具合を見つけたら、Issue で報告したり、修正を Pull Request で提案したりすることで、OSS の開発に貢献できます（\ref{sec:linux-oss}節）。
 
 \section{チーム開発のワークフロー}
+\label{sec:git-workflow}
 
-TODO
+\subsection{GitHub Flow}
+
+複数人で開発するときは、ブランチや Pull Request をどのように使うかをあらかじめ決めておきます。
+代表的な進め方が \textbf{GitHub Flow} と呼ばれるもので、次のようなシンプルなルールで運用します。
+
+\begin{enumerate}
+  \item \cmd{main} ブランチは、常に動く状態に保つ
+  \item 作業を始めるときは、最新の \cmd{main} から、作業ごとにブランチを作る（\cmd{feature/lidar}, \cmd{fix/speed-limit} など）
+  \item 作業用のブランチで、こまめにコミットし、GitHub に push する
+  \item 作業が終わったら Pull Request を作り、ほかのメンバーにレビューしてもらう
+  \item レビューで問題がなければ \cmd{main} にマージし、作業用のブランチは削除する
+\end{enumerate}
+
+\begin{terminal}[作業を始めるときの手順]
+$ git switch main
+$ git pull
+$ git switch -c feature/lidar
+\end{terminal}
+
+作業を始める前に \cmd{git pull} で \cmd{main} を最新にしておくと、ほかの人の変更とのコンフリクトが起きにくくなります。
+
+\subsection{チームで開発するときのルール}
+
+\begin{itemize}
+  \item 1 つの Pull Request は小さく保つ。大きな変更は、レビューが難しく、コンフリクトも起きやすくなる
+  \item 同じファイルを複数人が同時に大きく書き換えないように、担当を決める（Issue で作業を宣言するのも有効）
+  \item コミットメッセージや Pull Request の説明は、ほかの人が読んでわかるように書く
+  \item \cmd{main} に直接コミットしない
+\end{itemize}
+
+実は本書の原稿も、GitHub のリポジトリで管理され、同じような流れで執筆されています。
+
+\begin{caution}[\cmd{git push --force} は使わない]
+  インターネット上の資料には、push がうまくいかないときに \cmd{git push --force} で強制的に送る方法が書かれていることがあります。
+  このコマンドは、リモートリポジトリにあるほかの人のコミットを消してしまうおそれがあります。
+  push が拒否されたときは、まず \cmd{git pull} でリモートの変更を取り込んでから、もう一度 push しましょう。
+\end{caution}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item Git は、ファイルの変更の歴史を記録するバージョン管理システムです。変更は \cmd{git add} でステージングエリアに登録し、\cmd{git commit} でリポジトリに記録します。
+  \item \cmd{git status} で状態を、\cmd{git diff} で差分を、\cmd{git log} で履歴を確認します。管理しないファイルは \cmd{.gitignore} に書きます。
+  \item ブランチを使うと、\cmd{main} に影響を与えずに新しい作業を進められます。作業が終わったら \cmd{main} にマージします。
+  \item GitHub は Git のリポジトリをインターネット上で共有するサービスです。\cmd{git push}, \cmd{git pull}, \cmd{git clone} でやり取りし、Pull Request でレビューを受けてからマージします。
+  \item チームでは、\cmd{main} を常に動く状態に保ち、作業ごとにブランチを作って Pull Request で取り込む、という流れで開発します。
+\end{itemize}

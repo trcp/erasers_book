@@ -1,0 +1,15 @@
+% 図：Git の 4 つの領域とコマンド（chapters/tools/git.tex）
+\begin{tikzpicture}[area/.style={figbox, minimum width=19mm, minimum height=13mm, font=\footnotesize}]
+  \node[area] (work) at (0,0) {作業\\ディレクトリ};
+  \node[area, fill=green!6] (stage) at (2.9,0) {ステージング\\エリア};
+  \node[area, fill=blue!6] (local) at (5.8,0) {ローカル\\リポジトリ};
+  \node[area, fill=orange!10] (remote) at (8.7,0) {リモート\\リポジトリ\\（GitHub）};
+  \draw[figarrow] (work.east) -- node[figlabel, above]{\texttt{add}} (stage.west);
+  \draw[figarrow] (stage.east) -- node[figlabel, above]{\texttt{commit}} (local.west);
+  \draw[figarrow] (local.east) -- node[figlabel, above]{\texttt{push}} (remote.west);
+  \draw[figarrow] (remote.north) -- ++(0,0.5) -| node[figlabel, pos=0.25, above]{\texttt{clone}（最初に丸ごとコピー）} (work.north);
+  \draw[figarrow] (remote.south) -- ++(0,-1.2) -| node[figlabel, pos=0.25, below]{\texttt{pull}（変更を取り込み、作業ディレクトリにも反映）} (work.south);
+  % 自分のコンピュータの範囲
+  \draw[black!40, thick] ([xshift=-1mm,yshift=-2mm]work.south west) -- ++(0,-1.5mm) -| ([xshift=1mm,yshift=-2mm]local.south east);
+  \node[figlabel, text=black!60, fill=white, inner sep=1pt] at ([yshift=-3.5mm]stage.south) {自分のコンピュータの中};
+\end{tikzpicture}

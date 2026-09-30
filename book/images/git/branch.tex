@@ -1,0 +1,20 @@
+% 図：ブランチとマージ（chapters/tools/git.tex）
+\begin{tikzpicture}[commit/.style={circle, draw, thick, minimum size=4.5mm, inner sep=0pt, font=\scriptsize}]
+  % main
+  \node[commit, fill=blue!15] (a) at (0,0) {A};
+  \node[commit, fill=blue!15] (b) at (1.5,0) {B};
+  \node[commit, fill=blue!15] (e) at (4.5,0) {E};
+  \node[commit, fill=blue!30, very thick] (m) at (7.5,0) {M};
+  \draw[thick, blue!60!black] (a) -- (b) -- (e) -- (m);
+  \node[anchor=east, font=\small\ttfamily, text=blue!60!black] at (-0.4,0) {main};
+  % feature
+  \node[commit, fill=orange!20] (c) at (3.0,-1.2) {C};
+  \node[commit, fill=orange!20] (d) at (6.0,-1.2) {D};
+  \draw[thick, orange!70!black] (b) -- (c) -- (d) -- (m);
+  \node[anchor=east, font=\small\ttfamily, text=orange!70!black] at (2.6,-1.2) {feature/lidar};
+  % 説明
+  \node[figlabel, above=1mm of b] {ブランチを作る};
+  \node[figlabel, above=1mm of m] {マージ};
+  \node[figlabel, below=1mm of d, text=black!60] {新しい機能を試す};
+  \node[figlabel, above=1mm of e, text=black!60] {main でも作業が進む};
+\end{tikzpicture}
