@@ -1,0 +1,12 @@
+% 図：apt によるソフトウェアのインストールの流れ（chapters/tools/package.tex）
+\begin{tikzpicture}
+  \node[figpart, minimum width=30mm, minimum height=16mm, fill=orange!10] (repo) at (0,0)
+    {\textbf{リポジトリ}\\{\footnotesize インターネット上の}\\{\footnotesize パッケージの置き場}};
+  \node[figbox, minimum width=34mm, minimum height=24mm, fill=black!3, anchor=west] (pc) at (4.0,0) {};
+  \node[font=\small\bfseries, anchor=north west] at (pc.north west) {自分のコンピュータ};
+  \node[figbox, minimum width=28mm, font=\footnotesize] (list) at (5.7,0.35) {パッケージの一覧};
+  \node[figbox, minimum width=28mm, font=\footnotesize, fill=blue!6] (sys) at (5.7,-0.75) {インストール済みの\\ソフトウェア};
+  \draw[figarrow] ([yshift=4mm]repo.east) -- node[figlabel, above, pos=0.4]{\tikz\node[fignum]{1}; \texttt{apt update}} (list.west);
+  \draw[figarrow] ([yshift=-4mm]repo.east) -- node[figlabel, below, pos=0.4]{\tikz\node[fignum]{2}; \texttt{apt install}} (sys.west);
+  \node[figlabel, text=black!60, anchor=north] at (2.9,-1.6) {必要なパッケージ（依存関係）も自動でダウンロードしてインストール};
+\end{tikzpicture}

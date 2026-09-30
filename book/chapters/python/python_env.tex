@@ -1,0 +1,320 @@
+\chapter{Python の開発環境}
+\label{chap:python_env}
+
+% この章で学ぶこと
+\begin{goalbox}
+  \begin{itemize}
+    \item 対話モードとスクリプトファイルによる、Python のプログラムの実行方法
+    \item pip を使った外部パッケージのインストール
+    \item venv による仮想環境の作り方と使い方
+    \item Ubuntu 24.04 で Python のパッケージを扱うときの注意点（PEP 668）と、ROS 2 との付き合い方
+  \end{itemize}
+\end{goalbox}
+
+\ref{chap:what_is_python}章では、Python がどのような言語なのかを学びました。
+この章では、Python のプログラムを実際に動かすための環境を整えます。
+
+\section{プログラムの実行方法}
+\label{sec:python-run}
+
+Python のプログラムを実行する方法には、大きく分けて、対話モードで 1 行ずつ実行する方法と、スクリプトファイルに書いてまとめて実行する方法があります。
+
+\subsection{\cmd{python3} コマンド}
+
+Ubuntu 24.04 には Python 3 が最初からインストールされていて、\cmd{python3} というコマンドで実行できます。
+
+\begin{terminal}[Python のバージョンを確認する]
+$ python3 --version
+Python 3.12.3
+\end{terminal}
+
+\begin{caution}[\cmd{python} ではなく \cmd{python3}]
+  Ubuntu 24.04 では、\cmd{python} というコマンドは標準では用意されていません。
+  インターネット上の資料に \cmd{python hello.py} と書かれていても、\cmd{python3 hello.py} と読み替えてください。
+  どうしても \cmd{python} で実行したい場合は、\cmd{sudo apt install python-is-python3} で \cmd{python} を \cmd{python3} の別名として使えるようになります。
+\end{caution}
+
+\subsection{対話モード}
+
+\cmd{python3} を引数なしで実行すると、\textbf{対話モード}（インタラクティブモード）が始まります。
+\cmd{>>>} というプロンプトが表示され、Python の文を 1 行入力するたびに、その場で実行して結果を表示してくれます。
+
+\begin{terminal}[対話モードで Python を使う]
+$ python3
+Python 3.12.3 (main, ...) [GCC 13.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> 1 + 2
+3
+>>> print("Hello, World!")
+Hello, World!
+>>> exit()
+\end{terminal}
+
+対話モードを終了するには、\cmd{exit()} と入力するか、\key{Ctrl}+\key{D} を押します。
+対話モードは、ちょっとした計算をしたり、書き方を忘れた命令の動きを確かめたりするのに便利です。
+第IV部の例の中で \cmd{>>>} から始まっているものは、対話モードで実行した例です。
+
+\subsection{スクリプトファイル}
+
+何行にもわたるプログラムは、テキストファイルに書いて保存し、まとめて実行します。
+このファイルを\textbf{スクリプト}といい、拡張子は \cmd{.py} にするのが決まりです。
+エディタ（\ref{chap:editor}章）で次の内容を書き、\cmd{hello.py} という名前で保存してみましょう。
+
+\begin{lstlisting}[style=python, caption={はじめてのスクリプト（hello.py）}, label={lst:python-env-hello}]
+name = "robot"
+print("Hello, " + name + "!")
+\end{lstlisting}
+
+保存したら、\cmd{python3} の引数にファイル名を指定して実行します。
+
+\begin{terminal}[スクリプトを実行する]
+$ python3 hello.py
+Hello, robot!
+\end{terminal}
+
+\subsection{スクリプトを直接実行できるようにする}
+
+スクリプトの 1 行目に次のような行を書いておくと、シェルスクリプト（\ref{chap:shellscript}章）と同じように、ファイルを直接実行できるようになります。
+この行を \textbf{shebang}（シバン）といい、「このファイルは \cmd{python3} で実行する」ということをシェルに伝えます。
+
+\begin{lstlisting}[style=python, caption={shebang を付けたスクリプト（hello.py）}, label={lst:python-env-shebang}]
+#!/usr/bin/env python3
+name = "robot"
+print("Hello, " + name + "!")
+\end{lstlisting}
+
+ファイルに実行権限を付ければ（\ref{chap:permission}章）、\cmd{./hello.py} で実行できます。
+
+\begin{terminal}[スクリプトを直接実行する]
+$ chmod +x hello.py
+$ ./hello.py
+Hello, robot!
+\end{terminal}
+
+ROS 2 のノードとして書く Python のファイルにも、この shebang を付けるのが一般的です。
+
+\section{pip によるパッケージのインストール}
+\label{sec:python-pip}
+
+\subsection{パッケージと PyPI}
+
+Python には、標準でさまざまな機能（\textbf{標準ライブラリ}）が付属していますが、それ以外にも、世界中の開発者が作った便利なプログラムの部品が数多く公開されています。
+これらを\textbf{パッケージ}といい、多くは \textbf{PyPI}（Python Package Index、パイピーアイ）という Web サイトで公開されています。
+数値計算の NumPy、画像処理の OpenCV（パッケージ名は \cmd{opencv-python}）、機械学習の PyTorch（パッケージ名は \cmd{torch}）なども、PyPI からインストールできます。
+
+\subsection{pip の基本的な使い方}
+
+PyPI のパッケージをインストールするには、\textbf{pip} というコマンドを使います。
+Ubuntu 24.04 では pip は標準でインストールされていないので、次のようにインストールします。
+あわせて、次の節で使う仮想環境の機能もインストールしておきましょう。
+
+\begin{terminal}[pip と venv をインストールする]
+$ sudo apt install python3-pip python3-venv
+\end{terminal}
+
+pip のよく使うコマンドは、次のとおりです。
+
+\begin{center}
+  \begin{tabular}{p{0.5\linewidth}p{0.42\linewidth}}
+    \toprule
+    コマンド & 動作 \\
+    \midrule
+    \cmd{pip install パッケージ名} & パッケージをインストールする \\
+    \cmd{pip install パッケージ名==1.2.3} & バージョンを指定してインストールする \\
+    \cmd{pip uninstall パッケージ名} & パッケージを削除する \\
+    \cmd{pip list} & インストールされているパッケージの一覧を表示する \\
+    \cmd{pip show パッケージ名} & パッケージの詳しい情報を表示する \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{caution}[Ubuntu 24.04 では仮想環境の中で使う]
+  Ubuntu 24.04 では、仮想環境の外で \cmd{pip install} を実行すると、\cmd{externally-managed-environment} というエラーになり、パッケージをインストールできません。
+  これは故障ではなく、システムを守るための意図的な制限です（\ref{sec:python-pep668}節）。
+  pip は、次の節で説明する仮想環境の中で使うのが基本です。
+\end{caution}
+
+\subsection{使っているパッケージを記録する}
+
+プログラムがどのパッケージのどのバージョンを使っているかを記録しておくと、別のコンピュータでも同じ環境を再現できます。
+\cmd{pip freeze} でインストールされているパッケージとバージョンの一覧を出力し、\cmd{requirements.txt} という名前のファイルに保存するのが慣例です（\cmd{>} については\ref{chap:text_pipe}章で説明します）。
+
+\begin{terminal}[パッケージを記録して再現する]
+$ pip freeze > requirements.txt
+$ cat requirements.txt
+numpy==2.1.1
+$ pip install -r requirements.txt
+\end{terminal}
+
+\section{venv による仮想環境}
+\label{sec:python-venv}
+
+\subsection{仮想環境とは}
+
+複数のプログラムを開発していると、「プログラム A では NumPy の新しい版を使いたいが、古いプログラム B は古い版でないと動かない」といった問題が起こります。
+1 つの Python に 1 つのバージョンのパッケージしか入れられないと、この問題は解決できません。
+
+そこで使うのが\textbf{仮想環境}です。
+仮想環境は、Python のパッケージを入れるための独立した場所を、プロジェクトごとに作るしくみです（図\ref{fig:python-env-venv}）。
+仮想環境の中で \cmd{pip install} したパッケージは、その仮想環境の中だけで使われ、システムやほかの仮想環境には影響しません。
+Python には、仮想環境を作るための \textbf{venv} という機能が標準で用意されています。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/python_env/venv}
+  \caption{システムの Python と仮想環境の関係}
+  \label{fig:python-env-venv}
+\end{figure}
+
+\subsection{仮想環境を作る}
+
+仮想環境は、\cmd{python3 -m venv 仮想環境のディレクトリ名} で作ります。
+プロジェクトのディレクトリの中に \cmd{.venv} という名前で作るのが一般的です。
+
+\begin{terminal}[仮想環境を作る]
+$ mkdir ~/py_practice
+$ cd ~/py_practice
+$ python3 -m venv .venv
+$ ls -a
+.  ..  .venv
+\end{terminal}
+
+\cmd{.venv} ディレクトリの中に、この仮想環境専用の \cmd{python3} や \cmd{pip}、パッケージを入れる場所が作られます。
+
+\subsection{仮想環境を有効にする}
+
+作った仮想環境を使うには、\cmd{source} コマンド（\ref{chap:env}章）で仮想環境を\textbf{有効化}（activate）します。
+有効化すると、プロンプトの先頭に仮想環境の名前が表示されます。
+
+\begin{terminal}[仮想環境を有効にする]
+$ source .venv/bin/activate
+(.venv) user@robot:~/py_practice$
+\end{terminal}
+
+この状態で \cmd{python3} や \cmd{pip} を実行すると、仮想環境の中のものが使われます。
+\cmd{which} コマンド（\ref{sec:terminal-relation}節）で確かめてみましょう。
+
+\begin{terminal}[仮想環境の python3 を確かめる]
+$ which python3
+/home/user/py_practice/.venv/bin/python3
+\end{terminal}
+
+仮想環境の中であれば、\cmd{pip install} でパッケージをインストールできます。
+
+\begin{terminal}[仮想環境でパッケージを入れる]
+$ pip install numpy
+Collecting numpy
+...
+Successfully installed numpy-2.1.1
+$ python3 -c "import numpy; print(numpy.__version__)"
+2.1.1
+\end{terminal}
+
+\cmd{python3 -c} は、後ろに書いた Python の文を実行するオプションです。
+ここでは、NumPy が読み込めることと、そのバージョンを確かめています。
+
+\subsection{仮想環境を終了する}
+
+仮想環境を終了するには、\cmd{deactivate} と入力します。
+プロンプトの先頭の \cmd{(.venv)} が消え、システムの Python に戻ります。
+
+\begin{terminal}[仮想環境を終了する]
+$ deactivate
+user@robot:~/py_practice$
+\end{terminal}
+
+仮想環境は、ターミナルを開くたびに有効化し直す必要があります。
+いらなくなった仮想環境は、ディレクトリごと削除すれば消えます（\cmd{rm -r .venv}）。
+
+\begin{point}[仮想環境の使い方のまとめ]
+  \begin{itemize}
+    \item 作る：\cmd{python3 -m venv .venv}（プロジェクトごとに 1 回）
+    \item 有効にする：\cmd{source .venv/bin/activate}（ターミナルを開くたびに）
+    \item パッケージを入れる：\cmd{pip install パッケージ名}
+    \item 終了する：\cmd{deactivate}
+  \end{itemize}
+  \cmd{.venv} ディレクトリはコンピュータごとに作り直すものなので、Git で管理するときは含めないようにします（\ref{chap:git}章）。
+  代わりに \cmd{requirements.txt} を管理しておきましょう。
+\end{point}
+
+\begin{column}{venv 以外の開発ツール：uv・pixi・Anaconda}
+  仮想環境やパッケージを管理するツールは、venv と pip のほかにもあります。
+
+  \textbf{uv}：
+  近年、急速に利用者を増やしているツールです。
+  Rust という高速な言語で作られていて、開発元によれば pip の 10〜100 倍の速さでパッケージをインストールできます。
+  仮想環境の作成（\cmd{uv venv}）、パッケージのインストール（\cmd{uv pip install}）、Python 本体のバージョンの切り替えまで、1 つのコマンドでこなせます。
+
+  \textbf{pixi}：
+  conda 形式のパッケージを扱う、uv と同じく Rust 製の高速なツールです。
+  C/C++ のライブラリなど Python 以外のソフトウェアもまとめて管理でき、RoboStack というプロジェクトと組み合わせると、apt を使わずに ROS 2 の環境を作ることもできます。
+
+  \textbf{Anaconda}：
+  データ分析や機械学習の分野で古くから使われている、よく使うライブラリをまとめた Python の配布パッケージです。
+  容量が大きく、組織で使う場合は有料のライセンスが必要になることがあります。
+
+  uv は venv や pip とほぼ同じ感覚で使えるので、慣れてきたら試してみるとよいでしょう。
+\end{column}
+
+\section{Ubuntu 24.04 での注意点（PEP 668）}
+\label{sec:python-pep668}
+
+\subsection{\cmd{externally-managed-environment} エラー}
+
+Ubuntu 24.04 で、仮想環境の外から \cmd{pip install} を実行すると、次のようなエラーが表示されます。
+
+\begin{terminal}[仮想環境の外で pip install する]
+$ pip install numpy
+error: externally-managed-environment
+...
+\end{terminal}
+
+これは、\textbf{PEP 668} という Python の取り決めに基づいた制限です\footnote{PEP（Python Enhancement Proposal）は、Python の機能や決まりごとを提案・記録するための文書で、番号で呼ばれます。}。
+Ubuntu のシステムには、OS の一部として動いている Python のプログラムがたくさんあり、それらは \cmd{apt} で管理されたパッケージを使っています。
+pip でシステムの Python のパッケージを書き換えてしまうと、\cmd{apt} で管理しているパッケージと食い違いが起きて、システムのツールが動かなくなるおそれがあります。
+そこで、システムの Python は \cmd{apt} に管理を任せ、pip は仮想環境の中で使う、という役割分担が決められました。
+
+\subsection{パッケージを入れる方法の選び方}
+
+Ubuntu 24.04 で Python のパッケージを使いたいときは、次のように選びます。
+
+\begin{enumerate}
+  \item \textbf{apt で入れる}：
+    よく使われるパッケージの多くは、\cmd{python3-} で始まる名前で Ubuntu のパッケージとしても提供されています（例：\cmd{sudo apt install python3-numpy}）。
+    システム全体で使え、ROS 2 のノードからもそのまま使えます。
+    ただし、バージョンは少し古いことがあります。
+  \item \textbf{仮想環境の中で pip で入れる}：
+    apt にないパッケージや、新しいバージョンが必要なパッケージは、仮想環境を作って pip で入れます（\ref{sec:python-venv}節）。
+  \item \textbf{pipx で入れる}：
+    Python で書かれた「コマンドとして使うツール」をインストールしたいときは、\cmd{pipx} を使うと、ツールごとに自動で仮想環境を作ってインストールしてくれます（\cmd{sudo apt install pipx}）。
+\end{enumerate}
+
+\begin{caution}[\cmd{--break-system-packages} は使わない]
+  エラーメッセージを検索すると、\cmd{pip install} に \cmd{--break-system-packages} というオプションを付けて制限を無視する方法が見つかります。
+  名前のとおり「システムのパッケージを壊す」おそれがあるオプションなので、使わないようにしましょう。
+  同じ理由で、\cmd{sudo pip install} も使ってはいけません。
+\end{caution}
+
+\subsection{ROS 2 と Python のパッケージ}
+
+ROS 2 の Python のライブラリ（\cmd{rclpy} など）は、apt でシステムの Python にインストールされます（\ref{chap:ros2_install}章）。
+ROS 2 のノードが使うパッケージも、できるだけ apt で入れるのが基本です。
+ROS 2 には、パッケージが必要とするものを apt でまとめてインストールしてくれる \cmd{rosdep} というツールも用意されています（\ref{chap:workspace}章）。
+
+仮想環境の中から ROS 2 を使うこともできますが、その場合は、仮想環境を作るときに \cmd{--system-site-packages} オプションを付けて、システムにインストールされた \cmd{rclpy} なども見えるようにする必要があります。
+
+\begin{terminal}[システムのパッケージも使う仮想環境]
+$ python3 -m venv --system-site-packages .venv
+\end{terminal}
+
+ROS 2 と仮想環境を組み合わせるとトラブルの原因にもなりやすいので、本書では、ROS 2 のノードで使うパッケージは apt で入れることにします。
+
+\section*{この章のまとめ}
+
+\begin{itemize}
+  \item Ubuntu 24.04 では、Python 3 を \cmd{python3} コマンドで実行します。対話モードで 1 行ずつ試すことも、スクリプトファイルにまとめて実行することもできます。
+  \item スクリプトの 1 行目に shebang（\cmd{\#!/usr/bin/env python3}）を書き、実行権限を付けると、ファイルを直接実行できます。
+  \item PyPI で公開されているパッケージは、pip でインストールします。使っているパッケージは \cmd{requirements.txt} に記録しておきます。
+  \item venv で仮想環境を作ると、プロジェクトごとに独立したパッケージの環境を用意できます。
+  \item Ubuntu 24.04 では PEP 668 により、仮想環境の外では pip でパッケージを入れられません。システムで使うパッケージは apt で、それ以外は仮想環境の中で pip で入れます。ROS 2 のノードで使うパッケージは apt で入れるのが基本です。
+\end{itemize}

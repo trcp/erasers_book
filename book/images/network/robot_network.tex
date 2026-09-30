@@ -1,0 +1,10 @@
+% 図：開発用 PC とロボットのネットワーク構成（chapters/tools/network.tex）
+\begin{tikzpicture}
+  \node[figpart, minimum width=26mm, minimum height=14mm] (pc) at (0,0) {\textbf{開発用 PC}\\{\footnotesize\ttfamily 192.168.1.10}\\{\footnotesize\ttfamily dev-pc}};
+  \node[figbox, minimum width=22mm, minimum height=10mm, fill=black!6] (router) at (4.0,0) {Wi-Fi ルータ\\{\footnotesize\ttfamily 192.168.1.1}};
+  \node[figpart, minimum width=26mm, minimum height=14mm, fill=orange!10] (robot) at (8.0,0) {\textbf{ロボットの PC}\\{\footnotesize\ttfamily 192.168.1.20}\\{\footnotesize\ttfamily robot}};
+  \draw[thick, dashed] (pc) -- node[figlabel, above]{Wi-Fi} (router);
+  \draw[thick, dashed] (router) -- node[figlabel, above]{Wi-Fi} (robot);
+  \draw[figarrow, {Stealth[length=2mm]}-{Stealth[length=2mm]}, blue!60!black] (pc.south) -- ++(0,-0.7) -| node[figlabel, pos=0.25, below, text=blue!60!black]{SSH でログイン・ファイル転送・ROS 2 の通信} (robot.south);
+  \draw[thick, black!40] (router.north) -- ++(0,0.6) node[above, figlabel, text=black!60]{インターネット};
+\end{tikzpicture}

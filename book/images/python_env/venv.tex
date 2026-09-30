@@ -1,0 +1,22 @@
+% 図：システムの Python と仮想環境の関係（chapters/python/python_env.tex）
+\begin{tikzpicture}
+  % システムの Python
+  \node[figpart, minimum width=96mm, minimum height=15mm, anchor=north west, fill=blue!10] (sys) at (0,0) {};
+  \node[font=\small\bfseries, anchor=north west] at (sys.north west) {システムの Python（\texttt{/usr/bin/python3}）};
+  \node[figlabel, anchor=south west, align=left] at ([xshift=1.5mm,yshift=1.5mm]sys.south west)
+    {apt で入れたパッケージ（\texttt{python3-numpy} など）、ROS 2 の \texttt{rclpy} など\\
+     {\color{red!60!black} \texttt{pip} で直接パッケージを入れることはできない（PEP 668）}};
+  % 仮想環境
+  % 仮想環境（3 つの例）
+  \node[figbox, minimum width=29mm, minimum height=19mm, anchor=north west, fill=green!6] (v) at (0,-2.1) {};
+  \node[font=\footnotesize\bfseries, anchor=north west] at (v.north west) {\texttt{robot\_ai}};
+  \node[figlabel, anchor=north west, align=left] at ([xshift=1.5mm,yshift=-5mm]v.north west) {\ttfamily torch\\\ttfamily opencv-python};
+  \node[figbox, minimum width=29mm, minimum height=19mm, anchor=north west, fill=green!6] (v) at (3.3,-2.1) {};
+  \node[font=\footnotesize\bfseries, anchor=north west] at (v.north west) {\texttt{web\_tool}};
+  \node[figlabel, anchor=north west, align=left] at ([xshift=1.5mm,yshift=-5mm]v.north west) {\ttfamily flask\\\ttfamily requests};
+  \node[figbox, minimum width=29mm, minimum height=19mm, anchor=north west, fill=green!6] (v) at (6.6,-2.1) {};
+  \node[font=\footnotesize\bfseries, anchor=north west] at (v.north west) {\texttt{old\_project}};
+  \node[figlabel, anchor=north west, align=left] at ([xshift=1.5mm,yshift=-5mm]v.north west) {\ttfamily numpy\\\rmfamily （古い版）};
+  \node[figlabel, text=black!60] at (4.8,-4.55) {仮想環境ごとに、別々のパッケージやバージョンを入れられる};
+  \draw[figarrow, dashed, black!50] (4.8,-1.55) -- node[figlabel, right, text=black!60]{Python 本体を共有} (4.8,-2.05);
+\end{tikzpicture}

@@ -1,0 +1,13 @@
+% 図：ディストリビューションの構成（chapters/linux/what_is_linux.tex）
+\begin{tikzpicture}
+  \node[figpart, minimum width=62mm, fill=blue!18] (kernel) at (0,0) {\textbf{Linux カーネル}};
+  \node[figbox, minimum width=62mm, fill=blue!6, above=2mm of kernel] (gnu) {GNU のコマンド・ライブラリ};
+  \node[figbox, minimum width=30mm, fill=green!6, above=2mm of gnu.north west, anchor=south west] (desk) {デスクトップ環境\\{\footnotesize（GNOME など）}};
+  \node[figbox, minimum width=30mm, fill=green!6, above=2mm of gnu.north east, anchor=south east] (apps) {アプリケーション\\{\footnotesize（ブラウザなど）}};
+  \node[figbox, minimum width=24mm, fill=orange!8, right=3mm of kernel.south east, anchor=south west, minimum height=12mm] (pkg) {パッケージ\\管理システム\\{\footnotesize（apt など）}};
+  \node[figbox, minimum width=24mm, fill=orange!8, above=2mm of pkg, minimum height=12mm] (inst) {インストーラ};
+  \begin{scope}[on background layer]
+    \node[draw, thick, rounded corners=4pt, fill=black!3, inner sep=4mm,
+      fit=(kernel)(gnu)(desk)(apps)(pkg)(inst), label={[font=\small\bfseries]above:ディストリビューション（Ubuntu など）}] {};
+  \end{scope}
+\end{tikzpicture}

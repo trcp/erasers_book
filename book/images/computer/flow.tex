@@ -1,0 +1,21 @@
+% 図：プログラムが実行されるときのデータの流れ（chapters/linux/computer.tex）
+\begin{tikzpicture}[node distance=1.2cm]
+  \node[figpart, minimum width=22mm] (mem) at (3.7,0) {\textbf{メモリ}};
+  \node[figpart, minimum width=22mm] (cpu) at (3.7,2.2) {\textbf{CPU}};
+  \node[figpart, minimum width=22mm] (sto) at (-0.4,0) {\textbf{ストレージ}};
+  \node[figpart, minimum width=22mm] (gpu) at (7.8,0) {\textbf{GPU}\\{\footnotesize（VRAM）}};
+  \node[figbox, minimum width=22mm] (cam) at (3.7,-2.2) {カメラ};
+  \node[figbox, minimum width=22mm] (out) at (7.8,2.2) {ディスプレイ\\モータ};
+  % (1) 読み込み / (6) 保存
+  \draw[figarrow] ([yshift=2mm]sto.east) -- node[figlabel, above]{\tikz\node[fignum]{1}; 読み込み} ([yshift=2mm]mem.west);
+  \draw[figarrow] ([yshift=-2mm]mem.west) -- node[figlabel, below]{\tikz\node[fignum]{6}; 保存} ([yshift=-2mm]sto.east);
+  % (2) 命令の実行
+  \draw[figarrow, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (mem.north) -- node[figlabel, right]{\tikz\node[fignum]{2}; 命令・データ} (cpu.south);
+  % (3) 画像の入力
+  \draw[figarrow] (cam.north) -- node[figlabel, left]{\tikz\node[fignum]{3}; 画像} (mem.south);
+  % (4) GPU に計算を任せる
+  \draw[figarrow] ([yshift=2mm]mem.east) -- node[figlabel, above]{\tikz\node[fignum]{4}; 計算} ([yshift=2mm]gpu.west);
+  \draw[figarrow] ([yshift=-2mm]gpu.west) -- node[figlabel, below]{結果} ([yshift=-2mm]mem.east);
+  % (5) 出力
+  \draw[figarrow] (cpu.east) -- node[figlabel, above]{\tikz\node[fignum]{5}; 出力} (out.west);
+\end{tikzpicture}

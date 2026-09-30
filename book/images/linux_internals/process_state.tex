@@ -1,0 +1,16 @@
+% 図：プロセスの状態遷移（chapters/linux/linux_internals.tex）
+\begin{tikzpicture}[
+    >=Stealth, node distance=24mm and 30mm, on grid, auto,
+    every state/.style={draw, rounded corners, rectangle, fill=blue!6,
+      minimum width=16mm, minimum height=8mm, font=\small}]
+  \node[state, initial, initial text={\footnotesize 起動}] (ready) {実行可能};
+  \node[state, right=of ready]           (run)   {実行中};
+  \node[state, below right=24mm and 15mm of ready] (wait) {待機中};
+  \node[state, accepting, right=of run]  (done)  {終了};
+  \path[->, thick]
+    (ready) edge[bend left=30] node[font=\footnotesize]{CPU を割り当て} (run)
+    (run)   edge[bend left=30] node[font=\footnotesize]{時間切れ} (ready)
+    (run)   edge               node[font=\footnotesize, align=left]{入出力待ち} (wait)
+    (wait)  edge               node[font=\footnotesize, align=right]{入出力完了} (ready)
+    (run)   edge               node[font=\footnotesize]{終了} (done);
+\end{tikzpicture}

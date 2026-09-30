@@ -1,0 +1,15 @@
+% 図：ロボットに載っているコンピュータの構成例（chapters/linux/computer.tex）
+\begin{tikzpicture}
+  \node[figbox, minimum width=17mm] (cam) at (0,0.8) {カメラ};
+  \node[figbox, minimum width=17mm] (lidar) at (0,-0.8) {LiDAR};
+  \node[figpart, minimum width=30mm, minimum height=22mm] (main) at (3.7,0)
+    {\textbf{メインの}\\\textbf{コンピュータ}\\{\footnotesize Linux + ROS 2}\\{\footnotesize （GPU 付き）}};
+  \node[figpart, minimum width=19mm, fill=orange!10] (mcu) at (7.3,0) {\textbf{マイコン}};
+  \node[figbox, minimum width=19mm] (motor) at (7.3,-1.8) {モータ};
+  \draw[figarrow] (cam.east) -- node[figlabel, above, sloped]{USB} (main.west |- cam.east);
+  \draw[figarrow] (lidar.east) -- node[figlabel, below, sloped]{LAN} (main.west |- lidar.east);
+  \draw[figarrow] (main.east) -- node[figlabel, above]{USB}node[figlabel, below]{指令} (mcu.west);
+  \draw[figarrow] (mcu.south) -- node[figlabel, right]{制御信号} (motor.north);
+  \node[figlabel, below=1mm of main, text=black!70] {センサの処理\\行動の判断};
+  \node[figlabel, above=1mm of mcu, text=black!70] {モータの制御};
+\end{tikzpicture}

@@ -1,0 +1,16 @@
+% 図：コンピュータの主な構成要素（chapters/linux/computer.tex）
+\begin{tikzpicture}
+  % バス
+  \draw[line width=4pt, black!25] (-0.4,0) -- (9.4,0);
+  \node[figlabel, anchor=north west, text=black!60] at (2.3,-0.15) {バス（マザーボード上の配線）};
+  % 上段
+  \node[figpart, minimum width=24mm] (cpu) at (1.4,1.5) {\textbf{CPU}\\{\footnotesize 命令の実行}};
+  \node[figpart, minimum width=24mm] (mem) at (4.5,1.5) {\textbf{メモリ}\\{\footnotesize 作業中のデータ}};
+  \node[figpart, minimum width=24mm] (gpu) at (7.6,1.5) {\textbf{GPU}\\{\footnotesize 大量の並列計算}};
+  % 下段
+  \node[figpart, minimum width=24mm] (sto) at (1.4,-1.7) {\textbf{ストレージ}\\{\footnotesize データの保存}};
+  \node[figpart, minimum width=40mm] (io) at (7.0,-1.7) {\textbf{入出力装置}\\{\footnotesize キーボード・ディスプレイ}\\{\footnotesize カメラ・センサ・モータ}};
+  % 接続
+  \foreach \n in {cpu,mem,gpu} \draw[{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]}, thick] (\n.south) -- (\n.south |- 0,0.08);
+  \foreach \n in {sto,io} \draw[{Stealth[length=1.6mm]}-{Stealth[length=1.6mm]}, thick] (\n.north) -- (\n.north |- 0,-0.08);
+\end{tikzpicture}

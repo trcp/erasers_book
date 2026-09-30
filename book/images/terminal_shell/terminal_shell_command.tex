@@ -1,0 +1,14 @@
+% 図：ターミナル・シェル・コマンドの関係（chapters/commandline/terminal_shell.tex）
+\begin{tikzpicture}
+  \node[font=\small, minimum height=14mm] (user) at (0,0) {利用者};
+  \node[figpart, minimum width=19mm, minimum height=14mm] (term) at (2.4,0) {\textbf{ターミナル}\\{\footnotesize 入出力の窓}};
+  \node[figpart, minimum width=19mm, minimum height=14mm] (shell) at (5.6,0) {\textbf{シェル}\\{\footnotesize bash}};
+  \node[figpart, minimum width=19mm, minimum height=14mm, fill=orange!10] (cmd) at (8.8,0) {\textbf{コマンド}\\{\footnotesize date など}};
+  % 行き
+  \draw[figarrow] ([yshift=3mm]user.east) -- node[figlabel, above]{入力} ([yshift=3mm]term.west);
+  \draw[figarrow] ([yshift=3mm]term.east) -- node[figlabel, above]{\tikz\node[fignum]{1}; 文字列} ([yshift=3mm]shell.west);
+  \draw[figarrow] ([yshift=3mm]shell.east) -- node[figlabel, above]{\tikz\node[fignum]{2}; 実行} ([yshift=3mm]cmd.west);
+  % 帰り
+  \draw[figarrow] (cmd.south) -- ++(0,-0.6) -| node[figlabel, pos=0.25, below]{\tikz\node[fignum]{3}; 実行結果を出力} (term.south);
+  \draw[figarrow] ([yshift=-3mm]term.west) -- node[figlabel, below]{\tikz\node[fignum]{4}; 表示} ([yshift=-3mm]user.east);
+\end{tikzpicture}

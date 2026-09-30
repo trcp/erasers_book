@@ -1,0 +1,15 @@
+% 図：CPU と GPU の違い（chapters/linux/computer.tex）
+\begin{tikzpicture}
+  % CPU：少数の高性能なコア
+  \node[figbox, minimum width=38mm, minimum height=30mm, fill=blue!3] (cpu) at (0,0) {};
+  \node[font=\small\bfseries, anchor=north] at (cpu.north) {CPU};
+  \foreach \x in {0,1} \foreach \y in {0,1}
+    \node[draw, fill=blue!20, minimum size=9mm, font=\scriptsize] at (-0.55+1.1*\x, -0.85+1.0*\y) {コア};
+  \node[figlabel, below=2mm of cpu] {少数の高性能なコア\\複雑な処理を順番にこなす};
+  % GPU：多数の単純なコア
+  \node[figbox, minimum width=50mm, minimum height=30mm, fill=orange!3] (gpu) at (5.2,0) {};
+  \node[font=\small\bfseries, anchor=north] at (gpu.north) {GPU};
+  \foreach \x in {0,...,15} \foreach \y in {0,...,6}
+    \fill[orange!45] (3.25+0.25*\x, -1.3+0.27*\y) rectangle ++(0.19,0.2);
+  \node[figlabel, below=2mm of gpu] {多数の単純なコア\\単純な計算を一斉にこなす};
+\end{tikzpicture}

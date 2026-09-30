@@ -4,30 +4,386 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item IP アドレス・ホスト名・ポートといったネットワークの基礎
+    \item \cmd{ip}, \cmd{ping}, \cmd{ss} によるネットワークの確認
+    \item SSH による別のコンピュータへのログインと、鍵認証の設定
+    \item \cmd{scp} と \cmd{rsync} によるファイルの転送
+    \item tmux を使って、1 つのターミナルで複数の作業を同時に行う方法
   \end{itemize}
 \end{goalbox}
 
-\section{IP アドレスとホスト名の基礎}
+ロボットに載っているコンピュータには、モニタやキーボードがつながっていないことがよくあります。
+そのため、ロボットの開発では、手元の開発用 PC からネットワーク越しにロボットのコンピュータにログインして、プログラムを実行したり、ファイルを送ったりする作業が欠かせません。
+また、ROS 2 のノードどうしの通信も、ネットワークを使って行われます。
+この章では、ネットワークの基礎と、ロボット開発で毎日のように使うリモート操作の方法を学びます。
 
-TODO
+\section{IP アドレスとホスト名の基礎}
+\label{sec:network-basics}
+
+\subsection{IP アドレス}
+
+ネットワークにつながったコンピュータには、それぞれを区別するための番号が割り当てられています。
+これを \textbf{IP アドレス}といいます。
+よく使われている IPv4 という形式では、\cmd{192.168.1.20} のように、0 から 255 までの 4 つの数字を \cmd{.} で区切って表します。
+住所にたとえると、IP アドレスはネットワークの中での「番地」にあたります。
+
+典型的なロボット開発の環境では、開発用 PC とロボットの PC が同じ Wi-Fi ルータにつながり、同じネットワークの中でそれぞれに IP アドレスが割り当てられます（図\ref{fig:network-robot}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/network/robot_network}
+  \caption{開発用 PC とロボットのネットワーク構成の例}
+  \label{fig:network-robot}
+\end{figure}
+
+\begin{description}
+  \item[プライベートアドレス]
+    家庭や研究室の中のネットワーク（LAN）では、\cmd{192.168.x.x} や \cmd{10.x.x.x} といった、その中だけで使える IP アドレスが使われます。
+    これを\textbf{プライベートアドレス}といいます。
+  \item[localhost]
+    \cmd{127.0.0.1} は、自分自身を表す特別な IP アドレスで、\textbf{localhost} とも呼ばれます。
+  \item[DHCP]
+    多くの場合、IP アドレスはルータが自動で割り当てます（\textbf{DHCP}）。
+    そのため、再起動するとロボットの IP アドレスが変わってしまうことがあります。
+    ロボットのように毎回同じ相手に接続したいコンピュータは、ルータの設定などで IP アドレスを固定しておくと便利です。
+\end{description}
+
+\subsection{ホスト名}
+
+IP アドレスは数字の並びなので、覚えにくく、打ち間違えやすいものです。
+そこで、コンピュータには\textbf{ホスト名}という名前も付けられています。
+ホスト名は、プロンプトの \cmd{@} の後ろに表示されている名前です（\ref{sec:terminal-prompt}節）。
+
+同じ LAN の中であれば、Ubuntu では \cmd{ホスト名.local} という名前で相手のコンピュータを指定できることが多くあります（mDNS というしくみを使っています）。
+たとえば、ホスト名が \cmd{robot} のコンピュータには、\cmd{robot.local} という名前で接続できます。
+ネットワークの環境によっては使えないこともあるので、そのときは IP アドレスを使いましょう。
+
+\subsection{ポート}
+
+1 台のコンピュータの中では、SSH や Web サーバなど、ネットワークを使う複数のプログラムが同時に動いています。
+どのプログラムと通信するのかを区別するための番号を\textbf{ポート番号}といいます。
+IP アドレスがマンションの住所だとすれば、ポート番号は部屋番号にあたります。
+たとえば、SSH は 22 番、Web（HTTPS）は 443 番のポートを使うのが標準です。
 
 \section{ネットワークの確認}
+\label{sec:network-check}
 
-TODO
+\subsection{\cmd{ip}：IP アドレスを確認する}
+
+自分のコンピュータの IP アドレスは、\cmd{ip address}（省略して \cmd{ip a}）で確認できます。
+
+\begin{terminal}[IP アドレスを確認する]
+$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    inet 127.0.0.1/8 scope host lo
+...
+3: wlp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 3c:22:fb:12:34:56 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.10/24 brd 192.168.1.255 scope global dynamic noprefixroute wlp2s0
+...
+\end{terminal}
+
+たくさんの情報が表示されますが、まずは \cmd{inet} の行を見ます。
+\cmd{lo} は自分自身を表す仮想的なネットワーク、\cmd{wlp2s0} は Wi-Fi のネットワークです（名前はコンピュータによって異なり、有線 LAN は \cmd{enp0s31f6} のような名前になります）。
+この例では、Wi-Fi の IP アドレスが \cmd{192.168.1.10} であることがわかります。
+末尾の \cmd{/24} は、先頭の 24 ビット（\cmd{192.168.1} の部分）が同じ IP アドレスどうしが同じネットワークに属する、という意味です。
+
+IP アドレスだけを手早く知りたいときは、\cmd{hostname -I} も便利です。
+
+\begin{terminal}[IP アドレスだけを表示する]
+$ hostname -I
+192.168.1.10
+\end{terminal}
+
+\subsection{\cmd{ping}：相手とつながっているか確認する}
+
+\cmd{ping} は、相手のコンピュータに小さなデータを送り、返事が返ってくるかどうかで、通信できるかを確認するコマンドです。
+\cmd{-c} オプションで、送る回数を指定できます。
+
+\begin{terminal}[ロボットの PC と通信できるか確認する]
+$ ping -c 3 192.168.1.20
+PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.
+64 bytes from 192.168.1.20: icmp_seq=1 ttl=64 time=3.21 ms
+64 bytes from 192.168.1.20: icmp_seq=2 ttl=64 time=2.87 ms
+64 bytes from 192.168.1.20: icmp_seq=3 ttl=64 time=4.02 ms
+
+--- 192.168.1.20 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+\end{terminal}
+
+\cmd{time=} は、返事が返ってくるまでの時間（応答時間）です。
+\cmd{0\% packet loss} であれば、すべての返事が返ってきています。
+ロボットと通信できないときは、まず \cmd{ping} で相手に届いているかを確かめるのが、トラブル解決の第一歩です。
+\cmd{-c} を付けずに実行した場合は、\key{Ctrl}+\key{C} で止めます。
+
+\subsection{\cmd{ss}：通信を待ち受けているプログラムを確認する}
+
+\cmd{ss} は、ネットワークの接続の状態を表示するコマンドです。
+\cmd{-tln} オプションを付けると、どのポートで通信を待ち受けているかがわかります。
+
+\begin{terminal}[待ち受けているポートを確認する]
+$ ss -tln
+State   Recv-Q  Send-Q   Local Address:Port    Peer Address:Port
+LISTEN  0       4096           0.0.0.0:22           0.0.0.0:*
+LISTEN  0       4096         127.0.0.1:631          0.0.0.0:*
+...
+\end{terminal}
+
+この例では、22 番のポートで SSH のサーバが待ち受けていることがわかります。
+次の節で SSH のサーバをインストールしたら、このコマンドで動いているかを確かめられます。
 
 \section{SSH によるリモートログインと鍵認証}
+\label{sec:network-ssh}
 
-TODO
+\subsection{SSH とは}
+
+\textbf{SSH}（Secure Shell）は、ネットワーク越しに別のコンピュータにログインして、コマンドを実行するためのしくみです。
+通信の内容はすべて暗号化されるので、パスワードや入力した内容を盗み見られる心配がありません。
+SSH を使えば、手元の開発用 PC のターミナルから、ロボットの PC のシェルを操作できます。
+
+SSH で接続するには、接続される側（ロボットの PC）で SSH の\textbf{サーバ}が動いている必要があります。
+Ubuntu のデスクトップ版には SSH のサーバが入っていないので、ロボットの PC で次のようにインストールします。
+
+\begin{terminal}[SSH のサーバを入れる（ロボット）]
+$ sudo apt install openssh-server
+\end{terminal}
+
+インストールすると、SSH のサーバが自動的に起動し、22 番のポートで接続を待ち受けるようになります。
+
+\subsection{ログインする}
+
+開発用 PC から接続するには、\cmd{ssh ユーザ名@接続先} と入力します。
+接続先には、IP アドレスかホスト名を指定します。
+
+\begin{terminal}[ロボットの PC に SSH でログインする]
+$ ssh user@192.168.1.20
+The authenticity of host '192.168.1.20 (192.168.1.20)' can't be established.
+ED25519 key fingerprint is SHA256:Xk3v...
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+user@192.168.1.20's password:
+...
+user@robot:~$
+\end{terminal}
+
+初めて接続する相手の場合は、「この相手を信頼してよいか」と聞かれるので、\cmd{yes} と入力します。
+続いて、ロボットの PC のユーザのパスワードを入力すると、ログインできます。
+プロンプトのホスト名が \cmd{robot} に変わったことに注目してください。
+ここから先に入力するコマンドは、すべてロボットの PC の上で実行されます。
+
+ログインを終了するには、\cmd{exit} と入力するか、\key{Ctrl}+\key{D} を押します。
+
+\begin{caution}[今どのコンピュータを操作しているか]
+  SSH でログインしていると、手元の PC とロボットの PC のターミナルが並んで、どちらで作業しているのかわからなくなりがちです。
+  「ロボットの PC で実行するつもりのコマンドを、手元の PC で実行してしまった」といった事故を防ぐため、コマンドを入力する前にプロンプトのホスト名を確かめる習慣をつけましょう。
+\end{caution}
+
+\subsection{鍵認証}
+
+毎回パスワードを入力するのは面倒ですし、推測されやすいパスワードを使うと、第三者に不正にログインされる危険もあります。
+そこで SSH では、パスワードの代わりに\textbf{鍵}を使ってログインする\textbf{公開鍵認証}がよく使われます（図\ref{fig:network-ssh-key}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/network/ssh_key}
+  \caption{SSH の公開鍵認証}
+  \label{fig:network-ssh-key}
+\end{figure}
+
+公開鍵認証では、\textbf{秘密鍵}と\textbf{公開鍵}という、対になった 2 つの鍵を使います。
+公開鍵を接続先に登録しておくと、SSH は、手元の秘密鍵が登録された公開鍵と対になっているかを確かめて、ログインを許可します。
+公開鍵は南京錠、秘密鍵はその鍵にたとえられます。
+南京錠（公開鍵）はいくつ配っても構いませんが、鍵（秘密鍵）は自分だけが持っていなければなりません。
+
+まず、開発用 PC で \cmd{ssh-keygen} を実行して、鍵のペアを作ります。
+
+\begin{terminal}[鍵のペアを作る（開発用 PC）]
+$ ssh-keygen -t ed25519
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (/home/user/.ssh/id_ed25519):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/user/.ssh/id_ed25519
+Your public key has been saved in /home/user/.ssh/id_ed25519.pub
+...
+\end{terminal}
+
+保存場所はそのまま \key{Enter} を押せば構いません。
+\textbf{パスフレーズ}は、秘密鍵そのものを守るためのパスワードです。
+設定しておくと、万が一秘密鍵のファイルが盗まれても、すぐには使われずに済みます。
+
+次に、\cmd{ssh-copy-id} で公開鍵をロボットの PC に登録します。
+このときだけ、ロボットの PC のパスワードを入力します。
+
+\begin{terminal}[公開鍵を登録する（開発用 PC）]
+$ ssh-copy-id user@192.168.1.20
+...
+Number of key(s) added: 1
+\end{terminal}
+
+これで、次からはパスワードを入力せずにログインできるようになります（パスフレーズを設定した場合は、パスフレーズを聞かれることがあります）。
+
+\begin{caution}[秘密鍵は絶対に渡さない]
+  \cmd{\textasciitilde/.ssh/id\_ed25519}（\cmd{.pub} の付いていないほう）が秘密鍵です。
+  秘密鍵は、ほかの人に渡したり、GitHub などに公開したりしてはいけません。
+  ほかのコンピュータやサービスに登録するのは、必ず \cmd{.pub} の付いた公開鍵のほうです。
+\end{caution}
+
+\subsection{接続の設定を保存する}
+
+\cmd{\textasciitilde/.ssh/config} というファイルに接続先の情報を書いておくと、短い名前で接続できるようになります。
+
+\begin{lstlisting}[caption={SSH の設定ファイル（\textasciitilde/.ssh/config）}, label={lst:network-ssh-config}]
+Host robot
+    HostName 192.168.1.20
+    User user
+\end{lstlisting}
+
+\begin{terminal}[設定した名前で接続する]
+$ ssh robot
+user@robot:~$
+\end{terminal}
+
+\begin{column}{GUI のアプリをリモートで表示する}
+  \cmd{ssh -X robot} のように \cmd{-X} オプションを付けて接続すると、ロボットの PC で起動した GUI のアプリの画面を、手元の PC に表示できます（X11 転送）。
+  ただし、画面のデータをネットワークで送るため動作が重く、RViz のような 3D の表示には向いていません。
+  ROS 2 では、GUI のツールは手元の PC で動かし、ネットワーク越しにロボットのノードと通信するのが一般的です（\ref{chap:ros2_install}章）。
+\end{column}
 
 \section{ファイル転送}
+\label{sec:network-transfer}
 
-TODO
+\subsection{\cmd{scp}：ファイルをコピーする}
+
+\cmd{scp} は、SSH を使ってコンピュータの間でファイルをコピーするコマンドです。
+使い方は \cmd{cp}（\ref{sec:files-manipulate}節）と同じで、\cmd{scp コピー元 コピー先} と指定します。
+別のコンピュータのファイルは、\cmd{接続先:パス} の形で表します。
+
+\begin{terminal}[scp でファイルを転送する]
+$ scp map.yaml robot:~/maps/             # 手元 → ロボット
+$ scp robot:~/logs/run1.csv .            # ロボット → 手元
+$ scp -r robot:~/logs ./robot_logs       # ディレクトリごと
+\end{terminal}
+
+接続先には、\cmd{\textasciitilde/.ssh/config} で設定した名前（\cmd{robot}）や、\cmd{user@192.168.1.20} を指定できます。
+ディレクトリをコピーするときは、\cmd{cp} と同じく \cmd{-r} オプションを付けます。
+
+\subsection{\cmd{rsync}：ディレクトリを同期する}
+
+\cmd{rsync} は、ディレクトリの中身を同期（同じ状態に）するコマンドです。
+2 回目以降は、変更のあったファイルだけを転送するので、大きなディレクトリでも短い時間で済みます。
+手元の PC で編集したプログラムをロボットの PC に送る、といった作業に便利です。
+
+\begin{terminal}[rsync でディレクトリを同期する]
+$ rsync -av ~/ros2_ws/src/ robot:~/ros2_ws/src/
+sending incremental file list
+my_robot/my_robot/controller.py
+
+sent 2,345 bytes  received 56 bytes  4,802.00 bytes/sec
+total size is 48,210  speedup is 20.08
+\end{terminal}
+
+\cmd{-a} はファイルの権限や更新日時などをそのまま保ってコピーするオプション、\cmd{-v} は転送したファイルを表示するオプションです。
+この例では、前回から変更された \cmd{controller.py} だけが転送されています。
+
+\begin{caution}[rsync のパスの末尾の \cmd{/}]
+  \cmd{rsync} では、コピー元のパスの末尾に \cmd{/} を付けるかどうかで意味が変わります。
+  \cmd{src/} と書くと「\cmd{src} の中身」を、\cmd{src} と書くと「\cmd{src} ディレクトリそのもの」をコピーします。
+  また、\cmd{--delete} オプションを付けると、コピー元にないファイルをコピー先から削除します。
+  パスを間違えると大事なファイルを消してしまうので、慣れないうちは \cmd{-n}（実際には転送せず、何が起きるかだけを表示する）を付けて確かめてから実行しましょう。
+\end{caution}
 
 \section{tmux で複数ターミナルを管理する}
+\label{sec:network-tmux}
 
-TODO
+\subsection{tmux とは}
+
+SSH でロボットにログインして作業していると、次のような困りごとが出てきます。
+
+\begin{itemize}
+  \item ROS 2 では、複数のノードを同時に起動して、別のターミナルで様子を見ることが多い。そのたびに SSH で新しくログインするのは面倒
+  \item Wi-Fi が一瞬切れただけで SSH の接続が切れ、ロボットの上で動かしていたプログラムも止まってしまう
+\end{itemize}
+
+これを解決するのが \textbf{tmux}（ティーマックス）です。
+tmux を使うと、1 つのターミナルの画面を分割して、複数のシェルを同時に使えます（図\ref{fig:network-tmux}）。
+さらに、tmux の中で動かしたプログラムは、SSH の接続が切れても動き続け、後から再び接続して続きの作業ができます。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/network/tmux}
+  \caption{tmux で画面を分割した様子}
+  \label{fig:network-tmux}
+\end{figure}
+
+tmux は、次のコマンドでインストールします。
+SSH で使う場合は、ロボットの PC にインストールします。
+
+\begin{terminal}[tmux をインストールする]
+$ sudo apt install tmux
+\end{terminal}
+
+\subsection{セッションを作る}
+
+tmux では、作業のまとまりを\textbf{セッション}と呼びます。
+\cmd{tmux new -s セッション名} で、新しいセッションを作って開始します。
+
+\begin{terminal}[tmux のセッションを開始する]
+$ tmux new -s robot
+\end{terminal}
+
+画面の下に緑色の帯（ステータスバー）が表示されれば、tmux の中で作業している状態です。
+
+\subsection{tmux の操作}
+
+tmux の操作は、\textbf{プレフィックスキー}と呼ばれる \key{Ctrl}+\key{B} を押して離し、続けて操作ごとのキーを押して行います。
+たとえば「\key{Ctrl}+\key{B} → \key{\%}」は、\key{Ctrl}+\key{B} を押して離してから \key{\%} を押す、という意味です。
+
+\begin{center}
+  \begin{tabular}{lp{0.5\linewidth}}
+    \toprule
+    キー操作 & 動作 \\
+    \midrule
+    \key{Ctrl}+\key{B} → \key{\%} & 画面を左右に分割する \\
+    \key{Ctrl}+\key{B} → \key{"} & 画面を上下に分割する \\
+    \key{Ctrl}+\key{B} → 矢印キー & 分割した画面（ペイン）を移動する \\
+    \key{Ctrl}+\key{B} → \key{x} & 今のペインを閉じる \\
+    \key{Ctrl}+\key{B} → \key{c} & 新しいウィンドウ（タブのようなもの）を作る \\
+    \key{Ctrl}+\key{B} → \key{n} & 次のウィンドウに切り替える \\
+    \key{Ctrl}+\key{B} → \key{d} & セッションから離れる（デタッチ） \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\subsection{セッションから離れる・戻る}
+
+\key{Ctrl}+\key{B} → \key{d} を押すと、セッションを動かしたまま tmux の画面から離れることができます。
+これを\textbf{デタッチ}といいます。
+デタッチしても、セッションの中のプログラムは動き続けています。
+SSH の接続が切れた場合も、自動的にデタッチした状態になります。
+
+離れたセッションに戻る（\textbf{アタッチ}する）には、\cmd{tmux attach -t セッション名} を実行します。
+動いているセッションの一覧は \cmd{tmux ls} で確認できます。
+
+\begin{terminal}[セッションの一覧を確認して、戻る]
+$ tmux ls
+robot: 1 windows (created Wed Sep 30 10:15:32 2026)
+$ tmux attach -t robot
+\end{terminal}
+
+セッションを完全に終了するには、セッションの中のすべてのシェルで \cmd{exit} を実行します。
+
+\begin{point}[ロボットでの tmux の使い方]
+  ロボットの PC に SSH でログインしたら、まず \cmd{tmux new -s robot}（2 回目以降は \cmd{tmux attach -t robot}）で tmux に入る習慣をつけましょう。
+  ノードの起動、トピックの確認、CPU の使用率の監視などを、1 つの画面で並べて行えます。
+  Wi-Fi が切れても、ロボットの上のプログラムは止まりません。
+\end{point}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item ネットワーク上のコンピュータは IP アドレスで区別されます。ホスト名や \cmd{ホスト名.local} を使うと、名前で指定できます。通信するプログラムはポート番号で区別されます。
+  \item \cmd{ip a} で IP アドレスを、\cmd{ping} で相手と通信できるかを、\cmd{ss} で待ち受けているポートを確認します。
+  \item SSH を使うと、ネットワーク越しに別のコンピュータにログインできます。公開鍵認証を設定すると、パスワードなしで安全にログインできます。秘密鍵は誰にも渡してはいけません。
+  \item \cmd{scp} でファイルをコピーし、\cmd{rsync} でディレクトリを同期します。
+  \item tmux を使うと、1 つのターミナルで複数のシェルを使え、SSH の接続が切れてもプログラムが動き続けます。
+\end{itemize}

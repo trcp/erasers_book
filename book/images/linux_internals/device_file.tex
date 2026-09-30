@@ -1,0 +1,14 @@
+% 図：デバイスファイルを通じたデバイスの読み書き（chapters/linux/linux_internals.tex）
+\begin{tikzpicture}
+  \node[figbox, minimum width=20mm] (prog) at (0.2,0) {プログラム\\{\footnotesize （ノードなど）}};
+  \node[figpart, minimum width=26mm, font=\small\ttfamily] (dev) at (4.4,0) {/dev/ttyUSB0};
+  \node[figpart, minimum width=20mm, fill=blue!15] (drv) at (4.4,-1.9) {デバイス\\ドライバ};
+  \node[figbox, minimum width=24mm, fill=orange!10] (hw) at (8.0,-1.9) {USB でつないだ\\マイコン・LiDAR};
+  \draw[figarrow, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (prog) -- node[figlabel, above]{読み書き} (dev);
+  \draw[figarrow, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (dev) -- (drv);
+  \draw[figarrow, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (drv) -- node[figlabel, above]{USB} (hw);
+  \begin{scope}[on background layer]
+    \node[draw, dashed, black!40, rounded corners, inner sep=3mm, fit=(dev)(drv),
+      label={[figlabel, text=black!60]right:カーネル}] {};
+  \end{scope}
+\end{tikzpicture}

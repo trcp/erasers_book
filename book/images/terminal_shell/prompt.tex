@@ -1,0 +1,16 @@
+% 図：プロンプトの各部分の意味（chapters/commandline/terminal_shell.tex）
+\begin{tikzpicture}[part/.style={font=\Large\ttfamily, text=white, inner sep=0pt, outer sep=0pt, anchor=base west}]
+  \node[part] (u) at (0,0) {user};
+  \node[part] (at) at (u.base east) {@};
+  \node[part] (h) at (at.base east) {robot};
+  \node[part] (c) at (h.base east) {:};
+  \node[part] (d) at (c.base east) {\textasciitilde};
+  \node[part] (p) at (d.base east) {\$};
+  \begin{scope}[on background layer]
+    \node[fill=black!85, rounded corners=2pt, inner xsep=3mm, inner ysep=2.5mm, fit=(u)(p)] (s) {};
+  \end{scope}
+  \draw[thick] (u.south |- s.south) -- ++(0,-0.6) node[below, figlabel]{ユーザ名};
+  \draw[thick] (h.south |- s.south) -- ++(0,-1.5) node[below, figlabel]{ホスト名\\（コンピュータの名前）};
+  \draw[thick] (d.south |- s.south) -- ++(0,-0.6) -- ++(0.9,0) node[right, figlabel, align=left]{カレントディレクトリ\\（\cmd{\textasciitilde} はホームディレクトリ）};
+  \draw[thick] (p.north |- s.north) -- ++(0,0.5) -- ++(0.6,0) node[right, figlabel, align=left]{\cmd{\$}：一般ユーザ\\\cmd{\#}：root};
+\end{tikzpicture}

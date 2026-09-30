@@ -1,0 +1,170 @@
+\chapter{Python とは}
+\label{chap:what_is_python}
+
+% この章で学ぶこと
+\begin{goalbox}
+  \begin{itemize}
+    \item Python がどのようなプログラミング言語なのか
+    \item コンパイラ型言語とインタプリタ型言語の違い
+    \item C 言語と比べたときの Python の特徴、メリットとデメリット
+    \item ロボット開発での Python と C++ の使い分け
+  \end{itemize}
+\end{goalbox}
+
+第IV部では、ROS 2 のプログラムを書くために必要な Python の基本を学びます。
+この章ではまず、Python がどのような言語なのかを、C 言語と比べながら見ていきます。
+
+\textbf{Python}（パイソン）は、1991 年に Guido van Rossum によって公開されたプログラミング言語です。
+「読みやすく、書きやすい」ことを重視して設計されていて、プログラミングの入門から、Web サービス、データ分析、機械学習、そしてロボット開発まで、幅広い分野で使われています。
+ROS 2 でも、C++ と並んで公式にサポートされている言語で、本書では Python を使って ROS 2 のプログラムを書きます（\ref{chap:rclpy}章）。
+
+\section{コンパイラ型とインタプリタ型}
+\label{sec:python-compile-interpret}
+
+\ref{sec:computer-software}節で説明したように、CPU が直接理解できるのは機械語だけです。
+人間がプログラミング言語で書いたプログラム（\textbf{ソースコード}）は、何らかの方法で機械語に翻訳してから実行する必要があります。
+この翻訳の方法によって、プログラミング言語は大きく 2 つの種類に分けられます（図\ref{fig:python-compile-interpret}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/what_is_python/compile_vs_interpret}
+  \caption{コンパイラ型言語とインタプリタ型言語の実行の流れ}
+  \label{fig:python-compile-interpret}
+\end{figure}
+
+\begin{description}
+  \item[コンパイラ型]
+    実行する前に、\textbf{コンパイラ}というプログラムを使って、ソースコード全体をまとめて機械語の実行ファイルに翻訳しておく方式です。
+    この翻訳の作業を\textbf{コンパイル}といいます。
+    C 言語や C++ がこの方式の代表です。
+    本にたとえると、外国語の本を、あらかじめ全部翻訳して翻訳書を作っておくようなものです。
+  \item[インタプリタ型]
+    \textbf{インタプリタ}というプログラムが、ソースコードを読みながら、その場で解釈して実行する方式です。
+    事前に実行ファイルを作る必要はありません。
+    Python はこの方式の代表です。
+    本にたとえると、通訳の人に、外国語の本をその場で読み上げながら訳してもらうようなものです。
+\end{description}
+
+\section{C 言語と比べてみる}
+\label{sec:python-vs-c}
+
+同じ「画面に Hello, World! と表示する」プログラムを、C 言語と Python で書き比べてみましょう。
+
+\begin{lstlisting}[style=cpp, caption={C 言語のプログラム（hello.c）}, label={lst:python-hello-c}]
+#include <stdio.h>
+
+int main(void)
+{
+    printf("Hello, World!\n");
+    return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={Python のプログラム（hello.py）}, label={lst:python-hello-py}]
+print("Hello, World!")
+\end{lstlisting}
+
+C 言語では、\cmd{main} という関数を用意し、その中に処理を書くという決まった形が必要です。
+一方、Python では、やりたいことを 1 行書くだけで済みます。
+
+実行の手順も異なります。
+C 言語では、まず \cmd{gcc} というコンパイラで実行ファイルを作り、それから実行します。
+Python では、\cmd{python3} というインタプリタにソースコードを渡すだけで、すぐに実行できます。
+
+\begin{terminal}[C 言語のプログラムを実行する]
+$ gcc hello.c -o hello
+$ ./hello
+Hello, World!
+\end{terminal}
+
+\begin{terminal}[Python のプログラムを実行する]
+$ python3 hello.py
+Hello, World!
+\end{terminal}
+
+プログラムを少し書き換えて試す、ということを何度も繰り返すときには、コンパイルの手間がない Python のほうが手軽です。
+
+\section{Python の特徴}
+\label{sec:python-features}
+
+Python には、C 言語と比べて次のような特徴があります。
+
+\begin{description}
+  \item[書き方がシンプル]
+    文の終わりに \cmd{;} を付けたり、処理のまとまりを \cmd{\{ \}} で囲んだりする必要がありません。
+    代わりに、処理のまとまりを\textbf{インデント}（行頭の字下げ）で表します。
+    インデントがそろっていないとエラーになるので、自然と読みやすいプログラムになります。
+  \item[型を宣言しなくてよい]
+    C 言語では、変数を使う前に「整数を入れる変数」「文字を入れる変数」のように\textbf{型}を宣言する必要があります（\textbf{静的型付け}）。
+    Python では型の宣言は不要で、変数に入れた値によって型が自動的に決まります（\textbf{動的型付け}）。
+  \item[メモリの管理が自動]
+    C 言語では、必要なメモリを自分で確保し、使い終わったら自分で解放しなければなりません。
+    解放を忘れたり、解放済みのメモリを使ったりすると、原因のわかりにくい不具合になります。
+    Python では、使わなくなったメモリは自動的に解放されます（\textbf{ガベージコレクション}）。
+  \item[ライブラリが豊富]
+    数値計算の NumPy、画像処理の OpenCV、機械学習の PyTorch など、便利なライブラリ（プログラムの部品）が数多く公開されていて、簡単に利用できます（\ref{sec:python-pip}節）。
+\end{description}
+
+\section{メリットとデメリット}
+\label{sec:python-pros-cons}
+
+Python と C 言語（C++）には、それぞれ得意・不得意があります。
+
+\begin{center}
+  \begin{tabular}{lp{0.33\linewidth}p{0.33\linewidth}}
+    \toprule
+     & Python & C 言語・C++ \\
+    \midrule
+    書きやすさ & 短く簡潔に書ける & 書く量が多く、決まりごとも多い \\
+    試しやすさ & すぐに実行して試せる & 実行のたびにコンパイルが必要 \\
+    実行速度 & 遅い & 速い \\
+    メモリ管理 & 自動 & 自分で管理する（C++ には補助のしくみもある） \\
+    エラーの発見 & 実行してみるまで見つからないことが多い & 型の誤りなどはコンパイル時に見つかる \\
+    向いている用途 & 試作、処理の組み合わせ、データ処理、機械学習 & 速度が必要な処理、マイコン、ハードウェアに近い処理 \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+Python の最大のデメリットは、実行速度が遅いことです。
+インタプリタがその場で解釈しながら実行するため、同じ処理でも、C 言語で書いたプログラムに比べて数十倍以上遅くなることがあります。
+また、型の宣言がないため、型の間違いなどのミスが、実際にその行を実行するまで見つからないこともあります。
+
+ただし、NumPy や OpenCV のような Python のライブラリの多くは、中身が C 言語や C++ で書かれています。
+重い計算はライブラリの中の高速なプログラムに任せ、それらを組み合わせる部分を Python で書く、という使い方をすれば、書きやすさと速さを両立できます。
+
+\begin{point}[ロボット開発での使い分け]
+  ROS 2 では、Python で書くためのライブラリ（\cmd{rclpy}）と、C++ で書くためのライブラリ（\cmd{rclcpp}）が用意されています。
+  Python で書いたノードと C++ で書いたノードは、同じように通信し合うことができます。
+  そのため、まずは Python で手早く作って動かし、速度が必要になった部分だけを C++ で書き直す、という進め方がよく使われます。
+  本書では、初めての人でも取り組みやすい Python を使います。
+\end{point}
+
+\section{Python のバージョン}
+\label{sec:python-version}
+
+Python には、大きく分けて Python 2 と Python 3 の 2 つの系統があります。
+両者には互換性がなく、Python 2 で書かれたプログラムは、そのままでは Python 3 で動かないことがあります。
+Python 2 は 2020 年にサポートが終了しているので、現在は Python 3 を使います。
+Ubuntu 24.04 には、Python 3.12 が標準でインストールされています。
+
+\begin{terminal}[Python のバージョンを確認する]
+$ python3 --version
+Python 3.12.3
+\end{terminal}
+
+インターネット上の古い情報には Python 2 向けのものも残っているので、参考にするときは注意しましょう。
+
+\begin{column}{Python という名前}
+  Python という名前は、ヘビのニシキヘビ（python）ではなく、作者の van Rossum が好きだったイギリスのコメディ番組「空飛ぶモンティ・パイソン」に由来しています。
+  ただ、ロゴにはヘビの絵が使われています。
+\end{column}
+
+\section*{この章のまとめ}
+
+\begin{itemize}
+  \item Python は、読みやすく書きやすいことを重視したインタプリタ型のプログラミング言語です。
+  \item C 言語のようなコンパイラ型の言語は実行前にまとめて機械語に翻訳し、Python のようなインタプリタ型の言語はその場で解釈しながら実行します。
+  \item Python は書きやすく試しやすい反面、実行速度は C 言語や C++ に劣ります。重い処理は C 言語などで書かれたライブラリに任せるのが基本です。
+  \item ROS 2 では Python（\cmd{rclpy}）と C++（\cmd{rclcpp}）の両方が使え、本書では Python を使います。
+  \item 現在は Python 3 を使います。Ubuntu 24.04 には Python 3.12 が入っています。
+\end{itemize}

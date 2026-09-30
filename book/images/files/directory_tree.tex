@@ -1,0 +1,47 @@
+% 図：Linux のディレクトリ構成（一部）（chapters/commandline/files.tex）
+% このファイルは手で編集して構いません（行を増やすときは y 座標と縦線に注意）
+\begin{tikzpicture}[every node/.style={inner sep=1.5pt}]
+  \node[anchor=west, font=\small\ttfamily] (n0) at (0.00,0.00) {/};
+  \node[anchor=west, font=\footnotesize, text=black!60] at (4.2,0.00) {ルートディレクトリ};
+  \draw[black!25, dotted] (n0.east) -- (4.15,0.00);
+  \node[anchor=west, font=\small\ttfamily] (n1) at (0.70,-0.48) {bin/};
+  \draw[black!50] (0.15,-0.20) |- (n1.west);
+  \node[anchor=west, font=\small\ttfamily] (n2) at (0.70,-0.96) {etc/};
+  \draw[black!50] (0.15,-0.20) |- (n2.west);
+  \node[anchor=west, font=\footnotesize, text=black!60] at (4.2,-0.96) {設定ファイル};
+  \draw[black!25, dotted] (n2.east) -- (4.15,-0.96);
+  \node[anchor=west, font=\small\ttfamily] (n3) at (0.70,-1.44) {home/};
+  \draw[black!50] (0.15,-0.20) |- (n3.west);
+  \node[anchor=west, font=\small\ttfamily, fill=blue!10] (n4) at (1.40,-1.92) {user/};
+  \draw[black!50] (0.85,-1.64) |- (n4.west);
+  \node[anchor=west, font=\footnotesize, text=black!60] at (4.2,-1.92) {ホームディレクトリ（\cmd{\textasciitilde}）};
+  \draw[black!25, dotted] (n4.east) -- (4.15,-1.92);
+  \node[anchor=west, font=\small\ttfamily] (n5) at (2.10,-2.40) {Desktop/};
+  \draw[black!50] (1.55,-2.12) |- (n5.west);
+  \node[anchor=west, font=\small\ttfamily] (n6) at (2.10,-2.88) {Documents/};
+  \draw[black!50] (1.55,-2.12) |- (n6.west);
+  \node[anchor=west, font=\small\ttfamily] (n7) at (2.80,-3.36) {memo.txt};
+  \draw[black!50] (2.25,-3.08) |- (n7.west);
+  \node[anchor=west, font=\small\ttfamily] (n8) at (2.10,-3.84) {Downloads/};
+  \draw[black!50] (1.55,-2.12) |- (n8.west);
+  \node[anchor=west, font=\small\ttfamily] (n9) at (0.70,-4.32) {opt/};
+  \draw[black!50] (0.15,-0.20) |- (n9.west);
+  \node[anchor=west, font=\small\ttfamily] (n10) at (1.40,-4.80) {ros/};
+  \draw[black!50] (0.85,-4.52) |- (n10.west);
+  \node[anchor=west, font=\small\ttfamily] (n11) at (2.10,-5.28) {jazzy/};
+  \draw[black!50] (1.55,-5.00) |- (n11.west);
+  \node[anchor=west, font=\footnotesize, text=black!60] at (4.2,-5.28) {ROS 2 Jazzy};
+  \draw[black!25, dotted] (n11.east) -- (4.15,-5.28);
+  \node[anchor=west, font=\small\ttfamily] (n12) at (0.70,-5.76) {usr/};
+  \draw[black!50] (0.15,-0.20) |- (n12.west);
+  \node[anchor=west, font=\small\ttfamily] (n13) at (1.40,-6.24) {bin/};
+  \draw[black!50] (0.85,-5.96) |- (n13.west);
+  \node[anchor=west, font=\footnotesize, text=black!60] at (4.2,-6.24) {コマンド};
+  \draw[black!25, dotted] (n13.east) -- (4.15,-6.24);
+  \node[anchor=west, font=\small\ttfamily] (n14) at (1.40,-6.72) {share/};
+  \draw[black!50] (0.85,-5.96) |- (n14.west);
+  \node[anchor=west, font=\small\ttfamily] (n15) at (0.70,-7.20) {tmp/};
+  \draw[black!50] (0.15,-0.20) |- (n15.west);
+  \node[anchor=west, font=\footnotesize, text=black!60] at (4.2,-7.20) {一時ファイル};
+  \draw[black!25, dotted] (n15.east) -- (4.15,-7.20);
+\end{tikzpicture}

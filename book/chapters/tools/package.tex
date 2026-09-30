@@ -4,22 +4,364 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item パッケージとパッケージ管理システムの考え方
+    \item \cmd{apt} によるソフトウェアのインストール・更新・削除
+    \item リポジトリの追加と、GPG 鍵によるパッケージの検証
+    \item apt にないソフトウェアを、ソースコードからビルドしてインストールする方法
   \end{itemize}
 \end{goalbox}
 
-\section{apt によるソフトウェアの管理}
+第III部では、開発に使うさまざまな道具を揃えていきます。
+エディタも Git も Docker も、そして ROS 2 も、まずはインストールしなければ使えません。
+この章では、Ubuntu でソフトウェアをインストール・管理する方法を学びます。
+これまでの章でも \cmd{sudo apt install} というコマンドが何度か出てきましたが、ここでその中身をきちんと理解しましょう。
 
-TODO
+\section{apt によるソフトウェアの管理}
+\label{sec:package-apt}
+
+\subsection{パッケージとパッケージ管理システム}
+
+Windows では、Web サイトからインストーラをダウンロードしてソフトウェアをインストールすることが多いでしょう。
+一方 Ubuntu では、ソフトウェアの多くは\textbf{パッケージ}という形にまとめられて、ディストリビューション（\ref{sec:linux-distribution}節）によって配布されています。
+パッケージには、プログラム本体のほか、設定ファイルや説明書、そして「このソフトウェアを動かすには、ほかにどのパッケージが必要か」という情報（\textbf{依存関係}）が含まれています。
+
+パッケージのインストール・更新・削除を一手に引き受けるのが\textbf{パッケージ管理システム}です。
+Ubuntu などの Debian 系のディストリビューションでは、\textbf{apt}（Advanced Package Tool）というパッケージ管理システムを使います。
+パッケージは、インターネット上の\textbf{リポジトリ}と呼ばれる置き場から、apt が自動でダウンロードしてインストールしてくれます（図\ref{fig:package-apt}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/package/apt_flow}
+  \caption{apt によるソフトウェアのインストールの流れ}
+  \label{fig:package-apt}
+\end{figure}
+
+パッケージ管理システムを使うと、次のような利点があります。
+
+\begin{itemize}
+  \item コマンド 1 つでインストールでき、必要な依存パッケージも自動で入る
+  \item インストールしたすべてのソフトウェアを、まとめて最新の状態に更新できる
+  \item 不要になったソフトウェアを、関連するファイルごときれいに削除できる
+  \item ディストリビューションが検証したパッケージなので、安全に使える
+\end{itemize}
+
+なお、Ubuntu の公式リポジトリで配布されているソフトウェアの多くは、\ref{sec:linux-oss}節で紹介したオープンソースソフトウェアです。
+世界中の開発者が作った OSS を、ディストリビューションが集めて、すぐに使える形にまとめて配ってくれているのです。
+
+\subsection{パッケージの一覧を更新する}
+
+apt は、リポジトリにどんなパッケージがあるかという一覧を、手元のコンピュータに保存しています。
+ソフトウェアをインストールする前には、まず \cmd{apt update} でこの一覧を最新の状態にします。
+
+\begin{terminal}[パッケージの一覧を更新する]
+$ sudo apt update
+Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
+Get:2 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+...
+Reading package lists... Done
+Building dependency tree... Done
+15 packages can be upgraded. Run 'apt list --upgradable' to see them.
+\end{terminal}
+
+システムの状態を変更する操作なので、\cmd{sudo}（\ref{sec:linux-internals-users}節）が必要です。
+\cmd{noble} は、Ubuntu 24.04 のコードネームです（\ref{sec:linux-distribution}節）。
+
+\subsection{パッケージをインストールする}
+
+パッケージのインストールには \cmd{apt install} を使います。
+ここでは例として、ディレクトリの中身を木構造で表示する \cmd{tree} コマンドをインストールしてみます。
+
+\begin{terminal}[パッケージをインストールする]
+$ sudo apt install tree
+Reading package lists... Done
+Building dependency tree... Done
+The following NEW packages will be installed:
+  tree
+0 upgraded, 1 newly installed, 0 to remove and 15 not upgraded.
+Need to get 47.1 kB of archives.
+After this operation, 111 kB of additional disk space will be used.
+...
+$ tree -L 1 ~
+/home/user
+├── Desktop
+├── Documents
+...
+\end{terminal}
+
+依存するパッケージが必要な場合は、それらもまとめてインストールされます。
+インストールするパッケージが多いときは \cmd{Do you want to continue? [Y/n]} と確認されるので、\key{Y} を入力して \key{Enter} を押します。
+スペースで区切れば、複数のパッケージを一度にインストールすることもできます。
+
+\subsection{パッケージを探す・調べる}
+
+インストールしたいソフトウェアのパッケージ名がわからないときは、\cmd{apt search} でキーワードから探せます。
+\cmd{apt show} を使うと、パッケージの説明やバージョン、依存関係などの詳しい情報がわかります。
+
+\begin{terminal}[パッケージを探す・調べる]
+$ apt search htop
+$ apt show htop
+Package: htop
+Version: 3.3.0-4build1
+...
+Description: interactive processes viewer
+...
+\end{terminal}
+
+調べるだけならシステムは変更されないので、\cmd{sudo} は必要ありません。
+
+\subsection{パッケージを更新する}
+
+インストール済みのパッケージを新しいバージョンに更新するには、\cmd{apt update} で一覧を更新してから、\cmd{apt upgrade} を実行します。
+
+\begin{terminal}[インストール済みのパッケージを更新する]
+$ sudo apt update
+$ sudo apt upgrade
+\end{terminal}
+
+\begin{point}[update と upgrade の違い]
+  名前が似ていますが、役割はまったく違います。
+  \begin{itemize}
+    \item \cmd{apt update}：パッケージの\textbf{一覧}を最新にする（ソフトウェア自体は変わらない）
+    \item \cmd{apt upgrade}：インストール済みのソフトウェアを、一覧にある新しいバージョンに\textbf{更新}する
+  \end{itemize}
+  セキュリティの修正も apt で配布されるので、定期的に両方を実行して、システムを最新に保ちましょう。
+\end{point}
+
+\subsection{パッケージを削除する}
+
+不要になったパッケージは、\cmd{apt remove} で削除します。
+設定ファイルも含めて完全に削除したいときは、\cmd{apt purge} を使います。
+また、依存パッケージとして自動でインストールされたものの、もう使われていないパッケージは、\cmd{apt autoremove} でまとめて削除できます。
+
+\begin{terminal}[パッケージを削除する]
+$ sudo apt remove tree
+$ sudo apt autoremove
+\end{terminal}
+
+\subsection{apt のコマンドのまとめ}
+
+ここまでに紹介した apt のコマンドを、表にまとめておきます。
+
+\begin{center}
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    コマンド & 動作 \\
+    \midrule
+    \cmd{sudo apt update} & パッケージの一覧を更新する \\
+    \cmd{sudo apt upgrade} & インストール済みのパッケージを更新する \\
+    \cmd{sudo apt install 名前} & パッケージをインストールする \\
+    \cmd{sudo apt remove 名前} & パッケージを削除する \\
+    \cmd{sudo apt purge 名前} & 設定ファイルも含めて削除する \\
+    \cmd{sudo apt autoremove} & 使われていない依存パッケージを削除する \\
+    \cmd{apt search キーワード} & パッケージを探す \\
+    \cmd{apt show 名前} & パッケージの詳しい情報を表示する \\
+    \cmd{apt list --installed} & インストール済みのパッケージを一覧する \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{column}{apt と apt-get}
+  インターネット上の資料では、\cmd{apt} の代わりに \cmd{apt-get} や \cmd{apt-cache} というコマンドが使われていることがあります。
+  これらは古くからあるコマンドで、\cmd{apt} はそれらを使いやすくまとめたものです。
+  \cmd{apt-get install} は \cmd{apt install} と、\cmd{apt-cache search} は \cmd{apt search} と、ほぼ同じ意味だと考えて構いません。
+  なお、シェルスクリプトの中では、出力の形式が変わりにくい \cmd{apt-get} を使うのが一般的です。
+\end{column}
+
+\subsection{.deb ファイルからインストールする}
+
+apt のパッケージの実体は、\cmd{.deb} という拡張子のファイルです。
+ソフトウェアによっては、公式サイトで \cmd{.deb} ファイルが直接配布されていることがあります（\ref{chap:editor}章で扱う VS Code など）。
+ダウンロードした \cmd{.deb} ファイルは、パスを指定して \cmd{apt install} でインストールできます。
+
+\begin{terminal}[.deb ファイルからインストールする]
+$ sudo apt install ./code_1.93.1_amd64.deb
+\end{terminal}
+
+ファイル名の前の \cmd{./} を忘れると、リポジトリからその名前のパッケージを探そうとしてしまうので注意してください。
+
+\begin{column}{snap パッケージ}
+  Ubuntu には、apt のほかに \textbf{snap} というパッケージのしくみもあります。
+  snap のパッケージは、必要なライブラリをすべて同梱しているので、ディストリビューションのバージョンに左右されずに動きます。
+  Ubuntu 24.04 では、Firefox などのいくつかのアプリケーションが snap で提供されています。
+  snap のパッケージは、\cmd{snap install} や、デスクトップの「App Center」からインストールできます。
+\end{column}
 
 \section{リポジトリと GPG 鍵}
+\label{sec:package-repository}
 
-TODO
+\subsection{リポジトリ}
+
+apt がどのリポジトリからパッケージを取得するかは、\cmd{/etc/apt/} の下の設定ファイルに書かれています。
+Ubuntu 24.04 では、公式のリポジトリの設定は \cmd{/etc/apt/sources.list.d/ubuntu.sources} にあります。
+
+\begin{terminal}[公式のリポジトリの設定を確認する]
+$ cat /etc/apt/sources.list.d/ubuntu.sources
+Types: deb
+URIs: http://archive.ubuntu.com/ubuntu/
+Suites: noble noble-updates noble-backports
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+...
+\end{terminal}
+
+\cmd{Components} は、リポジトリの中の区分を表しています。
+\cmd{main} は Canonical が公式にサポートする OSS、\cmd{universe} はコミュニティが保守する OSS、\cmd{restricted} と \cmd{multiverse} はライセンスに制限のあるソフトウェアです。
+
+\subsection{リポジトリを追加する}
+
+Ubuntu の公式リポジトリにないソフトウェアや、公式リポジトリより新しいバージョンを使いたいときは、ソフトウェアの開発元が用意しているリポジトリを apt に追加します。
+本書で扱う Docker（\ref{chap:docker}章）や ROS 2（\ref{chap:ros2_install}章）も、開発元のリポジトリを追加してからインストールします。
+
+リポジトリの追加は、一般的に次のような手順で行います。
+具体的なコマンドは、ソフトウェアごとに公式ドキュメントに書かれているので、それに従ってください。
+
+\begin{enumerate}
+  \item 開発元の \textbf{GPG 鍵}をダウンロードして、\cmd{/etc/apt/keyrings/} などに保存する
+  \item リポジトリの URL と、そのリポジトリの検証に使う鍵の場所を、\cmd{/etc/apt/sources.list.d/} の下の設定ファイルに書く
+  \item \cmd{sudo apt update} で、追加したリポジトリのパッケージの一覧を取得する
+  \item \cmd{sudo apt install} でインストールする
+\end{enumerate}
+
+\begin{terminal}[リポジトリを追加する手順の例]
+$ sudo install -m 0755 -d /etc/apt/keyrings
+$ sudo curl -fsSL <GPG 鍵の URL> -o /etc/apt/keyrings/<名前>.asc
+$ echo "deb [signed-by=/etc/apt/keyrings/<名前>.asc] <リポジトリの URL> noble main" | sudo tee /etc/apt/sources.list.d/<名前>.list
+$ sudo apt update
+$ sudo apt install <パッケージ名>
+\end{terminal}
+
+\cmd{\textless{}\textgreater{}} で囲んだ部分は、ソフトウェアごとに異なります。
+
+\subsection{GPG 鍵によるパッケージの検証}
+
+インターネットからダウンロードしたパッケージが、本当に開発元が作ったものなのか、途中で誰かに書き換えられていないかは、どうすれば確かめられるでしょうか。
+apt はこれを、\textbf{GPG 鍵}による\textbf{電子署名}で確かめています。
+
+リポジトリのパッケージの一覧には、開発元だけが持っている秘密の鍵で署名が付けられています。
+apt は、あらかじめ保存しておいた開発元の公開鍵（GPG 鍵）を使って、その署名が正しいかどうかを検証します。
+署名が正しくなければ、apt はそのリポジトリを使うことを拒否します。
+リポジトリを追加するときに GPG 鍵も保存するのは、このためです。
+
+\begin{caution}[リポジトリを追加するときの注意]
+  リポジトリを追加すると、そのリポジトリのパッケージが root の権限でインストールされるようになります。
+  つまり、そのリポジトリの提供者を信頼することになります。
+  リポジトリを追加するのは、公式ドキュメントに書かれた、信頼できる開発元のものだけにしましょう。
+  また、古い資料には \cmd{apt-key} というコマンドで鍵を登録する方法が書かれていることがありますが、この方法は現在は非推奨です。
+\end{caution}
+
+\begin{column}{PPA}
+  Ubuntu には、個人やチームが自分のパッケージを配布できる \textbf{PPA}（Personal Package Archive）というしくみもあります。
+  PPA は、\cmd{sudo add-apt-repository ppa:<名前>} のようにコマンド 1 つで追加でき、GPG 鍵も自動で登録されます。
+  手軽な反面、公式のパッケージほどは検証されていないので、信頼できるものだけを使いましょう。
+\end{column}
 
 \section{ソースからのビルド}
+\label{sec:package-build}
 
-TODO
+\subsection{ソースコードからインストールするとき}
+
+使いたいソフトウェアが apt で提供されていないこともあります。
+また、研究室や競技チームで作られたロボット用のソフトウェアは、ソースコードの形でしか公開されていないことも珍しくありません。
+そのような場合は、ソースコードをダウンロードし、自分のコンピュータで\textbf{ビルド}（コンパイルして実行ファイルを作ること）してからインストールします。
+C 言語や C++ のプログラムのコンパイルについては、\ref{sec:python-compile-interpret}節も参考にしてください。
+
+ビルドに必要な基本的な道具は、次のコマンドでまとめてインストールできます。
+\cmd{build-essential} には、C/C++ のコンパイラ（\cmd{gcc}, \cmd{g++}）や \cmd{make} が含まれています。
+
+\begin{terminal}[ビルドに必要な道具をインストールする]
+$ sudo apt install build-essential cmake git
+\end{terminal}
+
+\subsection{make}
+
+プログラムが大きくなると、ソースコードは何十、何百ものファイルに分かれます。
+それらを正しい順番でコンパイルし、1 つの実行ファイルにまとめる作業を自動で行ってくれるのが \textbf{make} です。
+make は、\cmd{Makefile} というファイルに書かれた手順に従ってビルドを行います。
+また、変更されたファイルだけを選んでコンパイルし直してくれるので、2 回目以降のビルドは短い時間で終わります。
+
+\subsection{CMake}
+
+\textbf{CMake} は、ソースコードとビルドの設定を書いた \cmd{CMakeLists.txt} というファイルから、そのコンピュータに合った \cmd{Makefile} を自動で作ってくれるツールです。
+C++ で書かれたロボット用のソフトウェアの多くは CMake を使っていて、ROS 2 のパッケージも内部で CMake を使ってビルドされます（\ref{chap:workspace}章）。
+
+簡単な例で、CMake を使ったビルドの流れを体験してみましょう。
+\cmd{hello\_cmake} というディレクトリを作り、その中に次の 2 つのファイルを作ります。
+
+\begin{lstlisting}[style=cpp, caption={ソースコード（hello.c）}, label={lst:package-hello-c}]
+#include <stdio.h>
+
+int main(void)
+{
+    printf("Hello, CMake!\n");
+    return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={ビルドの設定（CMakeLists.txt）}, label={lst:package-cmakelists}]
+cmake_minimum_required(VERSION 3.10)
+project(hello C)
+add_executable(hello hello.c)
+\end{lstlisting}
+
+\cmd{CMakeLists.txt} には、「\cmd{hello.c} から \cmd{hello} という実行ファイルを作る」ということが書かれています。
+ビルドは、次の手順で行います。
+
+\begin{terminal}[CMake でビルドする]
+$ cd ~/hello_cmake
+$ mkdir build
+$ cd build
+$ cmake ..
+-- The C compiler identification is GNU 13.2.0
+...
+-- Build files have been written to: /home/user/hello_cmake/build
+$ make
+[ 50%] Building C object CMakeFiles/hello.dir/hello.c.o
+[100%] Linking C executable hello
+[100%] Built target hello
+$ ./hello
+Hello, CMake!
+\end{terminal}
+
+\begin{enumerate}
+  \item \cmd{build} ディレクトリを作って移動する（ビルドで生成されるファイルを、ソースコードと分けておくため）
+  \item \cmd{cmake ..} で、1 つ上のディレクトリにある \cmd{CMakeLists.txt} を読み込み、\cmd{Makefile} を作る
+  \item \cmd{make} で、\cmd{Makefile} に従ってビルドする
+\end{enumerate}
+
+大きなソフトウェアでは、\cmd{make -j\$(nproc)} のように \cmd{-j} オプションを付けると、CPU のコアの数だけ並列にコンパイルして、ビルドの時間を短くできます（\cmd{nproc} は CPU のコアの数を表示するコマンドです）。
+
+\subsection{ビルドしたソフトウェアをインストールする}
+
+ビルドしたソフトウェアをシステム全体で使えるようにするには、\cmd{sudo make install} を実行します。
+多くの場合、ソフトウェアは \cmd{/usr/local/} の下にインストールされます（\ref{sec:linux-internals-fs}節）。
+公開されているソフトウェアをソースからインストールする手順は、おおむね次のような流れになります。
+
+\begin{terminal}[ソースからインストールする一般的な流れ]
+$ git clone <リポジトリの URL>
+$ cd <ソフトウェアのディレクトリ>
+$ mkdir build && cd build
+$ cmake ..
+$ make -j$(nproc)
+$ sudo make install
+\end{terminal}
+
+\cmd{git clone} は、ソースコードをダウンロードするコマンドです（\ref{chap:git}章）。
+\cmd{\&\&} は、前のコマンドが成功したときだけ次のコマンドを実行する、という意味です（\ref{chap:shellscript}章）。
+実際の手順はソフトウェアによって異なるので、必ずそのソフトウェアの \cmd{README} などを読んでから作業しましょう。
+
+\begin{caution}[ソースからのインストールは最後の手段]
+  \cmd{sudo make install} でインストールしたソフトウェアは、apt の管理の外にあります。
+  apt のように簡単に更新したり削除したりすることはできず、apt で入れたパッケージとぶつかって、トラブルの原因になることもあります。
+  まずは apt で提供されていないかを調べ、ソースからのインストールは、どうしても必要なときだけにしましょう。
+  なお、ROS 2 のパッケージをソースからビルドするときは、\cmd{sudo make install} ではなく、ワークスペースの中でビルドする方法を使います（\ref{chap:workspace}章）。
+\end{caution}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item Ubuntu のソフトウェアの多くはパッケージとして配布されていて、パッケージ管理システムの apt でインストール・更新・削除します。
+  \item \cmd{sudo apt update} でパッケージの一覧を更新し、\cmd{sudo apt install} でインストール、\cmd{sudo apt upgrade} で更新します。
+  \item 公式にないソフトウェアは、開発元のリポジトリを追加してインストールします。リポジトリは GPG 鍵による電子署名で検証されます。
+  \item apt にないソフトウェアは、ソースコードからビルドします。C/C++ のソフトウェアの多くは CMake と make でビルドします。
+  \item ソースからのインストールは apt の管理の外になるので、最後の手段と考えましょう。
+\end{itemize}

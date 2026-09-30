@@ -1,0 +1,21 @@
+% 図：コンパイラ型言語とインタプリタ型言語の実行の流れ（chapters/python/what_is_python.tex）
+\begin{tikzpicture}
+  % コンパイラ型（C 言語）
+  \node[font=\small\bfseries, anchor=west] at (-1.1,1.25) {コンパイラ型（C 言語）};
+  \node[figbox, minimum width=18mm] (csrc) at (0,0) {ソースコード\\{\footnotesize\ttfamily hello.c}};
+  \node[figpart, minimum width=18mm] (cc) at (2.9,0) {コンパイラ\\{\footnotesize\ttfamily gcc}};
+  \node[figbox, minimum width=18mm, fill=black!8] (bin) at (5.8,0) {実行ファイル\\{\footnotesize（機械語）}};
+  \node[figbox, minimum width=14mm, fill=orange!10] (cpu1) at (8.5,0) {CPU};
+  \draw[figarrow] (csrc) -- (cc);
+  \draw[figarrow] (cc) -- node[figlabel, above]{翻訳} (bin);
+  \draw[figarrow] (bin) -- node[figlabel, above]{実行} (cpu1);
+  \node[figlabel, text=black!60] at (2.9,-0.95) {実行する前にまとめて翻訳};
+  % インタプリタ型（Python）
+  \node[font=\small\bfseries, anchor=west] at (-1.1,-1.85) {インタプリタ型（Python）};
+  \node[figbox, minimum width=18mm] (psrc) at (0,-3.1) {ソースコード\\{\footnotesize\ttfamily hello.py}};
+  \node[figpart, minimum width=47mm] (py) at (4.35,-3.1) {インタプリタ\\{\footnotesize\ttfamily python3}};
+  \node[figbox, minimum width=14mm, fill=orange!10] (cpu2) at (8.5,-3.1) {CPU};
+  \draw[figarrow] (psrc) -- (py);
+  \draw[figarrow] (py) -- node[figlabel, above]{実行} (cpu2);
+  \node[figlabel, text=black!60] at (4.35,-4.05) {1 行ずつ読みながら、その場で解釈して実行};
+\end{tikzpicture}

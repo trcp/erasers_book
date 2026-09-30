@@ -1,0 +1,15 @@
+% 図：Issue と Pull Request による OSS 開発の流れ（chapters/linux/what_is_linux.tex）
+\begin{tikzpicture}
+  
+  \foreach \a/\name/\text in {
+      90/use/利用者がソフトウェアを使う,
+      18/issue/不具合を見つけて\\Issue で報告,
+      -54/pr/誰かが修正して\\Pull Request を送る,
+      -126/review/レビューを経て\\変更が取り込まれる,
+      162/release/新しい版が\\公開される} {
+    \node[figpart, minimum width=26mm, font=\footnotesize] (\name) at (\a:2.9cm and 2.3cm) {\text};
+  }
+  \foreach \a/\b in {use/issue, issue/pr, pr/review, review/release, release/use}
+    \draw[figarrow] (\a) to[bend left=18] (\b);
+  \node[figlabel, text=black!60] at (0,0) {GitHub など};
+\end{tikzpicture}

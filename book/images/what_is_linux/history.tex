@@ -1,0 +1,17 @@
+% 図：UNIX から Linux への流れ（chapters/linux/what_is_linux.tex）
+\begin{tikzpicture}[y=-0.75cm]
+  \draw[thick, black!40] (1.4,-0.4) -- (1.4,7.4);
+  \foreach \year/\text/\col [count=\i from 0] in {
+      1969/UNIX 誕生（AT\&T ベル研究所）/black,
+      1970 年代/BSD など UNIX の派生版が広がる/black,
+      1983/GNU プロジェクト開始/green!50!black,
+      1991/Linux カーネル公開（Linus Torvalds）/blue!70!black,
+      1992/Linux カーネルが GPL で配布されるように/blue!70!black,
+      2004/Ubuntu の最初のバージョンが公開/orange!80!black,
+      2008/Linux カーネルを使った Android 端末が登場/blue!70!black,
+      2024/Ubuntu 24.04 LTS 公開/orange!80!black} {
+    \fill[\col] (1.4,\i) circle (1.2mm);
+    \node[anchor=east, font=\small\bfseries] at (1.15,\i) {\year};
+    \node[anchor=west, font=\small, text=\col] at (1.65,\i) {\text};
+  }
+\end{tikzpicture}

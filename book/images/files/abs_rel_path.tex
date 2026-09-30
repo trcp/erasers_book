@@ -1,0 +1,32 @@
+% 図：絶対パスと相対パスの道順（chapters/commandline/files.tex）
+\begin{tikzpicture}[
+    every node/.style={font=\small\ttfamily, inner sep=2pt},
+    level distance=10mm,
+    level 1/.style={sibling distance=22mm},
+    level 2/.style={sibling distance=18mm},
+    level 3/.style={sibling distance=28mm},
+    edge from parent/.style={draw, black!40}]
+  \node (root) {/}
+    child {node {etc/}}
+    child {node (home) {home/}
+      child {node[fill=blue!10] (user) {user/}
+        child {node (docs) {Documents/}
+          child {node (memo) {memo.txt}}}
+        child {node {Downloads/}}}}
+    child {node {usr/}};
+  % 絶対パス：/ から
+  \draw[-{Stealth[length=2mm]}, very thick, blue!70!black]
+    ([xshift=-1mm]root.west) to[bend right=50] ([xshift=-1mm]home.west)
+    to[bend right=50] ([xshift=-1mm]user.west) to[bend right=40] ([xshift=-1mm]docs.west)
+    to[bend right=40] ([xshift=-1mm]memo.west);
+  % 相対パス：カレントディレクトリ（user）から
+  \draw[-{Stealth[length=2mm]}, very thick, red!70!black, dashed]
+    ([yshift=-1mm]user.south) to[bend left=30] ([xshift=1mm]docs.east)
+    to[bend left=40] ([xshift=1mm]memo.east);
+  \node[font=\footnotesize, text=black!70, right=2mm of user] {← カレントディレクトリ};
+  % 凡例
+  \draw[very thick, blue!70!black] (-4.6,-4.5) -- ++(0.6,0)
+    node[right, font=\footnotesize, text=blue!70!black]{絶対パス：\texttt{/home/user/Documents/memo.txt}};
+  \draw[very thick, red!70!black, dashed] (-4.6,-5.0) -- ++(0.6,0)
+    node[right, font=\footnotesize, text=red!70!black]{相対パス：\texttt{Documents/memo.txt}};
+\end{tikzpicture}

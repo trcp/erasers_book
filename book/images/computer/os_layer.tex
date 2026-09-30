@@ -1,0 +1,20 @@
+% 図：ハードウェア・OS・アプリケーションの関係（chapters/linux/computer.tex）
+\begin{tikzpicture}[x=1cm, y=1cm]
+  \def\w{9.6}
+  % ハードウェア
+  \node[figbox, minimum width=\w cm, minimum height=16mm, fill=black!6, anchor=south west] (hw) at (0,0) {};
+  \node[font=\small\bfseries, anchor=north west] at (hw.north west) {ハードウェア};
+  \foreach \t [count=\i from 0] in {CPU,メモリ,ストレージ,GPU,入出力装置}
+    \node[figbox, minimum width=17mm, minimum height=6mm, font=\footnotesize] at (1.0+1.9*\i, 0.5) {\t};
+  % OS
+  \node[figpart, minimum width=\w cm, minimum height=12mm, anchor=south west, fill=blue!12] (os) at (0,1.8)
+    {\textbf{OS}（Linux など）\\{\footnotesize CPU・メモリ・ファイル・周辺機器の管理}};
+  % アプリケーション
+  \node[figbox, minimum width=\w cm, minimum height=16mm, fill=green!6, anchor=south west] (app) at (0,3.2) {};
+  \node[font=\small\bfseries, anchor=north west] at (app.north west) {アプリケーション};
+  \foreach \t [count=\i from 0] in {Web ブラウザ,エディタ,ROS 2 のプログラム}
+    \node[figbox, minimum width=28mm, minimum height=6mm, font=\footnotesize] at (1.7+3.1*\i, 3.7) {\t};
+  % 利用者
+  \node[figbox, minimum width=30mm] (user) at (\w/2, 6.0) {利用者};
+  \draw[figarrow, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (user.south) -- (app.north -| user.south);
+\end{tikzpicture}

@@ -1,0 +1,14 @@
+% 図：SSH の公開鍵認証（chapters/tools/network.tex）
+\begin{tikzpicture}
+  \node[figbox, minimum width=42mm, minimum height=28mm, fill=blue!4, anchor=north] (pc) at (0,0) {};
+  \node[font=\small\bfseries, anchor=north] at (pc.north) {開発用 PC {\footnotesize\mdseries（接続する側）}};
+  \node[figbox, minimum width=36mm, fill=red!8, font=\footnotesize, anchor=north] (priv) at (0,-0.75) {秘密鍵\\\texttt{\textasciitilde/.ssh/id\_ed25519}};
+  \node[figbox, minimum width=36mm, fill=green!8, font=\footnotesize, anchor=north] (pub) at (0,-1.6) {公開鍵\\\texttt{\textasciitilde/.ssh/id\_ed25519.pub}};
+  \node[figbox, minimum width=42mm, minimum height=28mm, fill=orange!6, anchor=north] (robot) at (6.2,0) {};
+  \node[font=\small\bfseries, anchor=north] at (robot.north) {ロボットの PC {\footnotesize\mdseries（接続される側）}};
+  \node[figbox, minimum width=36mm, fill=green!8, font=\footnotesize, anchor=north] (auth) at (6.2,-1.3) {登録された公開鍵\\\texttt{\textasciitilde/.ssh/authorized\_keys}};
+  \draw[figarrow] (pub.east) -- node[figlabel, below, pos=0.5]{\tikz\node[fignum]{1}; \texttt{ssh-copy-id}} (auth.west |- pub.east);
+  \draw[figarrow, {Stealth[length=2mm]}-{Stealth[length=2mm]}] (priv.east) -- node[figlabel, above, pos=0.5]{\tikz\node[fignum]{2}; 照合} (auth.west |- priv.east);
+  \node[figlabel, text=red!60!black] at (0,-3.05) {秘密鍵は誰にも渡さない};
+  \node[figlabel, text=black!60] at (6.2,-3.05) {公開鍵は渡しても安全};
+\end{tikzpicture}
