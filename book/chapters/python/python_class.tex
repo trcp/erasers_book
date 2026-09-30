@@ -4,38 +4,917 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item クラスを定義し、インスタンスを作る方法
+    \item 継承を使って、既存のクラスを拡張する方法
+    \item 関数を値として渡す（コールバック）考え方
+    \item モジュールを import して使う方法と、自分でモジュールを作る方法
+    \item 例外処理、読みやすいコードの書き方、デバッグの基本
   \end{itemize}
 \end{goalbox}
 
-\section{クラスとオブジェクト}
+\ref{chap:python_basics}章では、Python の基本的な文法を学びました。
+この章では、もう少し大きなプログラムを書くための道具を学びます。
+特に、クラス・継承・コールバックは、ROS 2 のノードを書くとき（\ref{chap:rclpy}章）に毎回使う、とても大切な考え方です。
+この章でも、各節の最後に練習問題を用意しました。
+解答例は章の最後（\ref{sec:python-class-answers}節）にあります。
 
-TODO
+\section{クラスとオブジェクト}
+\label{sec:python-class-class}
+
+\subsection{オブジェクト}
+
+Python では、数値も文字列もリストも、すべて\textbf{オブジェクト}です。
+オブジェクトは、データと、そのデータを扱うための関数をひとまとめにしたものです。
+オブジェクトに属する関数を\textbf{メソッド}といい、\cmd{オブジェクト.メソッド名( )} の形で呼び出します。
+\ref{sec:python-basics-list}節で使った \cmd{sensors.append("imu")} も、リストというオブジェクトのメソッドでした。
+
+\begin{terminal}[文字列のメソッドを使う]
+>>> name = "turtle"
+>>> name.upper()
+'TURTLE'
+>>> name.replace("t", "T")
+'TurTle'
+\end{terminal}
+
+\subsection{クラス}
+
+\textbf{クラス}は、オブジェクトの設計図です。
+クラスを使うと、自分で新しい種類のオブジェクトを作れます。
+たとえば、RPG のプレイヤーを考えてみましょう。
+プレイヤーには「名前」「体力」といったデータと、「攻撃する」「回復する」といった動作があります。
+これらを 1 つのクラスにまとめておけば、同じ設計図から、名前の違うプレイヤーを何人でも作れます。
+クラスから作ったオブジェクトを\textbf{インスタンス}といい、インスタンスを作ることを\textbf{インスタンス化}といいます。
+
+クラスは、\cmd{class} を使って定義します。
+
+\begin{lstlisting}[style=python, caption={クラスを定義してインスタンスを作る（player.py）}, label={lst:python-class-player}]
+class Player:
+    def __init__(self, name, hp):
+        self.name = name   # インスタンスごとのデータ（属性）
+        self.hp = hp
+
+    def attack(self):
+        print(f"{self.name}は攻撃をした！")
+
+    def heal(self, amount):
+        self.hp += amount
+        print(f"{self.name}の体力が {amount} 回復した（体力: {self.hp}）")
+
+
+hero = Player("勇者", 100)      # インスタンスを作る
+wizard = Player("魔法使い", 60)
+
+hero.attack()
+wizard.attack()
+wizard.heal(20)
+print(hero.hp, wizard.hp)
+\end{lstlisting}
+
+\begin{terminal}[クラスのプログラムを実行する]
+$ python3 player.py
+勇者は攻撃をした！
+魔法使いは攻撃をした！
+魔法使いの体力が 20 回復した（体力: 80）
+100 80
+\end{terminal}
+
+ポイントを見ていきましょう。
+
+\begin{itemize}
+  \item クラスの名前は、\cmd{Player} のように単語の先頭を大文字にします。
+  \item クラスの中に \cmd{def} で書いた関数が、メソッドです。
+  \item メソッドの最初の引数は、必ず \cmd{self} にします。\cmd{self} は、そのメソッドを呼び出したインスタンス自身を表します。呼び出すときは、\cmd{self} の分の引数は書きません（\cmd{wizard.heal(20)} のように、\cmd{self} 以外の引数だけを渡します）。
+  \item \cmd{\_\_init\_\_}（\cmd{init} の前後にアンダースコアが 2 つずつ）は、インスタンスを作るときに自動で呼ばれる特別なメソッドです。インスタンスを作るときに \cmd{Player("勇者", 100)} と渡した値は、\cmd{\_\_init\_\_} の引数に入ります。
+  \item \cmd{self.name = name} のように \cmd{self.} を付けた変数は、そのインスタンスが持つデータ（\textbf{属性}）になります。属性は、同じインスタンスのほかのメソッドからも使えます。
+\end{itemize}
+
+\cmd{hero} と \cmd{wizard} は同じ \cmd{Player} クラスから作られていますが、それぞれが自分の \cmd{name} と \cmd{hp} を持っています。
+\cmd{wizard.heal(20)} で変わったのは \cmd{wizard} の体力だけで、\cmd{hero} の体力は変わっていません。
+
+\subsection{ロボットをクラスで表す}
+
+もう 1 つ、ロボットらしい例を見てみましょう。
+ロボットの位置を属性として持ち、指令を受けて移動するクラスです。
+
+\begin{lstlisting}[style=python, caption={ロボットを表すクラス（robot.py）}, label={lst:python-class-robot}]
+class Robot:
+    def __init__(self, name, max_speed=0.5):
+        self.name = name
+        self.max_speed = max_speed
+        self.x = 0.0
+
+    def move(self, speed, duration):
+        # 最高速度を超えないように制限する
+        if speed > self.max_speed:
+            speed = self.max_speed
+        self.x += speed * duration
+        print(f"{self.name}: {speed} m/s で {duration} 秒進んだ（x = {self.x:.2f}）")
+
+
+robot = Robot("turtle")
+robot.move(0.3, 2.0)
+robot.move(1.0, 2.0)   # 最高速度 0.5 m/s に制限される
+\end{lstlisting}
+
+\begin{terminal}[ロボットのクラスの実行結果]
+turtle: 0.3 m/s で 2.0 秒進んだ（x = 0.60）
+turtle: 0.5 m/s で 2.0 秒進んだ（x = 1.60）
+\end{terminal}
+
+このように、関係するデータと処理をクラスにまとめておくと、プログラムが整理され、読みやすく、使い回しやすくなります。
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 19.1] 次の 2 つのメソッドを持つ \cmd{Human} クラスを作り、2 つのインスタンスを作って、それぞれのメソッドを呼び出してください。名前と年齢は、インスタンスを作るときに渡すこと（メソッドの引数は \cmd{self} だけにすること）。
+    \begin{itemize}
+      \item \cmd{introduce}：「私の名前は〇〇です」と表示する
+      \item \cmd{show\_age}：「年齢は〇〇歳です」と表示する
+    \end{itemize}
+  \item[問 19.2] 消費税の税率を属性として持つ \cmd{Tax} クラスを作ってください。税率 8\% と 10\% の 2 つのインスタンスを作り、メソッド \cmd{price(値段)} で、250 円と 580 円の税込み価格を計算して表示すること（端数は \cmd{round( )} で丸める）。
+  \item[問 19.3] \cmd{Robot} クラス（リスト\ref{lst:python-class-robot}）に、バッテリの残量 [\%] を表す属性 \cmd{battery}（最初は 100）を追加してください。\cmd{move} を呼ぶたびに、進んだ距離 1 m あたり 10\% ずつ減らし、残量が 0 以下になったら「バッテリ切れです」と表示して移動しないようにすること。
+\end{description}
 
 \section{継承}
+\label{sec:python-class-inherit}
 
-TODO
+\subsection{継承とは}
+
+\textbf{継承}を使うと、すでにあるクラスをもとにして、機能を追加したり変更したりした新しいクラスを作れます。
+もとになるクラスを\textbf{親クラス}、新しく作るクラスを\textbf{子クラス}といいます。
+子クラスは、親クラスの属性とメソッドをすべて引き継ぎます。
+
+継承するには、クラスを定義するときに、クラス名の後ろの \cmd{( )} に親クラスの名前を書きます。
+
+\begin{lstlisting}[style=python, caption={継承を使う（inherit.py）}, label={lst:python-class-inherit}]
+class Robot:
+    def __init__(self, name):
+        self.name = name
+
+    def hello(self):
+        print(f"こんにちは、{self.name}です")
+
+    def move(self):
+        print(f"{self.name}は移動した")
+
+
+class DroneRobot(Robot):   # Robot クラスを継承する
+    def __init__(self, name, max_height):
+        super().__init__(name)          # 親クラスの __init__ を呼ぶ
+        self.max_height = max_height    # 子クラスで属性を追加する
+
+    def move(self):                     # 親クラスのメソッドを上書きする
+        print(f"{self.name}は高度 {self.max_height} m まで飛んだ")
+
+
+drone = DroneRobot("tello", 10)
+drone.hello()    # 親クラスから引き継いだメソッド
+drone.move()     # 子クラスで上書きしたメソッド
+\end{lstlisting}
+
+\begin{terminal}[継承のプログラムの実行結果]
+こんにちは、telloです
+telloは高度 10 m まで飛んだ
+\end{terminal}
+
+\begin{itemize}
+  \item \cmd{DroneRobot} には \cmd{hello} メソッドを書いていませんが、親クラスの \cmd{Robot} から引き継いでいるので使えます。
+  \item 親クラスと同じ名前のメソッドを子クラスで定義すると、子クラスのほうが使われます（\textbf{オーバーライド}）。
+  \item \cmd{super().\_\_init\_\_(name)} は、親クラスの \cmd{\_\_init\_\_} を呼び出しています。こうすることで、親クラスが行う準備（ここでは \cmd{self.name} の設定）を、子クラスでもそのまま利用できます。
+\end{itemize}
+
+\subsection{ROS 2 のノードと継承}
+
+ROS 2 で Python のノードを作るときは、ROS 2 が用意している \cmd{Node} というクラスを継承して、自分のクラスを作ります。
+\cmd{Node} クラスには、ほかのノードと通信するための機能がたくさん用意されていて、継承するだけでそれらを使えるようになります。
+次のコードは、\ref{chap:rclpy}章で学ぶノードの形を先取りしたものです（今はまだ実行できなくても構いません）。
+
+\begin{lstlisting}[style=python, caption={ROS 2 のノードの形（先取り）}, label={lst:python-class-node-preview}]
+from rclpy.node import Node
+
+
+class MyNode(Node):                 # Node クラスを継承する
+    def __init__(self):
+        super().__init__("my_node")   # 親クラスにノードの名前を渡す
+        self.get_logger().info("ノードを起動しました")
+\end{lstlisting}
+
+\cmd{super().\_\_init\_\_("my\_node")} で親クラス（\cmd{Node}）の準備をし、\cmd{self.get\_logger( )} のように、親クラスから引き継いだメソッドを使っています。
+この章で学んだクラスと継承の知識が、そのまま使われていることがわかるでしょう。
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 19.4] \cmd{Player} クラス（リスト\ref{lst:python-class-player}）を継承した \cmd{Wizard} クラスを作ってください。\cmd{Wizard} は属性 \cmd{mp}（魔力）を追加で持ち、メソッド \cmd{magic( )} を呼ぶと、魔力を 10 使って「〇〇は魔法を唱えた！（残り魔力: △）」と表示します。魔力が 10 未満のときは「魔力が足りない」と表示すること。
+  \item[問 19.5] 距離センサを表す \cmd{Sensor} クラス（属性 \cmd{name}、メソッド \cmd{read( )} は \cmd{0.0} を返す）を作り、それを継承した \cmd{DummyLidar} クラスを作ってください。\cmd{DummyLidar} の \cmd{read( )} は、\cmd{random.uniform(0.1, 5.0)}（0.1 以上 5.0 以下の小数の乱数）を返すようにオーバーライドすること。
+\end{description}
 
 \section{関数を渡す（コールバック）}
+\label{sec:python-class-callback}
 
-TODO
+\subsection{関数も値として扱える}
+
+Python では、関数も数値や文字列と同じように、変数に入れたり、ほかの関数の引数として渡したりできます。
+関数名の後ろに \cmd{( )} を付けると関数が\textbf{呼び出され}ますが、\cmd{( )} を付けずに書くと、関数\textbf{そのもの}を表します。
+
+\begin{lstlisting}[style=python, caption={関数を変数に入れる}, label={lst:python-class-func-value}]
+def greet():
+    print("こんにちは")
+
+
+f = greet   # ( ) を付けないので、関数そのものを f に入れる
+f()         # f を呼び出すと greet が実行される
+\end{lstlisting}
+
+\subsection{コールバック}
+
+ほかの関数に引数として渡しておき、ある出来事が起きたときに呼び出してもらう関数を、\textbf{コールバック関数}といいます。
+「何かが起きたら、この関数を呼んでね」とお願いしておくしくみです。
+
+次の例では、\cmd{run\_timer} という関数に「一定の間隔で呼んでほしい関数」を渡しています。
+\cmd{time.sleep(秒)} は、指定した秒数だけ待つ関数です。
+
+\begin{lstlisting}[style=python, caption={コールバック関数を渡す（callback.py）}, label={lst:python-class-callback}]
+import time
+
+
+def run_timer(period, count, callback):
+    # period 秒ごとに、callback を count 回呼び出す
+    for i in range(count):
+        time.sleep(period)
+        callback(i)
+
+
+def say_hello(i):
+    print(f"{i} 回目: こんにちは")
+
+
+def check_battery(i):
+    print(f"{i} 回目: バッテリを確認しました")
+
+
+run_timer(0.5, 3, say_hello)       # ( ) を付けずに関数を渡す
+run_timer(0.5, 2, check_battery)
+\end{lstlisting}
+
+\begin{terminal}[コールバックの実行結果]
+0 回目: こんにちは
+1 回目: こんにちは
+2 回目: こんにちは
+0 回目: バッテリを確認しました
+1 回目: バッテリを確認しました
+\end{terminal}
+
+\cmd{run\_timer} は、「一定の間隔で何かを呼ぶ」という部分だけを担当し、「何をするか」は渡されたコールバック関数に任せています。
+こうしておくと、同じ \cmd{run\_timer} を、いろいろな処理に使い回せます。
+
+\subsection{ROS 2 とコールバック}
+
+ROS 2 のプログラムは、コールバックの考え方で動いています。
+「0.5 秒ごとに、この関数を呼んでほしい」（タイマ）、「センサのデータが届いたら、この関数を呼んでほしい」（トピックの受信、\ref{chap:ros2_concepts}章）というように、コールバック関数を ROS 2 に登録しておき、出来事が起きるたびに ROS 2 がその関数を呼び出します。
+ROS 2 では、コールバックとしてクラスのメソッド（\cmd{self.timer\_callback} など）を渡すことがよくあります。
+
+\begin{lstlisting}[style=python, caption={ROS 2 のタイマのコールバック（先取り）}, label={lst:python-class-timer-preview}]
+class MyNode(Node):
+    def __init__(self):
+        super().__init__("my_node")
+        # 0.5 秒ごとに self.timer_callback を呼んでもらう
+        self.timer = self.create_timer(0.5, self.timer_callback)
+
+    def timer_callback(self):
+        self.get_logger().info("タイマが呼ばれました")
+\end{lstlisting}
+
+\cmd{self.create\_timer(0.5, self.timer\_callback)} の \cmd{self.timer\_callback} に \cmd{( )} が付いていないことに注目してください。
+メソッドを呼び出すのではなく、メソッドそのものを ROS 2 に渡しているのです。
+
+\begin{column}{lambda 式}
+  ちょっとした処理のためだけに、わざわざ \cmd{def} で関数を定義するのが面倒なときは、\textbf{lambda 式}で名前のない関数をその場で作れます。
+  \cmd{lambda 引数: 式} と書くと、「引数を受け取って式の値を返す関数」になります。
+  たとえば、\cmd{run\_timer(0.5, 3, lambda i: print(i * 10))} のように、コールバックをその場で書いて渡せます。
+  ROS 2 のプログラムでも、ときどき見かける書き方です。
+\end{column}
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 19.6] リストと関数を受け取り、リストの各要素にその関数を適用した結果を新しいリストにして返す関数 \cmd{apply\_all(values, func)} を作ってください。これを使って、\cmd{[1.0, 2.5, 4.0]}（単位は m）を cm に変換したリストを作ること。
+  \item[問 19.7] 距離のリストと、障害物を見つけたときに呼ぶコールバック関数を受け取る関数 \cmd{watch(distances, on\_obstacle)} を作ってください。距離が 0.3 m 未満の値を見つけるたびに \cmd{on\_obstacle(距離)} を呼び出すこと。コールバックとして、「障害物を検出: 〇 m」と表示する関数を渡して試してください。
+\end{description}
 
 \section{モジュールと import}
+\label{sec:python-class-module}
 
-TODO
+\subsection{モジュールを import する}
+
+Python には、よく使う機能をまとめた\textbf{モジュール}が最初からたくさん用意されています（\textbf{標準ライブラリ}）。
+モジュールの機能を使うには、\cmd{import} でモジュールを読み込みます。
+読み込んだ後は、\cmd{モジュール名.関数名( )} の形で使います。
+
+\begin{lstlisting}[style=python, caption={math モジュールと random モジュール}, label={lst:python-class-import}]
+import math
+import random
+
+print(math.sqrt(2))              # 平方根
+print(math.pi)                   # 円周率
+print(math.degrees(math.pi))     # ラジアンを度に変換する（180.0）
+print(random.randint(1, 100))    # 1〜100 の整数の乱数
+\end{lstlisting}
+
+ロボットの向きや角度の計算では、\cmd{math} モジュールの三角関数（\cmd{math.sin}, \cmd{math.cos}）や、ラジアンと度の変換（\cmd{math.radians}, \cmd{math.degrees}）をよく使います。
+
+\subsection{import のいろいろな書き方}
+
+\cmd{from モジュール名 import 名前} と書くと、モジュール名を付けずに関数などを使えます。
+\cmd{import モジュール名 as 別名} と書くと、モジュールに短い別名を付けられます。
+
+\begin{lstlisting}[style=python, caption={import のいろいろな書き方}, label={lst:python-class-import2}]
+from math import pi, sqrt   # math.pi ではなく pi と書ける
+import numpy as np          # numpy を np という名前で使う
+
+print(pi * 10 * 10)         # 半径 10 の円の面積
+print(sqrt(16))
+print(np.mean([1.0, 2.0, 3.0]))
+\end{lstlisting}
+
+NumPy のような標準ライブラリ以外のパッケージは、\ref{sec:python-pip}節の方法（Ubuntu では \cmd{sudo apt install python3-numpy} など）でインストールしてから使います。
+なお、\cmd{from math import *} のようにすべてを読み込む書き方もありますが、どの名前がどこから来たのかわからなくなるので、使わないほうがよいでしょう。
+
+\subsection{自分でモジュールを作る}
+
+Python のファイルは、それ自体がモジュールになります。
+よく使う関数を別のファイルにまとめておけば、ほかのプログラムから \cmd{import} して使えます。
+次の 2 つのファイルを、同じディレクトリに作ってみましょう。
+
+\begin{lstlisting}[style=python, caption={自分で作るモジュール（robot\_utils.py）}, label={lst:python-class-mymodule}]
+def clamp(value, low, high):
+    """value を low 以上 high 以下の範囲に収める"""
+    if value < low:
+        return low
+    if value > high:
+        return high
+    return value
+
+
+if __name__ == "__main__":
+    # このファイルを直接実行したときだけ動く（動作確認用）
+    print(clamp(1.5, -1.0, 1.0))
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={モジュールを使うプログラム（main.py）}, label={lst:python-class-usemodule}]
+import robot_utils
+
+speed = robot_utils.clamp(2.0, -0.5, 0.5)
+print(f"速度: {speed}")
+\end{lstlisting}
+
+\begin{terminal}[自分で作ったモジュールを使う]
+$ python3 main.py
+速度: 0.5
+$ python3 robot_utils.py
+1.0
+\end{terminal}
+
+\cmd{import robot\_utils} と書くと、同じディレクトリにある \cmd{robot\_utils.py} が読み込まれます（\cmd{.py} は付けません）。
+関数の最初の行に \cmd{"""} で囲んで書いた文字列は\textbf{ドキュメンテーション文字列}（docstring）といい、関数の説明を書いておく決まりです。
+
+\subsection{\cmd{if \_\_name\_\_ == "\_\_main\_\_":}}
+
+\cmd{robot\_utils.py} の最後の \cmd{if \_\_name\_\_ == "\_\_main\_\_":} は、「このファイルが直接実行されたときだけ、中の処理を実行する」という意味の決まり文句です。
+\cmd{python3 robot\_utils.py} のように直接実行したときは中の処理が実行されますが、\cmd{import robot\_utils} で読み込まれたときは実行されません。
+モジュールとして使うファイルに動作確認用のコードを書いておくときや、プログラムの入り口（\cmd{main} 関数）を示すときに使います。
+ROS 2 のノードのファイルも、最後にこの形で \cmd{main( )} を呼び出すのが一般的です（\ref{chap:rclpy}章）。
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 19.8] \cmd{from math import pi} を使って、半径 10 の円の面積を計算して表示してください。
+  \item[問 19.9] ロボットが角速度 30 度/秒で 4 秒間回転しました。回転した角度をラジアンで表示してください（\cmd{math.radians( )} を使う）。
+  \item[問 19.10] 2 点 \cmd{(x1, y1)} と \cmd{(x2, y2)} の間の距離を返す関数 \cmd{distance} と、角度（度）を $-180$ 度以上 $180$ 度未満に正規化する関数 \cmd{normalize\_angle} を、\cmd{geometry.py} というモジュールにまとめてください。別のファイルから \cmd{import geometry} して、\cmd{distance(0, 0, 3, 4)}（5.0 になる）と \cmd{normalize\_angle(270)}（$-90$ になる）を試すこと。
+\end{description}
 
 \section{例外処理}
+\label{sec:python-class-exception}
 
-TODO
+\subsection{例外}
 
-\section{読みやすいコードを書く（PEP 8・フォーマッタ）}
+プログラムの実行中にエラーが起きることを、\textbf{例外}が発生するといいます。
+例外が発生すると、その場でプログラムは止まり、エラーの内容が表示されます。
+たとえば、数値を期待しているところに文字が入力されると、\cmd{ValueError} という例外が発生します。
 
-TODO
+\begin{terminal}[例外が発生してプログラムが止まる]
+$ python3 speed_input.py
+速度 [m/s] => fast
+Traceback (most recent call last):
+  File "/home/user/py_practice/speed_input.py", line 1, in <module>
+    speed = float(input("速度 [m/s] => "))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: could not convert string to float: 'fast'
+\end{terminal}
+
+\subsection{try...except}
+
+\cmd{try...except} を使うと、例外が発生したときに、プログラムを止めずに別の処理を行えます。
+
+\begin{lstlisting}[style=python, caption={try...except の書き方}, label={lst:python-class-try-syntax}]
+try:
+    例外が発生するかもしれない処理
+except 例外の種類:
+    その例外が発生したときの処理
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={正しい数値が入力されるまで聞き直す（speed\_input.py）}, label={lst:python-class-try}]
+while True:
+    try:
+        speed = float(input("速度 [m/s] => "))
+        break
+    except ValueError:
+        print("数値を入力してください")
+print(f"速度を {speed} m/s に設定しました")
+\end{lstlisting}
+
+\begin{terminal}[例外処理をしたプログラムの実行結果]
+$ python3 speed_input.py
+速度 [m/s] => fast
+数値を入力してください
+速度 [m/s] => 0.3
+速度を 0.3 m/s に設定しました
+\end{terminal}
+
+\cmd{except} の後ろには、捕まえたい例外の種類を書きます。
+よく出てくる例外には、次のようなものがあります。
+
+\begin{center}
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    例外 & 発生する場面 \\
+    \midrule
+    \cmd{ValueError} & 値が不適切（\cmd{int("abc")} など） \\
+    \cmd{ZeroDivisionError} & 0 で割った \\
+    \cmd{TypeError} & 型が合わない（数値と文字列の \cmd{+} など） \\
+    \cmd{IndexError} & リストの範囲外のインデックスを指定した \\
+    \cmd{KeyError} & 辞書にないキーを指定した \\
+    \cmd{FileNotFoundError} & 開こうとしたファイルがない \\
+    \cmd{KeyboardInterrupt} & \key{Ctrl}+\key{C} が押された \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\cmd{except:} のように例外の種類を書かないと、すべての例外を捕まえてしまいます。
+プログラムの誤り（打ち間違いなど）まで隠してしまい、原因がわかりにくくなるので、できるだけ捕まえたい例外の種類を書きましょう。
+
+\subsection{finally と Ctrl+C}
+
+\cmd{finally} に書いた処理は、例外が発生してもしなくても、最後に必ず実行されます。
+ロボットのプログラムでは、プログラムがどのように終了しても、最後にモータを止めるといった後片付けを確実に行いたい場面があります。
+
+\begin{lstlisting}[style=python, caption={Ctrl+C で止めても後片付けをする（stop.py）}, label={lst:python-class-finally}]
+import time
+
+try:
+    while True:
+        print("走行中...")
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Ctrl+C が押されました")
+finally:
+    print("モータを停止します")
+\end{lstlisting}
+
+\begin{terminal}[Ctrl+C で止めたときの実行結果]
+$ python3 stop.py
+走行中...
+走行中...
+^CCtrl+C が押されました
+モータを停止します
+\end{terminal}
+
+\key{Ctrl}+\key{C} を押すと \cmd{KeyboardInterrupt} という例外が発生します（\ref{sec:process-kill}節の \cmd{SIGINT}）。
+ROS 2 のノードのプログラムでも、同じように \cmd{KeyboardInterrupt} を捕まえて終了処理を行う書き方がよく使われます。
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 19.11] 0〜3 の整数の乱数で 100 を割る処理を 10 回繰り返し、0 で割ってしまったときは、プログラムを止めずに「0 で割ろうとしました」と表示してください（\cmd{ZeroDivisionError} を捕まえる）。
+  \item[問 19.12] 整数を入力し、その数に 100 を足して表示してください。整数に変換できない値が入力されたときは、代わりに 10 を使って計算すること。
+\end{description}
+
+\section{読みやすいコードを書く}
+\label{sec:python-class-style}
+
+\subsection{PEP 8}
+
+プログラムは、書く時間よりも、読まれる時間のほうがずっと長いといわれます。
+あとで自分が読み返すときや、チームのメンバーが読むときのために、読みやすいコードを書くことが大切です。
+Python には、\textbf{PEP 8} というコーディングの決まり（スタイルガイド）があり、多くの人がこれに従ってコードを書いています。
+主な決まりは次のとおりです。
+
+\begin{itemize}
+  \item インデントは半角スペース 4 つにする
+  \item 1 行の長さは、なるべく 79 文字以内にする
+  \item 演算子の前後や、カンマの後ろには、空白を 1 つ入れる（\cmd{x = a + b}、\cmd{f(a, b)}）
+  \item \cmd{import} はファイルの先頭にまとめて書く
+  \item 関数やクラスの定義の前後は、2 行空ける
+\end{itemize}
+
+名前の付け方にも、次のような決まりがあります。
+
+\begin{center}
+  \begin{tabular}{lll}
+    \toprule
+    種類 & 書き方 & 例 \\
+    \midrule
+    変数・関数・メソッド & 小文字をアンダースコアでつなぐ & \cmd{max\_speed}, \cmd{read\_sensor} \\
+    クラス & 単語の先頭を大文字にしてつなげる & \cmd{MobileRobot} \\
+    定数（変えない値） & 大文字をアンダースコアでつなぐ & \cmd{WHEEL\_RADIUS} \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+また、ファイルの中は、次の順番で書くと読みやすくなります。
+
+\begin{lstlisting}[style=python, caption={読みやすいファイルの構成}, label={lst:python-class-layout}]
+# 1. import
+import math
+
+# 2. 定数
+WHEEL_RADIUS = 0.033   # 車輪の半径 [m]
+
+
+# 3. 関数・クラスの定義
+def wheel_speed(rps):
+    return 2 * math.pi * WHEEL_RADIUS * rps
+
+
+# 4. 実行する処理
+if __name__ == "__main__":
+    print(wheel_speed(2.0))
+\end{lstlisting}
+
+\subsection{フォーマッタとリンタ}
+
+PEP 8 の決まりを、すべて自分で気をつけるのは大変です。
+そこで、コードの見た目を自動で整えてくれる\textbf{フォーマッタ}や、誤りや決まりに合わない書き方を指摘してくれる\textbf{リンタ}を使います。
+代表的なツールに \textbf{Ruff} があり、フォーマッタとリンタの両方の機能を持っています。
+Ruff は、pipx（\ref{sec:python-pep668}節）でインストールできます。
+
+\begin{terminal}[Ruff をインストールして使う]
+$ pipx install ruff
+$ ruff format robot.py      # コードの見た目を整える
+1 file reformatted
+$ ruff check robot.py       # 誤りや決まりに合わない書き方を調べる
+All checks passed!
+\end{terminal}
+
+VS Code（\ref{sec:editor-vscode}節）でも、拡張機能を入れておくと、保存するたびに自動でコードを整えたり、問題のある箇所に波線を表示したりできます。
 
 \section{デバッグの基本}
+\label{sec:python-class-debug}
 
-TODO
+プログラムの誤り（\textbf{バグ}）を見つけて直すことを\textbf{デバッグ}といいます。
+どんなに経験を積んだ人でも、プログラムにバグはつきものです。
+大切なのは、バグを見つけて直す方法を知っておくことです。
+
+\subsection{エラーメッセージを読む}
+
+プログラムが例外で止まったときに表示されるメッセージ（\textbf{トレースバック}）には、原因を探すための情報が詰まっています。
+慌てずに、次の順番で読みましょう。
+
+\begin{enumerate}
+  \item \textbf{最後の行}を見る：例外の種類（\cmd{ValueError} など）と、その説明が書かれています。
+  \item \textbf{\cmd{File "...", line 〇}} を見る：どのファイルの何行目で例外が発生したかが書かれています。
+  \item その行と、その前後のコードを確かめる。
+\end{enumerate}
+
+よく出会うエラーと、主な原因は次のとおりです。
+
+\begin{center}
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    エラー & 主な原因 \\
+    \midrule
+    \cmd{SyntaxError} & 文法の誤り（\cmd{:} の付け忘れ、カッコやクォートの閉じ忘れ、全角の文字など） \\
+    \cmd{IndentationError} & インデントの誤り（ずれている、全角スペースが混ざっているなど） \\
+    \cmd{NameError} & 変数や関数の名前の打ち間違い、定義する前に使った \\
+    \cmd{TypeError} & 型の誤り（\cmd{input( )} の値を数値に変換し忘れたなど） \\
+    \cmd{IndexError} & リストのインデックスが範囲外（0 から始まることを忘れたなど） \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+エラーメッセージをそのままインターネットで検索すると、同じエラーで困った人の情報が見つかることもよくあります。
+
+\subsection{print でデバッグする}
+
+エラーは出ないのに、思ったとおりに動かないこともあります。
+そのようなときは、途中の変数の値を \cmd{print( )} で表示して、どこから期待と違う値になっているのかを調べます。
+f 文字列で \cmd{\{変数名=\}} と書くと、変数名と値を一緒に表示できて便利です。
+
+\begin{lstlisting}[style=python, caption={print で途中の値を確かめる}, label={lst:python-class-printdebug}]
+total = 0
+for i in range(1, 4):
+    total += i
+    print(f"{i=} {total=}")   # i=1 total=1 のように表示される
+\end{lstlisting}
+
+\subsection{デバッガを使う}
+
+\textbf{デバッガ}を使うと、プログラムを 1 行ずつ止めながら実行し、そのときの変数の値を確かめられます。
+プログラムの止めたい場所に \cmd{breakpoint()} と書いて実行すると、その行でプログラムが止まり、Python のデバッガ（pdb）が起動します。
+
+\begin{terminal}[pdb でプログラムを 1 行ずつ実行する]
+$ python3 robot.py
+> /home/user/py_practice/robot.py(10)move()
+-> if speed > self.max_speed:
+(Pdb) p speed
+1.0
+(Pdb) n
+> /home/user/py_practice/robot.py(11)move()
+-> speed = self.max_speed
+(Pdb) c
+\end{terminal}
+
+\cmd{(Pdb)} というプロンプトでは、\cmd{p 変数名}（値を表示）、\cmd{n}（次の行へ進む）、\cmd{s}（関数の中に入る）、\cmd{c}（次に止まる場所まで実行を続ける）、\cmd{q}（終了）といったコマンドが使えます。
+VS Code では、行番号の左をクリックして止める場所（ブレークポイント）を設定し、画面を見ながら同じことができます。
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 19.13] 次のプログラムは、1 から 9 の乱数を作り、5 が出たら繰り返しを終了して、最後に出た 5 を表示するつもりです。ところが、実行すると 10 が出ることがあり、最後の 5 も 2 回表示されます。正しく動くように直してください。
+\begin{lstlisting}[style=python, numbers=none]
+import random
+
+while True:
+    num = random.randint(1, 10)
+    print("生成された乱数:" + str(num))
+    if num == 5:
+        break
+
+print("生成された乱数:" + str(num))
+\end{lstlisting}
+  \item[問 19.14] 次のプログラムは、入力した数までの整数を順に 5 で割り、あまりが 2 か 3 のときにその数を表示するつもりです。誤りが 3 か所あります。見つけて直してください。
+\begin{lstlisting}[style=python, numbers=none]
+num = input("数値を入力=> ")
+
+for i in range(num):
+    if i % 5 == 2 or 3:
+        print("i")
+\end{lstlisting}
+  \item[問 19.15] 次のじゃんけんのプログラムには、誤りが 5 か所あります。エラーメッセージを読んで、すべて直してください（\cmd{try...except} は使わないこと）。
+\begin{lstlisting}[style=python, numbers=none]
+import random
+
+hands = ["グー", "チョキ", "パー"]
+judge = ["あいこ", "負け", "勝ち"]
+
+player = input("0:グー、1:チョキ、2:パー >>> ")
+if player == 0 and player == 1 and player == 2:
+    prin("あなた: " + hands[player])
+    computer = random.randint(0, 3)
+    print("コンピュータ: " + hands[computer])
+    decision = (player - computer + 3) % 3
+    print("結果は「" + judge[dceision] + "」です")
+\end{lstlisting}
+\end{description}
+
+\begin{column}{最終課題：自由製作}
+  第IV部で学んだことを使って、自由にプログラムを作ってみましょう。
+  何を作るかを自分で決め、必要な機能を考えて、少しずつ作っていくことが、プログラミングの一番の練習になります。
+  たとえば、次のようなものが考えられます。
+  \begin{itemize}
+    \item 文字だけで進む RPG：\cmd{input( )} でコマンドを入力して、3 体の魔物を倒すゲーム（\cmd{Player} クラスや乱数を使う）
+    \item 〇×ゲーム：3 × 3 のマス目をリストで表し、2 人で交互に入力して対戦する
+    \item ロボットの移動シミュレータ：マス目の上のロボットに「前進」「右を向く」などの指令を入力して動かし、障害物にぶつからずにゴールを目指す
+  \end{itemize}
+  わからないことは、検索したり、資料を読み返したり、人に聞いたりして構いません。
+  ただし、コピーしたコードをそのまま使うのではなく、1 行 1 行、何をしているのかを説明できるようにしておきましょう。
+  作ったプログラムは Git で管理して（\ref{chap:git}章）、README に何を作ったのかを書いておくとよいでしょう。
+\end{column}
+
+\section{練習問題の解答例}
+\label{sec:python-class-answers}
+
+\begin{lstlisting}[style=python, caption={問 19.1・問 19.2 の解答例}, label={lst:python-class-a1}]
+# 問 19.1
+class Human:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def introduce(self):
+        print(f"私の名前は{self.name}です")
+
+    def show_age(self):
+        print(f"年齢は{self.age}歳です")
+
+
+john = Human("ジョン", 23)
+marine = Human("マリン", 18)
+john.introduce()
+john.show_age()
+marine.introduce()
+marine.show_age()
+
+
+# 問 19.2
+class Tax:
+    def __init__(self, rate):
+        self.rate = rate   # 税率 [%]
+
+    def price(self, value):
+        total = round(value * (1 + self.rate / 100))
+        print(f"{value} 円（税率 {self.rate}%）→ {total} 円")
+
+
+tax8 = Tax(8)
+tax10 = Tax(10)
+for value in [250, 580]:
+    tax8.price(value)
+    tax10.price(value)
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={問 19.3 の解答例}, label={lst:python-class-a3}]
+class Robot:
+    def __init__(self, name, max_speed=0.5):
+        self.name = name
+        self.max_speed = max_speed
+        self.x = 0.0
+        self.battery = 100
+
+    def move(self, speed, duration):
+        if self.battery <= 0:
+            print("バッテリ切れです")
+            return
+        if speed > self.max_speed:
+            speed = self.max_speed
+        distance = speed * duration
+        self.x += distance
+        self.battery -= distance * 10
+        print(f"x = {self.x:.2f} m, バッテリ {self.battery:.0f}%")
+
+
+robot = Robot("turtle")
+for i in range(12):
+    robot.move(0.5, 2.0)
+\end{lstlisting}
+
+\cmd{return} だけを書くと、戻り値を返さずに、その時点で関数（メソッド）を終了します。
+
+\begin{lstlisting}[style=python, caption={問 19.4・問 19.5 の解答例}, label={lst:python-class-a4}]
+import random
+
+
+class Player:
+    def __init__(self, name, hp):
+        self.name = name
+        self.hp = hp
+
+    def attack(self):
+        print(f"{self.name}は攻撃をした！")
+
+
+# 問 19.4
+class Wizard(Player):
+    def __init__(self, name, hp, mp):
+        super().__init__(name, hp)
+        self.mp = mp
+
+    def magic(self):
+        if self.mp < 10:
+            print("魔力が足りない")
+            return
+        self.mp -= 10
+        print(f"{self.name}は魔法を唱えた！（残り魔力: {self.mp}）")
+
+
+wizard = Wizard("魔法使い", 60, 25)
+wizard.attack()
+wizard.magic()
+wizard.magic()
+wizard.magic()
+
+
+# 問 19.5
+class Sensor:
+    def __init__(self, name):
+        self.name = name
+
+    def read(self):
+        return 0.0
+
+
+class DummyLidar(Sensor):
+    def read(self):
+        return random.uniform(0.1, 5.0)
+
+
+lidar = DummyLidar("lidar")
+print(f"{lidar.name}: {lidar.read():.2f} m")
+\end{lstlisting}
+
+\cmd{DummyLidar} では \cmd{\_\_init\_\_} を定義していないので、親クラスの \cmd{\_\_init\_\_} がそのまま使われます。
+
+\begin{lstlisting}[style=python, caption={問 19.6・問 19.7 の解答例}, label={lst:python-class-a6}]
+# 問 19.6
+def apply_all(values, func):
+    results = []
+    for v in values:
+        results.append(func(v))
+    return results
+
+
+def to_cm(m):
+    return m * 100
+
+
+print(apply_all([1.0, 2.5, 4.0], to_cm))   # [100.0, 250.0, 400.0]
+
+
+# 問 19.7
+def watch(distances, on_obstacle):
+    for d in distances:
+        if d < 0.3:
+            on_obstacle(d)
+
+
+def warn(d):
+    print(f"障害物を検出: {d} m")
+
+
+watch([1.2, 0.25, 0.8, 0.1], warn)
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={問 19.8・問 19.9 の解答例}, label={lst:python-class-a8}]
+import math
+from math import pi
+
+# 問 19.8
+print(pi * 10 * 10)                # 314.1592653589793
+
+# 問 19.9
+print(math.radians(30 * 4))        # 2.0943951023931953
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={問 19.10 の解答例（geometry.py）}, label={lst:python-class-a10}]
+import math
+
+
+def distance(x1, y1, x2, y2):
+    """2 点間の距離を返す"""
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+
+def normalize_angle(deg):
+    """角度を -180 以上 180 未満に正規化する"""
+    return (deg + 180) % 360 - 180
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={問 19.10 の解答例（geometry を使うファイル）}, label={lst:python-class-a10b}]
+import geometry
+
+print(geometry.distance(0, 0, 3, 4))    # 5.0
+print(geometry.normalize_angle(270))    # -90
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={問 19.11・問 19.12 の解答例}, label={lst:python-class-a11}]
+import random
+
+# 問 19.11
+for i in range(10):
+    num = random.randint(0, 3)
+    try:
+        print(100 / num)
+    except ZeroDivisionError:
+        print("0 で割ろうとしました")
+
+# 問 19.12
+try:
+    num = int(input("整数を入力してください=> "))
+except ValueError:
+    num = 10
+print(num + 100)
+\end{lstlisting}
+
+\begin{description}
+  \item[問 19.13] \cmd{random.randint(1, 10)} は 10 も含むので \cmd{random.randint(1, 9)} に直します。また、ループの中の \cmd{print} で 5 もすでに表示されているので、最後の \cmd{print} を消す（またはループの中の \cmd{print} を \cmd{if} の後ろに移す）と、5 が 2 回表示されなくなります。
+  \item[問 19.14] \cmd{input( )} の値は文字列なので \cmd{range(int(num))} にする（1 か所目）、条件を \cmd{i \% 5 == 2 or i \% 5 == 3} にする（2 か所目、\ref{sec:python-basics-if}節の注意を参照）、\cmd{print("i")} は文字 \cmd{i} を表示してしまうので \cmd{print(i)} にする（3 か所目）。
+  \item[問 19.15] 次の 5 か所を直します。
+    \begin{enumerate}
+      \item \cmd{input( )} の値を \cmd{int( )} で整数に変換する
+      \item 条件の \cmd{and} を \cmd{or} にする（\cmd{player} が 0 かつ 1 かつ 2 になることはない）
+      \item \cmd{prin} を \cmd{print} にする
+      \item \cmd{random.randint(0, 3)} を \cmd{random.randint(0, 2)} にする（3 だと \cmd{hands[3]} で \cmd{IndexError} になる）
+      \item \cmd{dceision} を \cmd{decision} にする
+    \end{enumerate}
+\end{description}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item クラスはオブジェクトの設計図です。\cmd{class} で定義し、\cmd{\_\_init\_\_} で属性を用意し、メソッドの最初の引数は \cmd{self} にします。
+  \item 継承を使うと、親クラスの機能を引き継いだ子クラスを作れます。\cmd{super().\_\_init\_\_( )} で親クラスの準備を呼び出します。ROS 2 のノードは、\cmd{Node} クラスを継承して作ります。
+  \item 関数は値として渡せます。出来事が起きたときに呼んでもらう関数をコールバック関数といい、ROS 2 のタイマやトピックの受信で使います。
+  \item \cmd{import} でモジュールを読み込みます。自分で書いたファイルもモジュールとして使え、\cmd{if \_\_name\_\_ == "\_\_main\_\_":} で直接実行したときの処理を書きます。
+  \item \cmd{try...except} で例外を処理し、\cmd{finally} で後片付けを確実に行います。
+  \item PEP 8 に沿って読みやすいコードを書き、フォーマッタやリンタを活用します。バグは、エラーメッセージ・\cmd{print}・デバッガを使って探します。
+\end{itemize}

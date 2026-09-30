@@ -4,26 +4,957 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item 数値の計算と、変数・データ型の使い方
+    \item 文字列の扱い方と、キーボードからの入力
+    \item リスト・タプル・辞書を使って、複数のデータをまとめる方法
+    \item if 文による条件分岐と、for 文・while 文による繰り返し
+    \item 関数を作って、処理をまとめる方法
   \end{itemize}
 \end{goalbox}
 
-\section{変数と型}
+この章では、Python でプログラムを書くための基本的な文法を学びます。
+各節の最後には練習問題を用意しました。
+解答例は章の最後（\ref{sec:python-basics-answers}節）にあります。
+プログラミングは、読むだけでなく、実際に書いて動かしてみることで身につきます。
+ぜひ、自分の手でプログラムを書き、いろいろと書き換えて試してみてください。
 
-TODO
+\begin{point}[この章のプログラムの実行方法]
+  この章のプログラムは、\ref{sec:python-run}節で学んだ方法で実行します。
+  短い例は対話モード（\cmd{>>>} から始まる例）で、長い例はスクリプトファイルに保存して \cmd{python3 ファイル名} で実行してください。
+  練習用のディレクトリ（たとえば \cmd{\textasciitilde/py\_practice}）を作り、その中でファイルを作っていくとよいでしょう。
+\end{point}
+
+\section{数値と計算}
+\label{sec:python-basics-number}
+
+\subsection{四則演算}
+
+Python では、数値と演算子を組み合わせて計算ができます。
+足し算は \cmd{+}、引き算は \cmd{-}、掛け算は \cmd{*}、割り算は \cmd{/} です。
+
+\begin{terminal}[四則演算]
+>>> 3 + 5
+8
+>>> 6 - 10
+-4
+>>> 6 * 8
+48
+>>> 26 / 4
+6.5
+\end{terminal}
+
+算数と同じように、掛け算と割り算が先に計算されます。
+先に計算したい部分は \cmd{( )} で囲みます。
+
+\begin{terminal}[計算の順番]
+>>> 10 - 5 / 5
+9.0
+>>> (10 - 5) / 5
+1.0
+\end{terminal}
+
+\subsection{四則演算以外の計算}
+
+ほかにも、次のような演算子があります。
+
+\begin{center}
+  \begin{tabular}{lll}
+    \toprule
+    演算子 & 意味 & 例 \\
+    \midrule
+    \cmd{**} & 累乗 & \cmd{2 ** 5} は 32 \\
+    \cmd{//} & 割り算の商（小数点以下を切り捨て） & \cmd{10 // 3} は 3 \\
+    \cmd{\%} & 割り算のあまり & \cmd{10 \% 3} は 1 \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\cmd{\%} は、ある数が偶数かどうか（2 で割ったあまりが 0 かどうか）を調べるときなどによく使います。
+
+\subsection{コメント}
+
+プログラムの中で \cmd{\#} を書くと、そこから行の終わりまでが\textbf{コメント}になり、実行されません。
+コメントは、プログラムの説明を書いたり、一時的にある行を実行しないようにしたり（\textbf{コメントアウト}）するのに使います。
+
+\begin{lstlisting}[style=python, caption={コメントの例}, label={lst:python-basics-comment}]
+# 2 の 10 乗を計算する
+print(2 ** 10)   # 行の途中からコメントを書くこともできる
+# print(2 ** 12) この行はコメントアウトされているので実行されない
+\end{lstlisting}
+
+\cmd{print( )} は、カッコの中の値を画面に表示する\textbf{関数}です（\ref{sec:python-basics-function}節）。
+スクリプトファイルで実行するときは、\cmd{print} を使わないと計算結果は表示されません。
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 18.1] テンパズルに挑戦しましょう。\cmd{5}, \cmd{8}, \cmd{6}, \cmd{2} の 4 つの数字をこの順に並べ、間に演算子（\cmd{+}, \cmd{-}, \cmd{*}, \cmd{/}）とカッコを入れて、計算結果が 10 になる式を作ってください。
+  \item[問 18.2] ロボットが 200 秒間走りました。200 秒は何分何秒でしょうか。\cmd{//} と \cmd{\%} を使って計算してください。
+\end{description}
+
+\section{変数とデータ型}
+\label{sec:python-basics-variable}
+
+\subsection{変数}
+
+\textbf{変数}は、値に名前を付けて保存しておくしくみです。
+名前の付いた箱に値を入れておくイメージです。
+\cmd{変数名 = 値} と書くと、変数に値が入ります（\textbf{代入}）。
+
+\begin{lstlisting}[style=python, caption={変数を使う（speed.py）}, label={lst:python-basics-var}]
+distance = 12.0   # 走った距離 [m]
+time = 30.0       # かかった時間 [s]
+speed = distance / time
+print(speed)
+\end{lstlisting}
+
+\begin{terminal}[変数を使うプログラムを実行する]
+$ python3 speed.py
+0.4
+\end{terminal}
+
+変数の名前は、何の値が入っているのかがわかるように付けましょう。
+Python では、単語をアンダースコアでつなぐ \cmd{max\_speed} のような名前が一般的です（\ref{sec:python-class-style}節）。
+
+プログラムの \cmd{=} は、数学の「等しい」ではなく、「右辺の値を左辺の変数に入れる」という意味です。
+そのため、変数の値を使って計算し、同じ変数に入れ直すこともできます。
+\cmd{+=} などの演算子を使うと、これを短く書けます。
+
+\begin{lstlisting}[style=python, caption={変数の値を更新する}, label={lst:python-basics-update}]
+count = 0
+count = count + 1   # count の値に 1 を足して、count に入れ直す
+count += 1          # count = count + 1 と同じ意味
+print(count)        # 2 と表示される
+\end{lstlisting}
+
+\subsection{データ型}
+
+値には、\textbf{データ型}（型）があります。
+よく使う型は次のとおりです。
+値の型は、\cmd{type( )} 関数で確かめられます。
+
+\begin{center}
+  \begin{tabular}{llp{0.45\linewidth}}
+    \toprule
+    型 & 意味 & 例 \\
+    \midrule
+    \cmd{int} & 整数 & \cmd{10}, \cmd{-3} \\
+    \cmd{float} & 小数（浮動小数点数） & \cmd{0.5}, \cmd{3.14} \\
+    \cmd{str} & 文字列 & \cmd{"robot"}, \cmd{'Hello'} \\
+    \cmd{bool} & 真偽値（\ref{sec:python-basics-if}節） & \cmd{True}, \cmd{False} \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{terminal}[値の型を調べる]
+>>> type(10)
+<class 'int'>
+>>> type(0.5)
+<class 'float'>
+>>> type("robot")
+<class 'str'>
+\end{terminal}
+
+\subsection{文字列}
+
+文字列は、\cmd{"}（ダブルクォート）か \cmd{'}（シングルクォート）で囲んで書きます。
+文字列どうしは \cmd{+} でつなげられます。
+
+\begin{terminal}[文字列をつなげる]
+>>> name = "turtle"
+>>> "Hello, " + name + "!"
+'Hello, turtle!'
+\end{terminal}
+
+文字列の中に \cmd{'} を含めたいときは、\cmd{"} で囲むか、\cmd{\textbackslash '} のように \cmd{\textbackslash}（バックスラッシュ）を付けます。
+このような書き方を\textbf{エスケープシーケンス}といいます。
+\cmd{\textbackslash n} は改行を表します。
+
+\begin{terminal}[エスケープシーケンス]
+>>> print("It's my robot.")
+It's my robot.
+>>> print('It\'s my robot.')
+It's my robot.
+>>> print("1 行目\n2 行目")
+1 行目
+2 行目
+\end{terminal}
+
+\subsection{型の変換}
+
+数値と文字列は、そのままでは \cmd{+} でつなげられず、エラーになります。
+
+\begin{terminal}[数値と文字列はつなげられない]
+>>> temperature = 20
+>>> temperature + "℃"
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: unsupported operand type(s) for +: 'int' and 'str'
+\end{terminal}
+
+型を変換するには、\cmd{str( )}（文字列にする）、\cmd{int( )}（整数にする）、\cmd{float( )}（小数にする）を使います。
+
+\begin{terminal}[型を変換する]
+>>> str(temperature) + "℃"
+'20℃'
+>>> int("42") + 1
+43
+>>> float("3.14")
+3.14
+\end{terminal}
+
+\cmd{int("5.5")} や \cmd{int("にじゅう")} のように、変換できない文字列を渡すとエラーになります。
+
+\subsection{f 文字列}
+
+変数の値を文字列の中に埋め込むときは、\textbf{f 文字列}を使うと便利です。
+文字列の前に \cmd{f} を付け、埋め込みたい変数や式を \cmd{\{ \}} で囲みます。
+数値も自動で文字列に変換されるので、\cmd{str( )} を使う必要がありません。
+\cmd{:.2f} のように書くと、小数点以下の桁数を指定できます。
+
+\begin{lstlisting}[style=python, caption={f 文字列を使う}, label={lst:python-basics-fstring}]
+name = "turtle"
+speed = 0.4
+print(f"{name} の速度は {speed} m/s です")
+print(f"{name} の速度は {speed * 3.6:.2f} km/h です")
+\end{lstlisting}
+
+\begin{terminal}[f 文字列の実行結果]
+turtle の速度は 0.4 m/s です
+turtle の速度は 1.44 km/h です
+\end{terminal}
+
+ROS 2 のプログラムでログを表示するときにも、f 文字列をよく使います（\ref{chap:rclpy}章）。
+
+\subsection{キーボードからの入力}
+
+\cmd{input( )} 関数を使うと、キーボードから入力された文字列を受け取れます。
+カッコの中には、入力を促すメッセージを書きます。
+
+\begin{lstlisting}[style=python, caption={入力を受け取る（greet.py）}, label={lst:python-basics-input}]
+name = input("名前を入力してください=> ")
+print(f"こんにちは、{name}さん!")
+\end{lstlisting}
+
+\begin{terminal}[入力を受け取るプログラムを実行する]
+$ python3 greet.py
+名前を入力してください=> ロボ太
+こんにちは、ロボ太さん!
+\end{terminal}
+
+\cmd{input( )} で受け取った値は、数字を入力しても\textbf{文字列}になることに注意しましょう。
+計算に使うときは、\cmd{int( )} や \cmd{float( )} で数値に変換します。
+
+\begin{lstlisting}[style=python, caption={入力を数値に変換する}, label={lst:python-basics-input-num}]
+radius = float(input("半径 [m] => "))
+print(f"面積は {radius * radius * 3.14} m^2 です")
+\end{lstlisting}
+
+\begin{column}{小数の計算の誤差}
+  コンピュータは、小数を 2 進数で近似して扱っています。
+  そのため、\cmd{0.1 + 0.2} を計算すると \cmd{0.30000000000000004} になるように、小数の計算にはごくわずかな誤差が出ることがあります。
+  表示するときは、\cmd{round(値, 桁数)} で丸めたり、f 文字列の \cmd{:.2f} で桁数を指定したりしましょう。
+  また、小数どうしを \cmd{==}（\ref{sec:python-basics-if}節）で比べると、誤差のせいで等しくならないことがあるので注意が必要です。
+\end{column}
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 18.3] 所持金が 4000 円あります。本（980 円、税率 10\%）を 2 冊と、ポテトチップス（250 円、税率 8\%）とアイス（150 円、税率 8\%）を 1 つずつ買った後の所持金を計算してください。それぞれの値を、何の値かがわかる名前の変数に入れてから計算すること。結果は \cmd{round( )} で整数に丸めて表示してください。
+  \item[問 18.4] \cmd{input( )} で見たことのあるアニメの題名を入力し、「〇〇は△文字です。」と表示してください。文字数は \cmd{len(文字列)} で調べられます。
+  \item[問 18.5] ロボットの車輪の半径 [m] と、1 秒あたりの車輪の回転数を \cmd{input( )} で入力し、ロボットが進む速さ [m/s]（$2 \times 3.14 \times \text{半径} \times \text{回転数}$）を、小数点以下 2 桁まで表示してください。
+\end{description}
 
 \section{リスト・タプル・辞書}
+\label{sec:python-basics-list}
 
-TODO
+\subsection{リスト}
 
-\section{条件分岐とループ}
+\textbf{リスト}を使うと、複数の値を 1 つの変数にまとめて入れられます。
+値をカンマで区切って \cmd{[ ]} で囲みます。
+リストの中の 1 つ 1 つの値を\textbf{要素}といいます。
+たとえば、センサで測った 1 週間分の距離のデータを、7 個の変数ではなく 1 つのリストで扱えます。
 
-TODO
+\begin{lstlisting}[style=python, caption={リストを作る}, label={lst:python-basics-list}]
+distances = [1.2, 0.8, 0.5, 0.9, 1.5]   # センサで測った距離 [m]
+print(distances)
+print(len(distances))   # 要素の数
+\end{lstlisting}
+
+\begin{terminal}[リストの実行結果]
+[1.2, 0.8, 0.5, 0.9, 1.5]
+5
+\end{terminal}
+
+\subsection{要素を取り出す}
+
+リストの要素には、先頭から順に\textbf{インデックス}（位置番号）が付いています。
+インデックスは \textbf{1 からではなく 0 から}始まることに注意しましょう。
+\cmd{リスト[インデックス]} で要素を取り出せます。
+マイナスの数を指定すると、後ろから数えます（一番後ろは \cmd{-1}）。
+
+\begin{terminal}[要素を取り出す]
+>>> words = ["あ", "い", "う", "え", "お"]
+>>> words[0]
+'あ'
+>>> words[3]
+'え'
+>>> words[-1]
+'お'
+\end{terminal}
+
+\cmd{リスト[開始:終了]} と書くと、複数の要素をまとめて取り出せます（\textbf{スライス}）。
+取り出されるのは、開始の位置から、終了の位置の\textbf{1 つ手前}までです。
+開始を省略すると先頭から、終了を省略すると最後までになります。
+
+\begin{terminal}[スライスで複数の要素を取り出す]
+>>> words[1:3]
+['い', 'う']
+>>> words[:2]
+['あ', 'い']
+>>> words[2:]
+['う', 'え', 'お']
+\end{terminal}
+
+\subsection{要素を変更・追加・削除する}
+
+リストの要素は、後から変更したり、追加・削除したりできます。
+
+\begin{center}
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    書き方 & 動作 \\
+    \midrule
+    \cmd{リスト[i] = 値} & i 番目の要素を変更する \\
+    \cmd{リスト.append(値)} & 末尾に要素を追加する \\
+    \cmd{リスト.insert(i, 値)} & i 番目に要素を挿入する \\
+    \cmd{リスト.pop(i)} & i 番目の要素を取り出して削除する \\
+    \cmd{リスト.remove(値)} & 指定した値の要素を削除する \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{terminal}[要素を変更・追加・削除する]
+>>> sensors = ["camera", "lidar"]
+>>> sensors.append("imu")
+>>> sensors.insert(0, "gps")
+>>> sensors
+['gps', 'camera', 'lidar', 'imu']
+>>> sensors.remove("camera")
+>>> sensors
+['gps', 'lidar', 'imu']
+\end{terminal}
+
+\cmd{append} のように、\cmd{値.名前( )} の形で使う関数を\textbf{メソッド}といいます（\ref{sec:python-class-class}節）。
+数値のリストでは、\cmd{sum( )}（合計）、\cmd{max( )}（最大値）、\cmd{min( )}（最小値）も便利です。
+
+\begin{terminal}[数値のリストの合計・最大値・最小値]
+>>> sum(distances)
+4.9
+>>> min(distances)
+0.5
+\end{terminal}
+
+\subsection{タプル}
+
+\textbf{タプル}は、リストと似ていますが、作った後で要素を変更できないデータです。
+値をカンマで区切って \cmd{( )} で囲みます。
+ロボットの位置 \cmd{(x, y)} のように、組にして扱う値によく使います。
+タプルの要素は、複数の変数に一度に取り出せます。
+
+\begin{terminal}[タプルを使う]
+>>> position = (1.5, -0.3)
+>>> position[0]
+1.5
+>>> x, y = position
+>>> y
+-0.3
+\end{terminal}
+
+\subsection{辞書}
+
+\textbf{辞書}は、\textbf{キー}と\textbf{値}の組を集めたデータです。
+インデックスの代わりに、キー（名前）で値を取り出せます。
+\cmd{\{キー: 値, キー: 値\}} の形で書きます。
+ロボットの設定値（パラメータ）のように、名前で値を管理したいときに便利です。
+
+\begin{lstlisting}[style=python, caption={辞書を使う}, label={lst:python-basics-dict}]
+params = {"name": "turtle", "max_speed": 0.5, "wheel_radius": 0.033}
+print(params["max_speed"])     # キーで値を取り出す
+params["max_speed"] = 0.3      # 値を変更する
+params["use_lidar"] = True     # 新しいキーと値を追加する
+print(params)
+\end{lstlisting}
+
+\begin{terminal}[辞書の実行結果]
+0.5
+{'name': 'turtle', 'max_speed': 0.3, 'wheel_radius': 0.033, 'use_lidar': True}
+\end{terminal}
+
+辞書にないキーを指定するとエラーになります。
+\cmd{"max\_speed" in params} と書くと、そのキーがあるかどうかを確かめられます。
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 18.6] \cmd{"green"}, \cmd{"blue"}, \cmd{"red"}, \cmd{"black"}, \cmd{"white"} の 5 つの要素を持つリストを作り、スライスを使って \cmd{['blue', 'red', 'black']} と表示してください。
+  \item[問 18.7] \cmd{["satou", "tanaka", "suzuki"]} というリストに \cmd{"itou"} を追加し、\cmd{"satou"} を削除してから、リスト全体とインデックス 1 の要素を表示してください。
+  \item[問 18.8] 3 人の身長 [cm] のリスト \cmd{[176, 158, 164]} から、平均の身長を計算して表示してください。
+  \item[問 18.9] ロボットの設定を表す辞書 \cmd{\{"name": "turtle", "max\_speed": 0.5\}} を作り、\cmd{max\_speed} を 0.8 に変更し、\cmd{"battery": 12.0} を追加して、「turtle の最高速度は 0.8 m/s」と表示してください。
+\end{description}
+
+\section{条件分岐}
+\label{sec:python-basics-if}
+
+\subsection{if 文}
+
+\textbf{if 文}を使うと、条件によって実行する処理を変えられます。
+
+\begin{lstlisting}[style=python, caption={if 文の書き方}, label={lst:python-basics-if-syntax}]
+if 条件A:
+    条件A が成り立つときの処理
+elif 条件B:
+    条件A が成り立たず、条件B が成り立つときの処理
+else:
+    どの条件も成り立たないときの処理
+\end{lstlisting}
+
+条件の後ろには \cmd{:}（コロン）を付け、その下の処理は\textbf{インデント}（行頭の字下げ）をして書きます。
+Python では、インデントによって「どこからどこまでが if 文の中の処理か」を表します（\ref{sec:python-features}節）。
+インデントは半角スペース 4 つが標準です。
+\cmd{elif} はいくつでも書くことができ、\cmd{elif} と \cmd{else} は必要なければ省略できます。
+
+\begin{lstlisting}[style=python, caption={障害物までの距離で動作を変える（obstacle.py）}, label={lst:python-basics-if}]
+distance = float(input("障害物までの距離 [m] => "))
+
+if distance < 0.3:
+    print("停止します")
+elif distance < 1.0:
+    print("減速します")
+else:
+    print("そのまま進みます")
+\end{lstlisting}
+
+\begin{terminal}[if 文のプログラムを実行する]
+$ python3 obstacle.py
+障害物までの距離 [m] => 0.5
+減速します
+\end{terminal}
+
+\subsection{比較演算子}
+
+条件は、主に次の\textbf{比較演算子}で書きます。
+比較の結果は、成り立つときは \cmd{True}（真）、成り立たないときは \cmd{False}（偽）になります。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    演算子 & 意味 \\
+    \midrule
+    \cmd{a == b} & a と b が等しい \\
+    \cmd{a != b} & a と b が等しくない \\
+    \cmd{a < b} / \cmd{a > b} & a が b より小さい / 大きい \\
+    \cmd{a <= b} / \cmd{a >= b} & a が b 以下 / 以上 \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+「等しい」は \cmd{=} ではなく \cmd{==} と書くことに注意しましょう（\cmd{=} は代入です）。
+
+\subsection{論理演算子}
+
+複数の条件を組み合わせるときは、\textbf{論理演算子}を使います。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    演算子 & 意味 \\
+    \midrule
+    \cmd{a and b} & a と b がどちらも成り立つ \\
+    \cmd{a or b} & a と b の少なくとも一方が成り立つ \\
+    \cmd{not a} & a が成り立たない \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{terminal}[論理演算子]
+>>> battery = 11.5
+>>> 11.0 <= battery and battery <= 12.6
+True
+>>> battery < 11.0 or battery > 12.6
+False
+\end{terminal}
+
+\begin{caution}[\cmd{or} の書き間違い]
+  「\cmd{x} を 5 で割ったあまりが 2 か 3」という条件を、\cmd{x \% 5 == 2 or 3} と書いてはいけません。
+  これは \cmd{(x \% 5 == 2) or 3} と解釈され、\cmd{3} は常に真とみなされるので、条件がいつも成り立ってしまいます。
+  正しくは \cmd{x \% 5 == 2 or x \% 5 == 3} と書きます。
+\end{caution}
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 18.10] \cmd{input( )} で 2 つの数値 a, b を入力し、「a の方が大きい」「b の方が大きい」「a と b は同じ」のいずれかを表示してください。
+  \item[問 18.11] 身長 [m] と体重 [kg] を入力して BMI（体重 ÷ 身長の 2 乗）を計算し、18.5 未満なら「やせ」、25 未満なら「標準」、30 未満なら「肥満」、それ以上なら「高度肥満」と表示してください。
+  \item[問 18.12] 入力した整数が偶数なら「偶数である」、さらにそれが 25 以上なら「25 以上である」と表示してください。また、偶数かどうかに関係なく、3 の倍数なら「3 の倍数である」と表示してください。
+  \item[問 18.13] ロボットのバッテリの電圧を入力し、12.0 V 以上なら「充電十分」、11.0 V 以上 12.0 V 未満なら「そろそろ充電」、11.0 V 未満なら「すぐに充電してください」と表示してください。ただし、0 V 以下や 15 V より大きい値が入力されたときは「センサの値が異常です」と表示すること。
+\end{description}
+
+\section{繰り返し}
+\label{sec:python-basics-loop}
+
+\subsection{for 文}
+
+同じ処理を繰り返すには、\textbf{for 文}を使います。
+\cmd{for 変数 in リストなど:} と書くと、リストなどの要素が先頭から 1 つずつ変数に入り、その下のインデントした処理が繰り返されます。
+
+\begin{lstlisting}[style=python, caption={for 文でリストの要素を順に処理する}, label={lst:python-basics-for}]
+sensors = ["camera", "lidar", "imu"]
+for sensor in sensors:
+    print(f"{sensor} を確認します")
+\end{lstlisting}
+
+\begin{terminal}[for 文の実行結果]
+camera を確認します
+lidar を確認します
+imu を確認します
+\end{terminal}
+
+決まった回数だけ繰り返すときは、\cmd{range( )} を使います。
+\cmd{range(5)} は 0 から 4 までの 5 つの整数を、\cmd{range(1, 6)} は 1 から 5 までの整数を順に作ります（終わりの数は含まれません）。
+
+\begin{lstlisting}[style=python, caption={range で決まった回数だけ繰り返す}, label={lst:python-basics-range}]
+total = 0
+for i in range(1, 11):
+    total += i
+print(total)   # 1 から 10 までの合計 55 が表示される
+\end{lstlisting}
+
+\subsection{break と continue}
+
+\cmd{break} を実行すると、その時点で繰り返しを終了します。
+\cmd{continue} を実行すると、それより後の処理を飛ばして、次の繰り返しに進みます。
+
+\begin{lstlisting}[style=python, caption={break と continue}, label={lst:python-basics-break}]
+distances = [1.2, -1.0, 0.8, 0.2, 1.5]   # -1.0 は測定に失敗した値
+for d in distances:
+    if d < 0:
+        continue          # 失敗した値は飛ばす
+    if d < 0.3:
+        print(f"{d} m: 障害物が近いので停止")
+        break             # 繰り返しを終了する
+    print(f"{d} m: 前進")
+\end{lstlisting}
+
+\begin{terminal}[break と continue の実行結果]
+1.2 m: 前進
+0.8 m: 前進
+0.2 m: 障害物が近いので停止
+\end{terminal}
+
+\subsection{while 文}
+
+\textbf{while 文}は、条件が成り立っている間、処理を繰り返します。
+何回繰り返すかが前もって決まっていないときに便利です。
+
+\begin{lstlisting}[style=python, caption={while 文で繰り返す}, label={lst:python-basics-while}]
+battery = 12.6
+minutes = 0
+while battery > 11.0:
+    battery -= 0.2      # 1 分ごとに 0.2 V 下がるとする
+    minutes += 1
+print(f"{minutes} 分で充電が必要になります")
+\end{lstlisting}
+
+\cmd{while True:} と書くと、\cmd{break} するまで永遠に繰り返します。
+入力が正しい値になるまで聞き直す、といった処理によく使います。
+
+\begin{lstlisting}[style=python, caption={正しい値が入力されるまで聞き直す}, label={lst:python-basics-while-true}]
+while True:
+    num = int(input("1〜100 の値を入力してください=> "))
+    if 1 <= num <= 100:
+        break
+    print("範囲外の値です")
+print(f"入力された値は {num} です")
+\end{lstlisting}
+
+\cmd{1 <= num <= 100} のように、比較演算子をつなげて範囲を表すこともできます。
+
+\begin{caution}[無限ループ]
+  条件を間違えると、繰り返しが永遠に終わらない\textbf{無限ループ}になってしまいます。
+  プログラムが止まらなくなったら、\key{Ctrl}+\key{C} で強制終了しましょう（\ref{sec:process-kill}節）。
+\end{caution}
+
+\subsection{乱数を使う}
+
+練習問題でゲームを作るために、\textbf{乱数}（でたらめな数）の作り方を紹介しておきます。
+\cmd{import random} と書いておくと、\cmd{random.randint(a, b)} で a 以上 b 以下の整数の乱数を作れます。
+\cmd{import} については、\ref{sec:python-class-module}節で詳しく学びます。
+
+\begin{lstlisting}[style=python, caption={サイコロを 5 回振る}, label={lst:python-basics-random}]
+import random
+
+for i in range(5):
+    print(random.randint(1, 6))
+\end{lstlisting}
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 18.14] for 文を使って、1 から 30 までの整数の合計を計算して表示してください。
+  \item[問 18.15] リスト \cmd{[1, 62, 3, 6743, 51, 6783, 42, 4671, 5, 236]} から、1000 未満の値だけを表示してください。\cmd{continue} を使い、\cmd{print} は if 文の中に書かないこと。
+  \item[問 18.16] 整数を入力して、1 からその数までの棒グラフを表示してください（入力が 4 なら、下のように表示します）。\cmd{print("■", end="")} と書くと、改行せずに表示できます。また、\cmd{"■" * 3} のように文字列に整数を掛けると、文字列を繰り返せます。
+\begin{verbatim}
+1:■
+2:■■
+3:■■■
+4:■■■■
+\end{verbatim}
+  \item[問 18.17] 数を次々と入力し、負の数が入力されたら、それまでに入力された数の個数・合計・平均を表示してください。
+  \item[問 18.18] 数当てゲームを作りましょう。1 から 30 までの乱数を作り、5 回以内に当ててもらいます。外れたときは「それよりも大きいです」「それよりも小さいです」とヒントを出し、当たったら「正解です！」と表示して終了します。5 回で当てられなかったときは、正解を表示してください。
+  \item[問 18.19] じゃんけんのプログラムを作りましょう。グーを 0、チョキを 1、パーを 2 として自分の手を入力し、コンピュータの手を乱数で決めて、勝ち・負け・あいこを表示してください。ヒント：\cmd{(自分の手 - 相手の手 + 3) \% 3} を計算すると、あいこなら 0、負けなら 1、勝ちなら 2 になります。
+\end{description}
 
 \section{関数}
+\label{sec:python-basics-function}
 
-TODO
+\subsection{関数とは}
+
+\textbf{関数}は、ひとまとまりの処理に名前を付けたものです。
+これまでに使ってきた \cmd{print( )}, \cmd{len( )}, \cmd{input( )} なども、Python に最初から用意されている関数（\textbf{組み込み関数}）です。
+自分で関数を作っておけば、同じ処理を何度も書かずに、名前を呼ぶだけで実行できます。
+
+\subsection{関数を作る}
+
+関数は、\cmd{def} を使って作ります（\textbf{定義}します）。
+
+\begin{lstlisting}[style=python, caption={関数の書き方}, label={lst:python-basics-def-syntax}]
+def 関数名(引数1, 引数2, ...):
+    処理
+    return 戻り値
+\end{lstlisting}
+
+\textbf{引数}（ひきすう）は、関数に渡す値で、関数の中では変数として使えます。
+\textbf{戻り値}は、関数が処理した結果として呼び出し元に返す値で、\cmd{return} で返します。
+引数も戻り値も、必要なければ省略できます。
+関数は、定義した後で \cmd{関数名(引数)} と書いて呼び出します。
+
+\begin{lstlisting}[style=python, caption={円の面積を計算する関数（circle.py）}, label={lst:python-basics-def}]
+def circle_area(radius):
+    area = radius * radius * 3.14
+    return area
+
+
+a = circle_area(2.0)
+print(a)
+print(circle_area(5.0))
+\end{lstlisting}
+
+\begin{terminal}[関数のプログラムを実行する]
+$ python3 circle.py
+12.56
+78.5
+\end{terminal}
+
+関数の中の処理は、呼び出されるまで実行されません。
+また、関数は呼び出すより前（ファイルの上のほう）で定義しておく必要があります。
+
+\subsection{いろいろな引数と戻り値}
+
+引数には、\cmd{引数名=値} の形で\textbf{デフォルト値}（省略したときに使われる値）を決めておけます。
+呼び出すときに \cmd{引数名=値} と書くと（\textbf{キーワード引数}）、引数の順番を気にせずに値を渡せます。
+また、\cmd{return} の後ろにカンマで区切って書くと、複数の値を返せます（実際にはタプルとして返されます）。
+
+\begin{lstlisting}[style=python, caption={デフォルト値と複数の戻り値}, label={lst:python-basics-def2}]
+def price_with_tax(price, tax_rate=0.1):
+    return round(price * (1 + tax_rate))
+
+
+def min_max(values):
+    return min(values), max(values)
+
+
+print(price_with_tax(980))                  # 税率 10% で計算
+print(price_with_tax(250, tax_rate=0.08))   # 税率 8% で計算
+low, high = min_max([1.2, 0.8, 0.5, 1.5])
+print(low, high)
+\end{lstlisting}
+
+\begin{terminal}[デフォルト値と複数の戻り値の実行結果]
+1078
+270
+0.5 1.5
+\end{terminal}
+
+\cmd{print( )} にカンマで区切って複数の値を渡すと、空白で区切って表示されます。
+
+\subsection{変数の有効範囲}
+
+関数の中で作った変数や引数は、その関数の中でしか使えません。
+関数の外でその変数を使おうとすると、\cmd{NameError}（その名前は定義されていない）というエラーになります。
+関数の中で計算した結果を外で使いたいときは、\cmd{return} で返します。
+
+\begin{terminal}[関数の中の変数は外から使えない]
+>>> def f(x):
+...     temp = x * 2
+...     return temp
+...
+>>> f(3)
+6
+>>> temp
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'temp' is not defined
+\end{terminal}
+
+\subsection{練習問題}
+
+\begin{description}
+  \item[問 18.20] 「完璧を」「目指すよりも」「まずは」「終わらせろ」の 4 行を表示する関数を作り、3 回呼び出してください（ループは使わないこと）。
+  \item[問 18.21] 整数を 1 つ受け取り、偶数なら「偶数」、奇数なら「奇数」と表示する関数を作り、3 回以上呼び出してください。
+  \item[問 18.22] 3 つの数値を受け取り、その中で最も大きい数値を返す関数を作ってください。\cmd{max( )} を使わないこと。表示は関数の外で行うこと。
+  \item[問 18.23] リスト \cmd{[3, 62, 4, 56, 346, 8, 2, 893, 52, 46]} を受け取り、最大値と最小値の 2 つを返す関数を作ってください。表示は関数の外で行うこと。
+  \item[問 18.24] 距離のリストを受け取り、0 以上の値（正しく測れた値）だけの平均を返す関数を作ってください。正しい値が 1 つもないときは \cmd{None}（値がないことを表す特別な値）を返すこと。
+\end{description}
+
+\section{練習問題の解答例}
+\label{sec:python-basics-answers}
+
+解答例は一例です。
+同じ結果になれば、違う書き方でも構いません。
+
+\begin{description}
+  \item[問 18.1] たとえば \cmd{5 + 8 - 6 / 2} です（$6 / 2 = 3$ が先に計算されるので $5 + 8 - 3 = 10$）。\cmd{/} の計算結果は小数になるので、Python で実行すると \cmd{10.0} と表示されます。
+  \item[問 18.2] \cmd{200 // 60} で 3（分）、\cmd{200 \% 60} で 20（秒）なので、3 分 20 秒です。
+\end{description}
+
+\begin{lstlisting}[style=python, caption={問 18.3 の解答例}, label={lst:python-basics-a3}]
+money = 4000
+book = 980
+chips = 250
+ice = 150
+book_tax = 0.10
+food_tax = 0.08
+
+total = book * 2 * (1 + book_tax) + (chips + ice) * (1 + food_tax)
+print(round(money - total))   # 1412
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={問 18.4・問 18.5 の解答例}, label={lst:python-basics-a4}]
+# 問 18.4
+title = input("アニメ名=> ")
+print(f"{title}は{len(title)}文字です。")
+
+# 問 18.5
+radius = float(input("車輪の半径 [m] => "))
+rps = float(input("1 秒あたりの回転数 => "))
+print(f"速さは {2 * 3.14 * radius * rps:.2f} m/s です")
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={問 18.6〜問 18.9 の解答例}, label={lst:python-basics-a6}]
+# 問 18.6
+colors = ["green", "blue", "red", "black", "white"]
+print(colors[1:4])
+
+# 問 18.7
+members = ["satou", "tanaka", "suzuki"]
+members.append("itou")
+members.remove("satou")
+print(members)       # ['tanaka', 'suzuki', 'itou']
+print(members[1])    # suzuki
+
+# 問 18.8
+heights = [176, 158, 164]
+print(sum(heights) / len(heights))   # 166.0
+
+# 問 18.9
+robot = {"name": "turtle", "max_speed": 0.5}
+robot["max_speed"] = 0.8
+robot["battery"] = 12.0
+print(f"{robot['name']} の最高速度は {robot['max_speed']} m/s")
+\end{lstlisting}
+
+f 文字列の \cmd{\{ \}} の中で辞書のキーを書くときは、外側の \cmd{"} とぶつからないように \cmd{'} を使います。
+
+\begin{lstlisting}[style=python, caption={問 18.10〜問 18.13 の解答例}, label={lst:python-basics-a10}]
+# 問 18.10
+a = float(input("a => "))
+b = float(input("b => "))
+if a > b:
+    print("a の方が大きい")
+elif a < b:
+    print("b の方が大きい")
+else:
+    print("a と b は同じ")
+
+# 問 18.11
+height = float(input("身長 [m] => "))
+weight = float(input("体重 [kg] => "))
+bmi = weight / height ** 2
+print(f"BMI = {bmi:.1f}")
+if bmi < 18.5:
+    print("やせ")
+elif bmi < 25:
+    print("標準")
+elif bmi < 30:
+    print("肥満")
+else:
+    print("高度肥満")
+
+# 問 18.12
+num = int(input("整数 => "))
+if num % 2 == 0:
+    print("偶数である")
+    if num >= 25:
+        print("25 以上である")
+if num % 3 == 0:
+    print("3 の倍数である")
+
+# 問 18.13
+voltage = float(input("電圧 [V] => "))
+if voltage <= 0 or voltage > 15:
+    print("センサの値が異常です")
+elif voltage >= 12.0:
+    print("充電十分")
+elif voltage >= 11.0:
+    print("そろそろ充電")
+else:
+    print("すぐに充電してください")
+\end{lstlisting}
+
+問 18.12 のように、if 文の中に if 文を書くこともできます（インデントを 1 段深くします）。
+
+\begin{lstlisting}[style=python, caption={問 18.14〜問 18.17 の解答例}, label={lst:python-basics-a14}]
+# 問 18.14
+total = 0
+for i in range(1, 31):
+    total += i
+print(total)   # 465
+
+# 問 18.15
+nums = [1, 62, 3, 6743, 51, 6783, 42, 4671, 5, 236]
+for n in nums:
+    if n >= 1000:
+        continue
+    print(n)
+
+# 問 18.16
+n = int(input("数> "))
+for i in range(1, n + 1):
+    print(f"{i}:" + "■" * i)
+
+# 問 18.17
+count = 0
+total = 0
+while True:
+    data = float(input("データ入力（負の数で終了）> "))
+    if data < 0:
+        break
+    count += 1
+    total += data
+if count > 0:
+    print(f"個数: {count} 合計: {total} 平均: {total / count}")
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={問 18.18・問 18.19 の解答例}, label={lst:python-basics-a18}]
+import random
+
+# 問 18.18
+answer = random.randint(1, 30)
+for i in range(5):
+    guess = int(input("値を入力してください=> "))
+    if guess == answer:
+        print("正解です！")
+        break
+    elif guess < answer:
+        print("残念！それよりも大きいです！")
+    else:
+        print("残念！それよりも小さいです！")
+print(f"正解は {answer} でした。")
+
+# 問 18.19
+hands = ["グー", "チョキ", "パー"]
+results = ["あいこ", "負け", "勝ち"]
+mine = int(input("あなたの手は？（0:グー, 1:チョキ, 2:パー）=> "))
+computer = random.randint(0, 2)
+print(f"あなた: {hands[mine]}  コンピュータ: {hands[computer]}")
+print(results[(mine - computer + 3) % 3])
+\end{lstlisting}
+
+問 18.19 では、手の名前や結果をリストに入れておき、インデックスで取り出しています。
+if 文を何重にも書くよりも、短くわかりやすいプログラムになります。
+
+\begin{lstlisting}[style=python, caption={問 18.20〜問 18.24 の解答例}, label={lst:python-basics-a20}]
+# 問 18.20
+def motto():
+    print("完璧を")
+    print("目指すよりも")
+    print("まずは")
+    print("終わらせろ")
+
+
+motto()
+motto()
+motto()
+
+
+# 問 18.21
+def even_or_odd(num):
+    if num % 2 == 0:
+        print("偶数")
+    else:
+        print("奇数")
+
+
+even_or_odd(5)
+even_or_odd(20)
+even_or_odd(1)
+
+
+# 問 18.22
+def maximum(a, b, c):
+    largest = a
+    if b > largest:
+        largest = b
+    if c > largest:
+        largest = c
+    return largest
+
+
+print(maximum(40, 23, 60))   # 60
+
+
+# 問 18.23
+def find_max_min(values):
+    return max(values), min(values)
+
+
+largest, smallest = find_max_min([3, 62, 4, 56, 346, 8, 2, 893, 52, 46])
+print(largest, smallest)   # 893 2
+
+
+# 問 18.24
+def valid_average(distances):
+    valid = []
+    for d in distances:
+        if d >= 0:
+            valid.append(d)
+    if len(valid) == 0:
+        return None
+    return sum(valid) / len(valid)
+
+
+print(valid_average([1.2, -1.0, 0.8]))   # 1.0
+print(valid_average([-1.0, -1.0]))       # None
+\end{lstlisting}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item 数値は \cmd{+}, \cmd{-}, \cmd{*}, \cmd{/}, \cmd{**}, \cmd{//}, \cmd{\%} で計算できます。\cmd{\#} から後ろはコメントです。
+  \item 変数には \cmd{=} で値を代入します。値には \cmd{int}, \cmd{float}, \cmd{str}, \cmd{bool} などの型があり、\cmd{int( )}, \cmd{float( )}, \cmd{str( )} で変換します。変数の値を文字列に埋め込むには f 文字列が便利です。
+  \item \cmd{input( )} で受け取った値は文字列なので、計算に使うときは数値に変換します。
+  \item リストは \cmd{[ ]}、タプルは \cmd{( )}、辞書は \cmd{\{ \}} で作ります。リストのインデックスは 0 から始まります。
+  \item if 文で条件分岐、for 文と while 文で繰り返しができます。処理のまとまりはインデントで表します。
+  \item \cmd{def} で関数を定義し、引数で値を受け取り、\cmd{return} で結果を返します。
+\end{itemize}
