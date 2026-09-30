@@ -42,6 +42,16 @@
 - [ ] `head -n 3 /proc/meminfo` の出力の形式
 - [ ] Ubuntu 24.04 で `/bin` が `/usr/bin` へのシンボリックリンクになっていること、`/tmp` が再起動で消えること
 
+### 第15章 Docker 入門（`chapters/tools/docker.tex`）
+
+- [ ] Docker のインストール手順が、出版時点の公式ドキュメント（https://docs.docker.com/engine/install/ubuntu/）と合っているか（リポジトリの設定ファイルの形式が変わることがある）
+- [ ] `docker run hello-world`、`docker images`、`docker ps -a`、`docker build` の出力の形式
+- [ ] ROS 2 の公式イメージのタグ（`ros:jazzy-ros-core`、`ros:jazzy`、`osrf/ros:jazzy-desktop`）と、`osrf/ros:jazzy-desktop` に `demo_nodes_cpp` が含まれていること
+- [ ] `xhost +local:` と `DISPLAY` の受け渡しで、Ubuntu 24.04（Wayland）の上で turtlesim のウィンドウが表示されること
+- [ ] `--network host --ipc host` で、2 つのコンテナの talker / listener が通信できること
+- [ ] Dev Containers の `devcontainer.json` の例で、実際にコンテナの中に接続できること
+- [ ] Docker Desktop の有料ライセンスの条件
+
 ### 第16章 Python とは（`chapters/python/what_is_python.tex`）
 
 - [ ] `gcc hello.c -o hello` の例：Ubuntu 24.04 のデスクトップ版には `gcc` が標準で入っていない可能性がある（`sudo apt install build-essential` が必要か）。本文で断るか
@@ -57,6 +67,40 @@
 - [ ] `pipx` が `sudo apt install pipx` で入ること
 - [ ] ROS 2 と仮想環境を組み合わせる方法（`--system-site-packages`）の記述が、ROS 2 Jazzy の公式ドキュメントの推奨と合っているか
 - [ ] コラム「venv 以外の開発ツール」：uv の速さ（開発元の公称で pip の 10〜100 倍）、pixi と RoboStack で ROS 2 の環境を作れること、Anaconda の有料ライセンスの条件が、出版時点の情報と合っているか
+
+### 第2章 Linux とは：Ubuntu 環境の用意・デスクトップ（`chapters/linux/what_is_linux.tex`）
+
+- [ ] インストール手順の流れ（Ubuntu 24.04 のインストーラの画面の順番と文言）
+- [ ] `wsl --install -d Ubuntu-24.04` のディストリビューション名
+- [ ] 日本語でインストールしたときに Mozc が使える状態になっているか、`半角/全角` キーで切り替えられるか
+- [ ] GNOME のショートカットキー（`Super`+矢印、`Print` など）と、「App Center」「ソフトウェアとアップデート」「追加のドライバー」の名称
+- [ ] 推奨する PC の性能の目安（CPU 4 コア以上、メモリ 8 GB 以上、ストレージ 50 GB 以上）が妥当か
+
+### 第6章 パーミッションとユーザ管理（`chapters/commandline/permission.tex`）
+
+- [ ] `ls -l /dev/ttyUSB0` の表示（`crw-rw---- 1 root dialout 188, 0 ...`）
+- [ ] `groups` の出力（インストール時に作ったユーザの所属グループ）
+- [ ] `sudo` のパスワードの有効時間（標準で 15 分）
+- [ ] udev のルールの例（CP210x の ID `10c4:ea60`）と、`udevadm` の手順で `/dev/lidar` が作られること
+
+### 第7章 テキスト処理とパイプ（`chapters/commandline/text_pipe.tex`）
+
+- [x] 例のコマンドを実際に `robot.log` と `data.csv` で実行し、出力が本文と一致すること（執筆環境の GNU coreutils で確認済み。Ubuntu 24.04 でも同じ結果になるはずだが、念のため確認するとよい）
+
+### 第8章 プロセスとシステム管理（`chapters/commandline/process.tex`）
+
+- [ ] `ps`, `ps aux`, `top`, `df -h`, `free -h`, `systemctl status ssh` の出力の形式
+- [ ] Ubuntu 24.04 で `dmesg` に `sudo` が必要なこと、CP210x を差し込んだときのメッセージ
+- [ ] `journalctl -u ssh` のサービス名（`ssh`）
+
+### 第9章 環境変数とシェルの設定（`chapters/commandline/env.tex`）
+
+- [ ] Ubuntu 24.04 の標準の `PATH` の値
+- [ ] Ubuntu の `.bashrc` に最初から書かれているエイリアス（`ll`, `la`, `l`）と `PS1` の値
+
+### 第10章 シェルスクリプト入門（`chapters/commandline/shellscript.tex`、`samples/shellscript/setup_dev.sh`）
+
+- [ ] `samples/shellscript/setup_dev.sh` を Ubuntu 24.04 の実機で実行し、本文の出力例と一致すること（執筆時は `sudo` と `dpkg` を差し替えた環境でだけ確認）
 
 ### 第11章 パッケージ管理（`chapters/tools/package.tex`）
 
@@ -105,7 +149,7 @@
 - [ ] **第2章**：「リアルタイム性のための機能も用意されている」という記述の粒度（PREEMPT_RT などに具体的に触れるか）
 - [ ] **第2章**：2.1 節（歴史）と 2.2 節（OSS）で「1991 年に Linus Torvalds が公開」という内容が重複している。2.2 節側を `\ref{sec:linux-history}` を使った書き方に変えるか
 - [ ] **第3章**：プロセスの状態を「実行可能・実行中・待機中・終了」の 4 つに簡略化している（ゾンビや停止状態などは省略）。入門書として十分か
-- [ ] **第3章**：`dialout` グループや udev の話は第6章・付録C（トラブルシューティング）と重複しないよう、どこで詳しく扱うかを決める
+- [x] **第3章**：`dialout` グループや udev の話をどこで詳しく扱うか → 第6章 6.4 節で詳しく扱った（付録C からは参照する形にする）
 - [ ] **第16章**：「Python は C 言語に比べて数十倍以上遅くなることがある」という記述の妥当性（処理内容によって差が大きい）
 - [ ] **第16章**：Python の公開年（1991 年）、Python 2 のサポート終了（2020 年）、名前の由来のコラム
 - [ ] **第4章**：実行結果とエラーメッセージを英語表示で掲載する方針でよいか（日本語環境では日本語で表示される旨を 4.3 節で断っている）
@@ -114,9 +158,6 @@
 
 ## 3. 未執筆・書き残し
 
-- [ ] 第2章「Ubuntu 環境の用意」（`sec:linux-setup`）
-- [ ] 第2章「デスクトップ環境の基本操作」（`sec:linux-desktop`）
-- [ ] 第2章「この章のまとめ」の `\todo`（上の 2 節の分）
 - [ ] 後の章で OSS の話を振り返る（第2章 2.2 節からの流れ）
   - [x] 第11章 パッケージ管理：`apt` で入れるソフトウェアの多くは OSS で、ディストリビューションが配布している（11.1 節に記載済み）
   - [x] 第13章 Git：GitHub が OSS 開発の中心の場であること、Issue / Pull Request での貢献（13.4 節に記載済み）
@@ -124,13 +165,20 @@
   - [ ] 第23章 ワークスペースとパッケージ：`package.xml` の `<license>` タグ
   - [ ] 第29章 次のステップへ：使う側から貢献する側へ
 - [ ] 第IV部 Python 入門の第18章・第19章の本文を書く（第16章・第17章は執筆済み）。内容は ROS 2 のノードを書くのに必要な範囲（特にクラスと継承、コールバック）に絞る
-- [ ] 第10章 シェルスクリプト入門の「実践：開発環境セットアップスクリプトを書く」は、`apt` を扱う第11章 パッケージ管理より前にある。題材を変えるか（候補：ロボットを動かす前のチェックスクリプト、実験データのバックアップスクリプト）、`apt` について断り書きを入れる
+- [x] 第10章 シェルスクリプト入門の「実践：開発環境セットアップスクリプトを書く」は、`apt` を扱う第11章より前にある → 題材はそのままで、`apt-get` について断り書きを入れた
 - [ ] 付録D 用語集（`appendix/glossary.tex`）に、これまでの章で導入した用語を追加する
   - 第1章：CPU、コア、クロック周波数、メモリ（RAM）、ストレージ、GPU、VRAM、入出力装置、ハードウェア、ソフトウェア、機械語、OS、デバイスドライバ、マイコン
   - 第2章：カーネル、UNIX、GNU、UNIX 哲学、OSS、フリーソフトウェア、ライセンス、コピーレフト、パーミッシブ、ディストリビューション、LTS
   - 第3章：ユーザ空間、カーネル空間、システムコール、ファイルシステム、ルートディレクトリ、マウント、FHS、ユーザ、UID、グループ、GID、root、sudo、プロセス、PID、親プロセス・子プロセス、systemd、スケジューラ、デバイスファイル
+  - 第15章：コンテナ、Docker、仮想マシン、ハイパーバイザ、イメージ、タグ、レジストリ、Docker Hub、Dockerfile、ボリューム（`-v`）、Docker Compose、Dev Containers、Docker Desktop
   - 第16章：インタプリタ、コンパイラ、コンパイル、ソースコード、静的型付け、動的型付け、ガベージコレクション、ライブラリ
   - 第17章：対話モード、スクリプト、shebang、標準ライブラリ、パッケージ、PyPI、pip、仮想環境、venv、PEP 668、pipx
+  - 第2章（追加）：デュアルブート、仮想マシン、WSL2、ISO ファイル、GNOME、デスクトップ環境、Dock、ワークスペース、Super キー、Mozc
+  - 第6章：パーミッション、所有者、chmod、chown、sudoers、tee、dialout、udev、ルールファイル、ベンダ ID、プロダクト ID
+  - 第7章：標準入力、標準出力、標準エラー出力、リダイレクト、/dev/null、パイプ、CSV、grep、正規表現、wc、cut、sort、uniq、sed、awk
+  - 第8章：ps、top、htop、load average、フォアグラウンド、バックグラウンド、ジョブ、シグナル、SIGINT、SIGTERM、SIGKILL、kill、pkill、df、du、free、スワップ、サービス、journalctl、systemctl、dmesg
+  - 第9章：変数、シェル変数、環境変数、PATH、export、source、.bashrc、エイリアス、関数、PS1
+  - 第10章：シェルスクリプト、コメント、コマンド置換、引数、クォート、if 文、for 文、while 文、終了ステータス、set -euo pipefail
   - 第11章：パッケージ、依存関係、パッケージ管理システム、apt、リポジトリ、GPG 鍵、電子署名、.deb、snap、PPA、ビルド、make、Makefile、CMake
   - 第12章：テキストエディタ、テキストファイル、シンタックスハイライト、補完、ターミナルエディタ、GUI エディタ、nano、Vim、vi、モード、Emacs、VS Code、拡張機能、統合ターミナル、コマンドパレット、Remote - SSH、Dev Containers
   - 第13章：README、Markdown、バージョン管理システム、Git、リポジトリ、作業ディレクトリ、ステージングエリア、コミット、コミットハッシュ、差分、.gitignore、ブランチ、マージ、コンフリクト、GitHub、リモートリポジトリ、push、pull、clone、Pull Request、レビュー、Issue、GitHub Flow
@@ -143,19 +191,20 @@
 
 ## 4. 図版
 
-図は TikZ で描いて `images/<章のファイル名>/` に置いています（24 点）。
-残りの 4 か所はスクリーンショットが必要なため、プレースホルダのままです。
+図は TikZ で描いて `images/<章のファイル名>/` に置いています（31 点）。
+残りの 5 か所はスクリーンショットが必要なため、プレースホルダのままです。
 残っている箇所は `grep -rn '入れる画像' book/` で一覧できます。
 
 | 章 | ラベル | 内容 | 状態 |
 | --- | --- | --- | --- |
 | 第12章 | `fig:editor-vscode` | VS Code の画面 | 要スクリーンショット |
+| 第2章 | `fig:linux-desktop` | Ubuntu 24.04 のデスクトップ | 要スクリーンショット |
 | 第4章 | `fig:terminal-gui-cli` | 同じディレクトリを GUI と CLI で表示した例 | 要スクリーンショット |
 | 第4章 | `fig:terminal-window` | Ubuntu のターミナル | 要スクリーンショット |
 | 第4章 | `fig:terminal-man` | `man ls` の表示画面 | 要スクリーンショット |
 
-- [ ] 上の 4 点のスクリーンショットを Ubuntu 24.04 で撮影する
-- [ ] TikZ で描いた 24 点の図の内容・見た目を確認する（第1章 5 点、第2章 3 点、第3章 3 点、第4章 2 点、第5章 2 点、第11章 1 点、第12章 1 点、第13章 2 点、第14章 3 点、第16章 1 点、第17章 1 点）
+- [ ] 上の 5 点のスクリーンショットを Ubuntu 24.04 で撮影する
+- [ ] TikZ で描いた 31 点の図の内容・見た目を確認する（第1章 5 点、第2章 3 点、第3章 3 点、第4章 2 点、第5章 2 点、第6章 1 点、第7章 2 点、第8章 1 点、第9章 1 点、第11章 1 点、第12章 1 点、第13章 2 点、第14章 3 点、第15章 2 点、第16章 1 点、第17章 1 点）
 - [ ] 第5章のコラム「ホームディレクトリの中のディレクトリ名」に `xdg-user-dirs-gtk-update` のダイアログの画像を入れるか（コラムの囲みの中には `figure` を置けないため、入れる場合はコラムの外に出すか、囲みの中に `\includegraphics` を直接書く）
 
 ---

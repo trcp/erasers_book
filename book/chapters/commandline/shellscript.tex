@@ -4,30 +4,378 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item シェルスクリプトの書き方と実行の仕方
+    \item 変数・引数・クォートの使い方
+    \item 条件分岐とループ
+    \item 終了ステータスを使ったエラー処理
+    \item 実践：開発環境をセットアップするスクリプト
   \end{itemize}
 \end{goalbox}
 
-\section{はじめてのシェルスクリプト}
+ここまでの章では、コマンドを 1 つずつターミナルに入力してきました。
+毎回同じ手順を繰り返すなら、その手順をファイルに書いておいて、まとめて実行できると便利です。
+コマンドを並べて書いたファイルを\textbf{シェルスクリプト}といいます。
+シェルスクリプトを使うと、作業を自動化でき、手順を正確に記録・共有できます（\ref{sec:terminal-gui-cui}節）。
 
-TODO
+\section{はじめてのシェルスクリプト}
+\label{sec:shellscript-first}
+
+\subsection{スクリプトを書いて実行する}
+
+練習用のディレクトリを作り、次の内容の \cmd{hello.sh} というファイルを作りましょう。
+エディタ（\ref{chap:editor}章）で書くのが一般的ですが、ここでは nano を使う例を示します。
+
+\begin{terminal}[スクリプトのファイルを作る]
+$ mkdir -p ~/scripts
+$ cd ~/scripts
+$ nano hello.sh
+\end{terminal}
+
+\begin{lstlisting}[style=bash, caption={はじめてのシェルスクリプト（hello.sh）}, label={lst:shellscript-hello}]
+#!/usr/bin/env bash
+# はじめてのシェルスクリプト
+echo "Hello, robot!"
+echo "今日の日付："
+date
+\end{lstlisting}
+
+1 行目の \cmd{\#!/usr/bin/env bash} は \textbf{shebang}（シバン）といい、このファイルを bash で実行することをシェルに伝えます。
+2 行目のように \cmd{\#} で始まる行は\textbf{コメント}で、実行されません。
+3 行目以降が、上から順に実行されるコマンドです。
+
+スクリプトを実行するには、\cmd{chmod} で実行権限を付けて（\ref{sec:permission-chmod}節）、パスを指定して実行します。
+
+\begin{terminal}[スクリプトを実行する]
+$ chmod +x hello.sh
+$ ./hello.sh
+Hello, robot!
+今日の日付：
+Wed Sep 30 10:40:12 JST 2026
+\end{terminal}
+
+\cmd{bash hello.sh} のように、\cmd{bash} コマンドの引数にファイルを指定して実行することもできます（この場合は実行権限がなくても実行できます）。
+また、\cmd{./} を付けるのは、カレントディレクトリが \cmd{PATH}（\ref{sec:env-variable}節）に含まれていないためです。
+
+\begin{point}[\cmd{source} と \cmd{./} の違い]
+  \cmd{./hello.sh} や \cmd{bash hello.sh} は、新しいシェル（子プロセス）の中でスクリプトを実行します。
+  そのため、スクリプトの中で \cmd{cd} で移動したり、環境変数を設定したりしても、実行が終わると元のシェルには反映されません。
+  今のシェルに設定を反映させたいときは、\cmd{source} で実行します（\ref{sec:env-export-source}節）。
+\end{point}
 
 \section{変数・引数・クォート}
+\label{sec:shellscript-variable}
 
-TODO
+\subsection{変数}
+
+シェルスクリプトでも、\ref{sec:env-variable}節で学んだ変数を使えます。
+\cmd{\$\{変数名\}} のように \cmd{\{ \}} で囲むと、変数名の区切りをはっきりさせられます。
+
+\begin{lstlisting}[style=bash, caption={変数を使う（var.sh）}, label={lst:shellscript-var}]
+#!/usr/bin/env bash
+ROBOT="turtle"
+LOG_DIR="$HOME/logs"
+echo "robot: $ROBOT"
+echo "log file: ${LOG_DIR}/${ROBOT}.log"
+\end{lstlisting}
+
+\begin{terminal}[変数を使うスクリプトを実行する]
+$ bash var.sh
+robot: turtle
+log file: /home/user/logs/turtle.log
+\end{terminal}
+
+\cmd{\$(コマンド)} と書くと、コマンドの実行結果を文字列として使えます。
+これを\textbf{コマンド置換}といいます。
+次の例では、\cmd{date} の出力を使って、日付と時刻の入ったファイル名を作っています。
+
+\begin{lstlisting}[style=bash, caption={コマンド置換を使う}, label={lst:shellscript-subst}]
+NOW=$(date +%Y%m%d_%H%M%S)
+echo "backup_${NOW}.tar.gz"
+\end{lstlisting}
+
+このスクリプトを実行すると、\cmd{backup\_20260930\_104012.tar.gz} のように表示されます。
+
+\subsection{引数}
+
+スクリプトを実行するときに渡した引数は、スクリプトの中で次の特別な変数を使って受け取れます。
+
+\begin{center}
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    変数 & 内容 \\
+    \midrule
+    \cmd{\$0} & スクリプト自身の名前 \\
+    \cmd{\$1}, \cmd{\$2}, \ldots & 1 番目、2 番目、\ldots の引数 \\
+    \cmd{\$\#} & 引数の数 \\
+    \cmd{"\$@"} & すべての引数 \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{lstlisting}[style=bash, caption={引数を受け取る（greet.sh）}, label={lst:shellscript-args}]
+#!/usr/bin/env bash
+echo "script: $0"
+echo "number of args: $#"
+echo "hello, $1!"
+\end{lstlisting}
+
+\begin{terminal}[引数を渡して実行する]
+$ bash greet.sh turtle
+script: greet.sh
+number of args: 1
+hello, turtle!
+\end{terminal}
+
+引数が省略されたときに使う値（デフォルト値）を決めておきたいときは、\cmd{\$\{1:-デフォルト値\}} と書きます。
+\cmd{\$1} が空なら、\cmd{:-} の後ろの値が使われます。
+
+\subsection{クォート}
+
+文字列を囲む引用符（\textbf{クォート}）には、意味の違う 2 種類があります。
+
+\begin{description}
+  \item[ダブルクォート（\cmd{"}）] 中の変数（\cmd{\$変数名}）やコマンド置換が展開されます。
+  \item[シングルクォート（\cmd{'}）] 中身がそのままの文字列として扱われ、変数も展開されません。
+\end{description}
+
+\begin{terminal}[クォートの違い]
+$ ROBOT=turtle
+$ echo "robot: $ROBOT"
+robot: turtle
+$ echo 'robot: $ROBOT'
+robot: $ROBOT
+\end{terminal}
+
+\begin{caution}[変数はダブルクォートで囲む]
+  変数をクォートで囲まずに使うと、値にスペースが含まれていたときに、複数の引数に分かれてしまいます（\ref{sec:terminal-command-structure}節）。
+  たとえば \cmd{FILE="my data.csv"} のとき、\cmd{rm \$FILE} は \cmd{my} と \cmd{data.csv} という 2 つのファイルを消そうとしてしまいます。
+  スクリプトの中で変数を使うときは、\cmd{rm "\$FILE"} のように、ダブルクォートで囲む習慣をつけましょう。
+\end{caution}
 
 \section{条件分岐とループ}
+\label{sec:shellscript-control}
 
-TODO
+\subsection{if 文}
+
+条件によって処理を変えるには、\textbf{if 文}を使います。
+条件は \cmd{[ ]} の中に書きます（\cmd{[} の後ろと \cmd{]} の前には、必ずスペースが必要です）。
+
+\begin{lstlisting}[style=bash, caption={ファイルがあるかどうかで処理を変える（check.sh）}, label={lst:shellscript-if}]
+#!/usr/bin/env bash
+FILE="$1"
+if [ -f "$FILE" ]; then
+    echo "$FILE があります"
+elif [ -d "$FILE" ]; then
+    echo "$FILE はディレクトリです"
+else
+    echo "$FILE は見つかりません"
+fi
+\end{lstlisting}
+
+\cmd{if} の後ろの条件が成り立てば \cmd{then} の後ろが実行され、成り立たなければ \cmd{elif}（別の条件）や \cmd{else} の後ろが実行されます。
+最後は \cmd{fi}（\cmd{if} を逆から書いたもの）で閉じます。
+\cmd{[ ]} の中で使える主な条件は、次のとおりです。
+
+\begin{center}
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    条件 & 意味 \\
+    \midrule
+    \cmd{-f ファイル} & 通常のファイルがある \\
+    \cmd{-d ディレクトリ} & ディレクトリがある \\
+    \cmd{-e パス} & ファイルかディレクトリがある \\
+    \cmd{-z 文字列} & 文字列が空である \\
+    \cmd{文字列1 = 文字列2} & 文字列が等しい（\cmd{!=} で等しくない） \\
+    \cmd{数値1 -eq 数値2} & 数値が等しい（\cmd{-ne}：等しくない） \\
+    \cmd{数値1 -lt 数値2} & 数値1 が小さい（\cmd{-le}：以下、\cmd{-gt}：大きい、\cmd{-ge}：以上） \\
+    \cmd{! 条件} & 条件が成り立たない \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\cmd{[ ]} の代わりに、コマンドをそのまま条件として書くこともできます。
+その場合は、コマンドが成功したかどうか（\ref{sec:shellscript-exit}節）で判断されます。
+次の例では、\cmd{grep -q}（結果を表示せずに、見つかったかどうかだけを返す）を使って、\cmd{.bashrc} に ROS 2 の設定が書かれているかを調べています。
+
+\begin{lstlisting}[style=bash, caption={コマンドの結果で条件分岐する}, label={lst:shellscript-if-cmd}]
+if grep -q "setup.bash" ~/.bashrc; then
+    echo "ROS 2 の設定はすでにあります"
+fi
+\end{lstlisting}
+
+\subsection{for 文}
+
+同じ処理を繰り返すには、\textbf{for 文}を使います。
+\cmd{in} の後ろに並べた値が 1 つずつ変数に入り、\cmd{do} と \cmd{done} の間の処理が繰り返されます。
+
+\begin{lstlisting}[style=bash, caption={for 文で繰り返す}, label={lst:shellscript-for}]
+for sensor in camera lidar imu; do
+    echo "checking $sensor ..."
+done
+
+# ワイルドカードで、CSV ファイルを 1 つずつ処理する
+for f in *.csv; do
+    echo "$f: $(wc -l < "$f") lines"
+done
+
+# ブレース展開で 1〜3 の数字を使う
+for i in {1..3}; do
+    echo "trial $i"
+done
+\end{lstlisting}
+
+ワイルドカード（\ref{sec:files-wildcard}節）やブレース展開と組み合わせると、たくさんのファイルをまとめて処理したり、決まった回数だけ繰り返したりできます。
+
+\subsection{while 文}
+
+\textbf{while 文}は、条件が成り立っている間、処理を繰り返します。
+\cmd{\$(( ))} の中では、整数の計算ができます。
+
+\begin{lstlisting}[style=bash, caption={while 文で繰り返す}, label={lst:shellscript-while}]
+count=1
+while [ "$count" -le 3 ]; do
+    echo "count: $count"
+    count=$((count + 1))
+done
+\end{lstlisting}
+
+\cmd{while read} を使うと、ファイルを 1 行ずつ読んで処理できます。
+
+\begin{lstlisting}[style=bash, caption={ファイルを 1 行ずつ処理する}, label={lst:shellscript-read}]
+while read -r line; do
+    echo "> $line"
+done < robot.log
+\end{lstlisting}
 
 \section{終了ステータスとエラー処理}
+\label{sec:shellscript-exit}
 
-TODO
+\subsection{終了ステータス}
+
+コマンドは、終了するときに\textbf{終了ステータス}という数値を返します。
+成功したときは \cmd{0}、失敗したときは \cmd{0} 以外の値を返すのが決まりです。
+直前のコマンドの終了ステータスは、\cmd{\$?} で確認できます。
+
+\begin{terminal}[終了ステータスを確認する]
+$ ls /home > /dev/null
+$ echo $?
+0
+$ ls /nonexistent
+ls: cannot access '/nonexistent': No such file or directory
+$ echo $?
+2
+\end{terminal}
+
+\subsection{\cmd{\&\&} と \cmd{||}}
+
+終了ステータスを使うと、前のコマンドの結果によって、次のコマンドを実行するかどうかを決められます。
+
+\begin{description}
+  \item[\cmd{コマンド1 \&\& コマンド2}] コマンド1 が成功したときだけ、コマンド2 を実行します。
+  \item[\cmd{コマンド1 || コマンド2}] コマンド1 が失敗したときだけ、コマンド2 を実行します。
+\end{description}
+
+\begin{terminal}[\&\& と || を使う]
+$ mkdir -p build && cd build
+$ cd /nonexistent || echo "移動できませんでした"
+\end{terminal}
+
+\subsection{スクリプトの終了ステータスとエラーメッセージ}
+
+スクリプトの中で \cmd{exit 数値} を実行すると、その時点でスクリプトを終了し、指定した終了ステータスを返します。
+エラーのときは、メッセージを標準エラー出力（\ref{sec:text-pipe-stream}節）に出して、\cmd{0} 以外の値で終了するのが作法です。
+\cmd{>\&2} と書くと、出力を標準エラー出力に送れます。
+
+\begin{lstlisting}[style=bash, caption={引数がなければエラーで終了する}, label={lst:shellscript-exit}]
+if [ "$#" -lt 1 ]; then
+    echo "使い方: $0 ファイル名" >&2
+    exit 1
+fi
+\end{lstlisting}
+
+\subsection{\cmd{set -euo pipefail}}
+
+シェルスクリプトは、途中のコマンドが失敗しても、標準では止まらずに次のコマンドを実行し続けます。
+たとえば \cmd{cd} に失敗したまま \cmd{rm} を実行すると、思わぬ場所のファイルを消してしまうかもしれません。
+そこで、スクリプトの先頭に次の 1 行を書いておくのがおすすめです。
+
+\begin{lstlisting}[style=bash, caption={安全のための設定}, label={lst:shellscript-set}]
+set -euo pipefail
+\end{lstlisting}
+
+\begin{description}
+  \item[\cmd{-e}] コマンドが失敗したら、その時点でスクリプトを終了する
+  \item[\cmd{-u}] 設定されていない変数を使ったら、エラーにする（変数名の打ち間違いに気づける）
+  \item[\cmd{-o pipefail}] パイプの途中のコマンドが失敗したときも、失敗として扱う
+\end{description}
+
+\subsection{関数}
+
+\ref{sec:env-alias}節で紹介した関数は、シェルスクリプトの中でも使えます。
+何度も出てくる処理を関数にまとめておくと、スクリプトが読みやすくなります。
+関数の中の \cmd{\$1} や \cmd{\$*} は、関数に渡された引数を表します（\cmd{\$*} はすべての引数をつなげた文字列です）。
+
+\begin{lstlisting}[style=bash, caption={メッセージを表示する関数}, label={lst:shellscript-func}]
+info() {
+    echo "[INFO] $*"
+}
+
+info "処理を始めます"
+\end{lstlisting}
 
 \section{実践：開発環境セットアップスクリプトを書く}
+\label{sec:shellscript-practice}
 
-TODO
+最後に、この章で学んだことを使って、ロボット開発の環境を整えるスクリプトを書いてみましょう。
+このスクリプトは、次の 4 つの作業を行います。
+
+\begin{enumerate}
+  \item 開発に使うパッケージ（git, tree, htop, tmux）が入っていなければインストールする
+  \item ROS 2 のワークスペースのディレクトリを作る
+  \item ROS 2 がインストールされていれば、\cmd{.bashrc} に ROS 2 の設定を追加する（まだ書かれていなければ）
+  \item 自分が \cmd{dialout} グループに入っているかを確認する
+\end{enumerate}
+
+パッケージのインストールには \cmd{apt-get} というコマンドを使います。
+\cmd{sudo apt-get install -y パッケージ名} で、確認なしにパッケージをインストールできます。
+apt のしくみについては、\ref{chap:package}章で詳しく学びます。
+
+\lstinputlisting[style=bash, caption={開発環境のセットアップスクリプト（setup\_dev.sh）}, label={lst:shellscript-setup}]{samples/shellscript/setup_dev.sh}
+
+ポイントを見ていきましょう。
+
+\begin{itemize}
+  \item 先頭の \cmd{set -euo pipefail} で、途中で失敗したら止まるようにしています。
+  \item \cmd{WS\_DIR="\$\{1:-\$HOME/ros2\_ws\}"} で、引数があればそのディレクトリを、なければ \cmd{\textasciitilde/ros2\_ws} をワークスペースにしています。
+  \item \cmd{info} と \cmd{warn} という関数で、メッセージの表示をそろえています。\cmd{warn} は標準エラー出力に出しています。
+  \item 1 では、\cmd{for} 文でパッケージを 1 つずつ調べています。\cmd{dpkg -s} はパッケージの情報を表示するコマンドで、インストールされていれば成功（終了ステータス 0）を返します。その出力は必要ないので、\cmd{/dev/null} に捨てています。
+  \item 3 では、ROS 2 がまだインストールされていないときに \cmd{.bashrc} に設定を書いてしまわないよう、\cmd{[ ! -f "\$ROS\_SETUP" ]} で確認しています。また、\cmd{grep -qF} ですでに書かれていないかを確かめてから追記しているので、何度実行しても同じ行が増えません。
+  \item 4 で \cmd{dialout} グループに入っていなければ、対処の方法を表示して、終了ステータス 1 で終了します。
+\end{itemize}
+
+実行すると、次のように表示されます。
+
+\begin{terminal}[セットアップスクリプトを実行する]
+$ chmod +x setup_dev.sh
+$ ./setup_dev.sh
+[INFO] git はインストール済みです
+[INFO] tree をインストールします
+...
+[INFO] /home/user/ros2_ws/src を作りました
+[WARN] ROS 2 がインストールされていないので、.bashrc の設定は飛ばします
+[INFO] dialout グループに入っています
+[INFO] セットアップが完了しました
+\end{terminal}
+
+「何度実行しても同じ結果になる」ように書いておくと、新しい PC やロボットの環境を整えるときに、安心して何度でも使えます。
+このスクリプトを Git で管理して（\ref{chap:git}章）、チームで共有するのもよいでしょう。
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item シェルスクリプトは、コマンドを並べて書いたファイルです。1 行目に shebang を書き、\cmd{chmod +x} で実行権限を付けて \cmd{./スクリプト名} で実行します。
+  \item 変数は \cmd{"\$変数名"} のようにダブルクォートで囲んで使います。引数は \cmd{\$1}, \cmd{\$2}, \ldots で受け取り、\cmd{\$(コマンド)} でコマンドの結果を使えます。
+  \item \cmd{if} 文で条件分岐、\cmd{for} 文や \cmd{while} 文で繰り返しができます。
+  \item コマンドは成功すると終了ステータス 0 を返します。\cmd{\&\&} や \cmd{||}、\cmd{exit} を使ってエラーを処理し、スクリプトの先頭には \cmd{set -euo pipefail} を書いておきます。
+  \item 何度実行しても同じ結果になるように書くと、安心して使えるスクリプトになります。
+\end{itemize}

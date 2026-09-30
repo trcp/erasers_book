@@ -1,0 +1,23 @@
+% 図：仮想マシンとコンテナの違い（chapters/tools/docker.tex）
+\begin{tikzpicture}[layer/.style={draw, rounded corners=1.5pt, align=center, font=\footnotesize, minimum height=7mm, inner sep=1pt}]
+  % 仮想マシン
+  \node[font=\small\bfseries] at (2.1,4.35) {仮想マシン};
+  \foreach \x/\a in {0/A,1.45/B,2.9/C} {
+    \node[layer, fill=green!8, minimum width=13mm, anchor=south west, font=\scriptsize] at (\x,3.3) {アプリ \a};
+    \node[layer, fill=orange!10, minimum width=13mm, anchor=south west, font=\scriptsize] at (\x,2.5) {ライブラリ};
+    \node[layer, fill=blue!12, minimum width=13mm, anchor=south west, font=\scriptsize] at (\x,1.7) {ゲスト OS};
+  }
+  \node[layer, fill=black!8, minimum width=42mm, anchor=south west] at (0,0.9) {ハイパーバイザ};
+  \node[layer, fill=blue!20, minimum width=42mm, anchor=south west] at (0,0.1) {ホスト OS};
+  \node[layer, fill=black!15, minimum width=42mm, anchor=south west] at (0,-0.7) {ハードウェア};
+  % コンテナ
+  \node[font=\small\bfseries] at (7.6,4.35) {コンテナ};
+  \foreach \x/\a in {5.5/A,6.95/B,8.4/C} {
+    \node[layer, fill=green!8, minimum width=13mm, anchor=south west, font=\scriptsize] at (\x,2.5) {アプリ \a};
+    \node[layer, fill=orange!10, minimum width=13mm, anchor=south west, font=\scriptsize] at (\x,1.7) {ライブラリ};
+  }
+  \node[layer, fill=black!8, minimum width=42mm, anchor=south west] at (5.5,0.9) {Docker};
+  \node[layer, fill=blue!20, minimum width=42mm, anchor=south west] at (5.5,0.1) {ホスト OS（カーネルを共有）};
+  \node[layer, fill=black!15, minimum width=42mm, anchor=south west] at (5.5,-0.7) {ハードウェア};
+  \draw[black!30, dashed] (4.75,-0.8) -- (4.75,4.5);
+\end{tikzpicture}

@@ -347,12 +347,175 @@ Linux には、プログラミング言語の開発環境、バージョン管�
 \section{Ubuntu 環境の用意}
 \label{sec:linux-setup}
 
-TODO
+本書の内容を実際に試すには、Ubuntu 24.04 が動く環境が必要です。
+ここでは、Ubuntu の環境を用意するいくつかの方法を紹介し、その中から自分に合った方法を選べるようにします。
+
+\subsection{環境を用意する方法}
+
+Ubuntu の環境を用意する方法には、主に次のようなものがあります。
+
+\begin{center}
+  \begin{tabular}{lp{0.3\linewidth}p{0.3\linewidth}}
+    \toprule
+    方法 & 良いところ & 気になるところ \\
+    \midrule
+    専用の PC にインストール & 性能を最大限に使え、トラブルが最も少ない & PC が 1 台必要 \\
+    デュアルブート & 1 台の PC で Windows と使い分けられる & 起動のたびに OS を選ぶ。設定を誤ると既存のデータを失うおそれ \\
+    仮想マシン & 今の OS の上で手軽に試せる & 動作が遅く、GPU や USB 機器の扱いに制限がある \\
+    WSL2 & Windows の上で手軽に使える & USB 機器やネットワークの扱いに追加の設定が必要 \\
+    Docker & 環境を丸ごと再現・共有できる & しくみの理解が必要（\ref{chap:docker}章） \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+ロボットを実際に動かすことを考えると、\textbf{Ubuntu を専用の PC にインストールする}方法が最もおすすめです。
+センサやモータを USB でつないだり、シミュレータで 3D の描画をしたりするときに、ほかの方法では思わぬ制限にぶつかることがあるからです。
+古いノートパソコンなどを 1 台、Ubuntu 専用にできると理想的です。
+まずは手元の PC で試してみたいという場合は、仮想マシンや WSL2 から始めても構いません。
+
+PC の性能の目安は、次のとおりです。
+シミュレータ（\ref{chap:simulation}章）を快適に動かすには、これより余裕があると安心です。
+
+\begin{itemize}
+  \item CPU：4 コア以上
+  \item メモリ：8 GB 以上（16 GB 以上を推奨）
+  \item ストレージ：空き容量 50 GB 以上
+\end{itemize}
+
+\subsection{PC に Ubuntu をインストールする}
+
+PC に Ubuntu をインストールする流れは、おおむね次のとおりです。
+
+\begin{enumerate}
+  \item \textbf{インストール用のファイルを入手する}：
+    Ubuntu の公式サイト（\url{https://jp.ubuntu.com/download} など）から、Ubuntu 24.04 LTS のデスクトップ版のファイル（拡張子が \cmd{.iso} のファイル）をダウンロードします。
+  \item \textbf{インストール用の USB メモリを作る}：
+    8 GB 以上の USB メモリに、balenaEtcher や Rufus といったツールを使ってダウンロードしたファイルを書き込みます。
+    USB メモリの中身はすべて消えるので注意してください。
+  \item \textbf{USB メモリから起動する}：
+    インストールしたい PC に USB メモリを差して電源を入れ、起動するときに特定のキー（\key{F12} や \key{F2} など、機種によって異なります）を押して、USB メモリから起動します。
+  \item \textbf{インストーラの指示に従う}：
+    言語（日本語）、キーボードの配列、ネットワーク、インストールの種類などを選びます。
+    ディスクの設定で「ディスクを削除して Ubuntu をインストール」を選ぶと、その PC の中のデータはすべて消えます。
+  \item \textbf{ユーザを作る}：
+    自分の名前、コンピュータの名前（ホスト名、\ref{sec:terminal-prompt}節）、ユーザ名、パスワードを設定します。
+    ユーザ名とホスト名は、ターミナルで何度も目にすることになるので、半角英小文字の短い名前にしておくと便利です。
+  \item \textbf{再起動する}：
+    インストールが終わったら USB メモリを抜いて再起動し、設定したユーザでログインします。
+\end{enumerate}
+
+\begin{caution}[インストールの前にバックアップを]
+  Ubuntu のインストールでは、ディスクの設定を誤ると、PC の中のデータがすべて消えてしまいます。
+  特にデュアルブートにする場合は、インストールの前に、大切なデータを必ず別の場所にバックアップしておきましょう。
+\end{caution}
+
+インストールが終わったら、最初にソフトウェアを最新の状態に更新しておきます。
+ターミナル（\ref{chap:terminal_shell}章）を開いて、次のコマンドを実行します（\ref{chap:package}章で詳しく説明します）。
+
+\begin{terminal}[インストール後にソフトウェアを更新する]
+$ sudo apt update
+$ sudo apt upgrade
+\end{terminal}
+
+NVIDIA の GPU を搭載した PC では、「ソフトウェアとアップデート」の「追加のドライバー」から、NVIDIA のドライバをインストールしておくと、3D の描画が快適になります。
+
+\subsection{仮想マシン・WSL2 で使う}
+
+\textbf{仮想マシン}を使う場合は、VirtualBox や VMware Workstation などのソフトウェアをインストールし、ダウンロードした Ubuntu の \cmd{.iso} ファイルを使って、仮想マシンの中に Ubuntu をインストールします。
+Apple シリコン（M1 など）を搭載した Mac では、UTM や Parallels Desktop などを使って、ARM 版の Ubuntu をインストールします。
+仮想マシンには、メモリを 8 GB 程度、CPU を 4 コア程度割り当てると、ROS 2 の学習には十分です。
+
+Windows 11 の PC では、\textbf{WSL2}（Windows Subsystem for Linux）を使うと、Windows の中で Ubuntu を手軽に使えます。
+管理者として開いた PowerShell で、次のコマンドを実行すると、Ubuntu 24.04 がインストールされます。
+
+\begin{terminal}[WSL2 で Ubuntu 24.04 をインストールする（PowerShell）]
+PS> wsl --install -d Ubuntu-24.04
+\end{terminal}
+
+WSL2 では、Linux の GUI アプリを Windows の画面に表示することもできるので、本書の内容の多くを試せます。
+ただし、USB でつないだ機器を使うには追加のツールが必要など、実機のロボットを動かすには不便な点もあります。
 
 \section{デスクトップ環境の基本操作}
 \label{sec:linux-desktop}
 
-TODO
+Ubuntu 24.04 には、\textbf{GNOME}（グノーム）という\textbf{デスクトップ環境}が採用されています。
+デスクトップ環境とは、ウィンドウやアイコン、メニューなど、マウスで操作するための画面（GUI、\ref{sec:terminal-gui-cui}節）を提供するソフトウェアです。
+ログインすると、図\ref{fig:linux-desktop}のような画面が表示されます。
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：Ubuntu 24.04 にログインした直後のデスクトップ画面のスクリーンショット（上部バー、左側の Dock、アプリ一覧のボタンに番号を付ける）
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{what_is_linux/desktop.png}
+  \caption{Ubuntu 24.04 のデスクトップ}
+  \label{fig:linux-desktop}
+\end{figure}
+
+\subsection{画面の構成}
+
+\begin{description}
+  \item[上部バー]
+    画面の上端にあるバーです。
+    左端の「アクティビティ」を押すと、開いているウィンドウの一覧と検索画面が表示されます。
+    中央には日付と時刻が、右端には、ネットワークや音量、電源などを操作するシステムメニューがあります。
+  \item[Dock]
+    画面の左端に並んでいるアイコンです。
+    よく使うアプリケーションを起動したり、起動中のアプリケーションを切り替えたりできます。
+    一番下のボタンを押すと、インストールされているすべてのアプリケーションの一覧が表示されます。
+  \item[ワークスペース]
+    仮想的な画面を複数用意して、作業ごとに使い分けるしくみです。
+    たとえば、1 つ目のワークスペースでエディタとターミナルを、2 つ目のワークスペースでシミュレータを開く、といった使い方ができます。
+\end{description}
+
+\subsection{よく使うアプリケーション}
+
+\begin{description}
+  \item[ファイル] ファイルやディレクトリを GUI で操作するファイルマネージャです（\ref{sec:terminal-gui-cui}節）。
+  \item[端末] コマンドを入力するためのターミナルです（\ref{chap:terminal_shell}章）。本書で最もよく使うアプリケーションです。
+  \item[設定] ネットワーク（Wi-Fi）、ディスプレイ、キーボード、言語、ユーザなどの設定を行います。
+  \item[App Center] アプリケーションを検索してインストールできます（\ref{chap:package}章）。
+  \item[Firefox] Web ブラウザです。
+\end{description}
+
+\subsection{便利なショートカットキー}
+
+キーボードの \key{Super} キーは、Windows のロゴが描かれたキーのことです。
+次のショートカットキーを覚えておくと、マウスを使わずに素早く操作できます。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    キー & 動作 \\
+    \midrule
+    \key{Super} & アクティビティ画面を開く（続けて文字を入力するとアプリを検索できる） \\
+    \key{Ctrl}+\key{Alt}+\key{T} & ターミナルを開く \\
+    \key{Alt}+\key{Tab} & ウィンドウを切り替える \\
+    \key{Super}+\key{\(\leftarrow\)} / \key{\(\rightarrow\)} & ウィンドウを画面の左半分 / 右半分に配置する \\
+    \key{Super}+\key{\(\uparrow\)} & ウィンドウを最大化する \\
+    \key{Super}+\key{L} & 画面をロックする \\
+    \key{Print} & スクリーンショットを撮る \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+ターミナルとエディタを画面の左右に並べて作業することが多いので、\key{Super}+\key{\(\leftarrow\)} / \key{\(\rightarrow\)} は特に便利です。
+
+\begin{point}[日本語の入力]
+  日本語を選んでインストールした場合、日本語入力のソフトウェア（Mozc）も使えるようになっています。
+  日本語入力と英字入力は、\key{半角/全角} キーで切り替えます。
+  ターミナルでコマンドを入力するときは、英字入力になっているかを確かめましょう。
+  全角の文字やスペースが混ざると、コマンドは正しく動きません（\ref{sec:terminal-command-structure}節）。
+\end{point}
 
 \section*{この章のまとめ}
 
@@ -362,5 +525,6 @@ TODO
   \item Linux は OSS であり、ソースコードを読み、改良し、共有する自由があります。他人のコードを使うときはライセンスを確認します。
   \item Linux カーネルにさまざまなソフトウェアを組み合わせて配布しているものをディストリビューションといいます。本書では Ubuntu 24.04 LTS を使います。
   \item ROS 2 が Ubuntu を中心に開発されていること、さまざまなハードウェアで動くこと、リモートから操作しやすいことなどから、ロボット開発では Linux が広く使われています。
-  \item \todo{Ubuntu 環境の用意とデスクトップ環境の基本操作のまとめを追加}
+  \item Ubuntu の環境は、専用の PC にインストールするのがおすすめです。手軽に試すなら、仮想マシンや WSL2 も使えます。
+  \item Ubuntu 24.04 のデスクトップ環境は GNOME です。\key{Super} キーでアプリを検索し、\key{Ctrl}+\key{Alt}+\key{T} でターミナルを開きます。
 \end{itemize}

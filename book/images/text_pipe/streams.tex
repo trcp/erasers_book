@@ -1,0 +1,10 @@
+% 図：標準入力・標準出力・標準エラー出力（chapters/commandline/text_pipe.tex）
+\begin{tikzpicture}
+  \node[figpart, minimum width=24mm, minimum height=14mm] (cmd) at (0,0) {\textbf{コマンド}};
+  \node[figbox, minimum width=18mm] (in) at (-4.2,0) {キーボード};
+  \node[figbox, minimum width=14mm] (out) at (5.0,0.9) {画面};
+  \node[figbox, minimum width=14mm] (err) at (5.0,-0.9) {画面};
+  \draw[figarrow] (in) -- node[figlabel, above]{標準入力（0）} (cmd);
+  \draw[figarrow] ([yshift=3mm]cmd.east) -- ++(0.4,0) |- node[figlabel, above, pos=0.75]{標準出力（1）} (out.west);
+  \draw[figarrow, red!60!black] ([yshift=-3mm]cmd.east) -- ++(0.4,0) |- node[figlabel, below, pos=0.75, text=red!60!black]{標準エラー出力（2）} (err.west);
+\end{tikzpicture}

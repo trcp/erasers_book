@@ -4,30 +4,322 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item 動いているプロセスの確認（\cmd{ps}, \cmd{top}, \cmd{htop}）
+    \item フォアグラウンドとバックグラウンドの切り替え（ジョブ制御）
+    \item シグナルとプロセスの終了（\cmd{kill}, \cmd{pkill}）
+    \item ストレージとメモリの使用量の確認（\cmd{df}, \cmd{du}, \cmd{free}）
+    \item システムのログの確認（\cmd{journalctl}, \cmd{dmesg}）
   \end{itemize}
 \end{goalbox}
 
-\section{プロセスの確認}
+\ref{sec:linux-internals-process}節で学んだように、実行中のプログラムはプロセスとして動いています。
+ロボットを動かすときには、センサのドライバや制御のプログラムなど、たくさんのプロセスが同時に動きます。
+「プログラムが止まらない」「動作が重い」「センサが認識されない」といったトラブルに対処するには、プロセスやシステムの状態を確認する方法を知っておく必要があります。
 
-TODO
+\section{プロセスの確認}
+\label{sec:process-check}
+
+\subsection{\cmd{ps}：プロセスの一覧を表示する}
+
+\cmd{ps} は、動いているプロセスの一覧を表示するコマンドです。
+引数なしで実行すると、今のターミナルで動いているプロセスだけが表示されます。
+
+\begin{terminal}[今のターミナルのプロセスを表示する]
+$ ps
+    PID TTY          TIME CMD
+   2345 pts/0    00:00:00 bash
+   2789 pts/0    00:00:00 ps
+\end{terminal}
+
+\cmd{PID} はプロセス ID、\cmd{CMD} は実行しているコマンドです。
+シェル（bash）と、今実行した \cmd{ps} 自身が表示されています。
+
+システム全体のプロセスを表示するには、\cmd{ps aux} とします。
+非常にたくさんのプロセスが表示されるので、パイプ（\ref{sec:text-pipe-pipe}節）で \cmd{grep} と組み合わせて、目的のプロセスを探すのが定番の使い方です。
+
+\begin{terminal}[システム全体から目的のプロセスを探す]
+$ ps aux | grep python3
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+user        4012 12.5  0.6 345680 98012 pts/1    Sl+  10:31   0:15 python3 controller.py
+user        4150  0.0  0.0   9212  2304 pts/2    S+   10:33   0:00 grep --color=auto python3
+\end{terminal}
+
+\cmd{\%CPU} と \cmd{\%MEM} は、そのプロセスが使っている CPU とメモリの割合です。
+最後の行は、検索に使った \cmd{grep} 自身です。
+
+\subsection{\cmd{top} と \cmd{htop}：リアルタイムに監視する}
+
+\cmd{top} は、プロセスの状態をリアルタイムで表示し続けるコマンドです。
+CPU やメモリを多く使っているプロセスが上に表示されるので、「コンピュータが重い」ときに原因を探すのに役立ちます。
+
+\begin{terminal}[プロセスをリアルタイムで監視する]
+$ top
+top - 10:35:01 up  2:15,  1 user,  load average: 0.52, 0.48, 0.41
+Tasks: 312 total,   1 running, 311 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  3.1 us,  1.0 sy,  0.0 ni, 95.6 id,  0.2 wa,  0.0 hi,  0.1 si,  0.0 st
+MiB Mem :  15890.2 total,   9012.3 free,   3456.7 used,   3421.2 buff/cache
+MiB Swap:   4096.0 total,   4096.0 free,      0.0 used.  12433.5 avail Mem
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+   4012 user      20   0  345680  98012  21504 S  12.5   0.6   0:15.23 python3
+   1523 user      20   0 4812344 412300 150212 S   4.3   2.5   2:01.87 gnome-shell
+...
+\end{terminal}
+
+\cmd{top} を実行している間は、次のキーで操作できます。
+\key{P} で CPU の使用率の順に、\key{M} でメモリの使用量の順に並べ替え、\key{1} で CPU のコアごとの使用率を表示し、\key{q} で終了します。
+
+\cmd{htop} は、\cmd{top} をより見やすく、使いやすくしたコマンドです。
+CPU のコアごとの使用率やメモリの使用量がグラフで表示され、矢印キーでプロセスを選んで操作できます。
+標準では入っていないので、インストールして使います（\ref{chap:package}章）。
+
+\begin{terminal}[htop をインストールして起動する]
+$ sudo apt install htop
+$ htop
+\end{terminal}
+
+\begin{column}{load average}
+  \cmd{top} の 1 行目の \cmd{load average} は、CPU の使用を待っているプロセスの数の平均で、左から直近 1 分・5 分・15 分の値です。
+  CPU のコアの数（\cmd{nproc} で確認できます）と比べて、この値がずっと大きい状態が続いているなら、コンピュータの処理能力が足りていないということです。
+  ロボットの PC でこの値が高いときは、処理を軽くするか、より性能の高いコンピュータを検討しましょう。
+\end{column}
 
 \section{フォアグラウンドとバックグラウンド}
+\label{sec:process-job}
 
-TODO
+\subsection{ジョブ}
+
+ターミナルでコマンドを実行すると、ふつうはそのコマンドが終わるまで、次のコマンドを入力できません。
+このように、ターミナルを占有して動いている状態を\textbf{フォアグラウンド}といいます。
+これに対して、コマンドを裏で動かしたまま、ターミナルで別のコマンドを入力できる状態を\textbf{バックグラウンド}といいます。
+シェルから起動したこれらのプロセスを、\textbf{ジョブ}と呼びます（図\ref{fig:process-job}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/process/job_states}
+  \caption{ジョブの状態の切り替え}
+  \label{fig:process-job}
+\end{figure}
+
+\subsection{バックグラウンドで実行する}
+
+コマンドの最後に \cmd{\&} を付けると、バックグラウンドで実行されます。
+ここでは、指定した秒数だけ待つ \cmd{sleep} コマンドを使って試してみます。
+
+\begin{terminal}[バックグラウンドで実行する]
+$ sleep 100 &
+[1] 3456
+$ jobs
+[1]+  Running                 sleep 100 &
+\end{terminal}
+
+\cmd{[1]} はジョブ番号、\cmd{3456} は PID です。
+\cmd{jobs} で、今のシェルのジョブの一覧を確認できます。
+
+\subsection{フォアグラウンドとバックグラウンドを切り替える}
+
+\cmd{fg} で、バックグラウンドのジョブをフォアグラウンドに戻せます。
+フォアグラウンドで動いているジョブは、\key{Ctrl}+\key{Z} で一時停止でき、\cmd{bg} でバックグラウンドで再開できます。
+\cmd{\%1} のように書くと、ジョブ番号でジョブを指定できます。
+
+\begin{terminal}[ジョブを切り替える]
+$ fg %1
+sleep 100
+^Z
+[1]+  Stopped                 sleep 100
+$ bg %1
+[1]+ sleep 100 &
+\end{terminal}
+
+\cmd{\textasciicircum Z} は、\key{Ctrl}+\key{Z} を押したことを表しています。
+
+\begin{caution}[\key{Ctrl}+\key{Z} は終了ではない]
+  \key{Ctrl}+\key{Z} は、プログラムを\textbf{一時停止}するだけで、終了はしません。
+  ROS 2 のノードを止めるつもりで \key{Ctrl}+\key{Z} を押すと、ノードが止まったまま残り続け、同じ名前のノードが重複するなどのトラブルの原因になります。
+  プログラムを終了するときは、\key{Ctrl}+\key{C} を使いましょう。
+\end{caution}
+
+バックグラウンドのジョブは、ターミナルを閉じると一緒に終了します。
+ターミナルを閉じたり、SSH の接続が切れたりしても動かし続けたいときは、tmux（\ref{sec:network-tmux}節）を使うと便利です。
 
 \section{プロセスの終了とシグナル}
+\label{sec:process-kill}
 
-TODO
+\subsection{シグナル}
+
+プロセスには、\textbf{シグナル}という合図を送って、終了や一時停止などを指示できます。
+\key{Ctrl}+\key{C} や \key{Ctrl}+\key{Z} も、実はフォアグラウンドのプロセスにシグナルを送る操作です。
+よく使うシグナルには、次のようなものがあります。
+
+\begin{center}
+  \begin{tabular}{llp{0.5\linewidth}}
+    \toprule
+    シグナル & 番号 & 意味 \\
+    \midrule
+    \cmd{SIGINT} & 2 & 割り込み。\key{Ctrl}+\key{C} で送られる \\
+    \cmd{SIGTERM} & 15 & 終了の依頼。\cmd{kill} で標準で送られる \\
+    \cmd{SIGKILL} & 9 & 強制終了。プロセスは拒否できない \\
+    \cmd{SIGTSTP} & 20 & 一時停止。\key{Ctrl}+\key{Z} で送られる \\
+    \cmd{SIGHUP} & 1 & 端末が切断された。ターミナルを閉じると送られる \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\cmd{SIGINT} や \cmd{SIGTERM} を受け取ったプログラムは、ファイルを保存したり、モータを止めたりといった後片付けをしてから終了できます。
+ROS 2 のノードも、\key{Ctrl}+\key{C}（\cmd{SIGINT}）を受け取ると、きちんと終了処理を行ってから終了するように作られています。
+一方、\cmd{SIGKILL} を受けたプロセスは、後片付けをする間もなく即座に終了させられます。
+
+\subsection{\cmd{kill}：シグナルを送る}
+
+別のターミナルで動いているプロセスや、バックグラウンドのプロセスを終了させるには、\cmd{kill} で PID を指定してシグナルを送ります。
+シグナルを指定しなければ \cmd{SIGTERM} が送られます。
+
+\begin{terminal}[プロセスを終了させる]
+$ kill 4012                # SIGTERM を送る（終了を依頼する）
+$ kill -INT 4012           # SIGINT を送る（Ctrl+C と同じ）
+$ kill -9 4012             # SIGKILL を送る（強制終了）
+\end{terminal}
+
+\begin{point}[プロセスを終了させる順番]
+  プロセスを終了させるときは、まず \key{Ctrl}+\key{C} か \cmd{kill}（\cmd{SIGTERM}）を試し、それでも終了しないときだけ \cmd{kill -9} を使いましょう。
+  ロボットの制御プログラムを \cmd{kill -9} で強制終了すると、モータに最後の指令が残ったまま止まってしまうなど、後片付けが行われないことがあります。
+\end{point}
+
+\subsection{\cmd{pgrep} と \cmd{pkill}：名前で指定する}
+
+PID を調べるのが面倒なときは、プロセスの名前で指定できる \cmd{pgrep} と \cmd{pkill} が便利です。
+\cmd{pgrep} は名前に一致するプロセスの PID を表示し、\cmd{pkill} はシグナルを送ります。
+\cmd{-f} を付けると、コマンド名だけでなく、引数も含めたコマンドライン全体から探します。
+\cmd{-a} を付けると、PID と一緒にコマンドライン全体を表示します。
+
+\begin{terminal}[名前でプロセスを探して終了させる]
+$ pgrep -af controller
+4012 python3 controller.py
+$ pkill -f controller.py
+\end{terminal}
+
+\cmd{pkill} は名前が一致したすべてのプロセスに送られるので、関係のないプロセスまで終了させないように、先に \cmd{pgrep} で対象を確かめておきましょう。
 
 \section{ディスク・メモリの確認}
+\label{sec:process-resource}
 
-TODO
+\subsection{\cmd{df}：ストレージの空き容量を確認する}
+
+\cmd{df} は、ストレージ（ファイルシステム）の使用量と空き容量を表示するコマンドです。
+\cmd{-h} を付けると、容量を G（ギガバイト）などの単位で表示します。
+
+\begin{terminal}[ストレージの空き容量を確認する]
+$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           1.6G  2.4M  1.6G   1% /run
+/dev/nvme0n1p2  468G   85G  360G  20% /
+...
+\end{terminal}
+
+\cmd{Mounted on} が \cmd{/} の行が、Ubuntu が入っているストレージです。
+ロボットのセンサデータを記録していると（\ref{chap:debug}章）、あっという間にストレージがいっぱいになることがあるので、ときどき確認しましょう。
+
+\subsection{\cmd{du}：ディレクトリの使用量を確認する}
+
+\cmd{du} は、ディレクトリやファイルが使っている容量を表示するコマンドです。
+\cmd{-s} で合計だけを、\cmd{-h} で読みやすい単位で表示します。
+\cmd{sort -h}（単位付きの数値として並べ替える）と組み合わせると、どこが容量を使っているのかがわかります。
+
+\begin{terminal}[ホームディレクトリの中で容量の大きいものを探す]
+$ du -sh ~/* | sort -h
+4.0K    /home/user/Templates
+120M    /home/user/Documents
+2.3G    /home/user/ros2_ws
+15G     /home/user/bags
+\end{terminal}
+
+\subsection{\cmd{free}：メモリの使用量を確認する}
+
+\cmd{free} は、メモリの使用量を表示するコマンドです。
+
+\begin{terminal}[メモリの使用量を確認する]
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       3.4Gi       8.8Gi       312Mi       3.3Gi        12Gi
+Swap:          4.0Gi          0B       4.0Gi
+\end{terminal}
+
+実際に使える量の目安は、\cmd{available} の値です。
+\cmd{free} の値が小さくても、\cmd{buff/cache} の部分は必要に応じて解放されるので、すぐに困ることはありません。
+\cmd{Swap}（スワップ）は、メモリが足りなくなったときにストレージを代わりに使う領域です。
+スワップがたくさん使われているときは、メモリが足りておらず、動作が極端に遅くなっている可能性があります。
 
 \section{ログの確認}
+\label{sec:process-log}
 
-TODO
+\subsection{\cmd{journalctl}：システムのログを見る}
+
+Linux では、システムやサービス（バックグラウンドで動き続けるプログラム）のログが、\textbf{systemd}（\ref{sec:linux-internals-process}節）によってまとめて記録されています。
+このログは \cmd{journalctl} で見ることができます。
+ログは長いので、次のようなオプションで絞り込んで使います。
+
+\begin{center}
+  \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+    \toprule
+    コマンド & 表示する内容 \\
+    \midrule
+    \cmd{journalctl -b} & 今回の起動以降のログ \\
+    \cmd{journalctl -f} & 新しいログを表示し続ける（\cmd{tail -f} と同じ） \\
+    \cmd{journalctl -u ssh} & 特定のサービス（ここでは SSH のサーバ）のログ \\
+    \cmd{journalctl -p err} & エラー以上の重要度のログ \\
+    \cmd{journalctl --since "10 min ago"} & 直近 10 分間のログ \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+サービスが動いているかどうかは、\cmd{systemctl status} で確認できます。
+
+\begin{terminal}[SSH のサーバが動いているか確認する]
+$ systemctl status ssh
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/usr/lib/systemd/system/ssh.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-09-30 08:20:11 JST; 2h 15min ago
+...
+\end{terminal}
+
+\cmd{active (running)} と表示されていれば、動いています。
+表示が長いときは \key{q} で終了します。
+
+\subsection{\cmd{dmesg}：カーネルのメッセージを見る}
+
+\cmd{dmesg} は、カーネル（\ref{sec:linux-internals-kernel}節）が出力したメッセージを表示するコマンドです。
+デバイスがつながったり外れたりしたときの情報が記録されるので、USB でつないだセンサが認識されないときの調査に欠かせません。
+Ubuntu では、\cmd{sudo} を付けて実行します。
+
+\cmd{-w} を付けて実行したまま USB 機器を差し込むと、カーネルが機器をどう認識したかをその場で確かめられます。
+
+\begin{terminal}[USB 機器を差し込んだときのメッセージを見る]
+$ sudo dmesg -w
+...
+[ 8123.456789] usb 1-2: new full-speed USB device number 5 using xhci_hcd
+[ 8123.612345] usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60
+[ 8123.634567] cp210x 1-2:1.0: cp210x converter detected
+[ 8123.645678] usb 1-2: cp210x converter now attached to ttyUSB0
+\end{terminal}
+
+最後の行から、この機器が \cmd{/dev/ttyUSB0} として使えるようになったことがわかります（\ref{sec:linux-internals-device}節）。
+何も表示されなければ、ケーブルや機器そのものに問題がある可能性があります。
+終了するときは \key{Ctrl}+\key{C} を押します。
+
+\begin{point}[センサが認識されないときの確認の手順]
+  \begin{enumerate}
+    \item \cmd{sudo dmesg -w} を実行したまま機器を差し込み、カーネルに認識されているか、どのデバイスファイルになったかを確かめる
+    \item \cmd{ls -l /dev/ttyUSB*} で、デバイスファイルがあるか、権限はどうなっているかを確かめる
+    \item \cmd{groups} で、自分が \cmd{dialout} グループに入っているかを確かめる（\ref{sec:permission-device}節）
+  \end{enumerate}
+\end{point}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item \cmd{ps aux | grep} でプロセスを探し、\cmd{top} や \cmd{htop} で CPU やメモリの使用状況をリアルタイムに監視できます。
+  \item コマンドの末尾に \cmd{\&} を付けるとバックグラウンドで実行されます。\cmd{jobs}, \cmd{fg}, \cmd{bg}, \key{Ctrl}+\key{Z} でジョブを切り替えます。
+  \item プロセスはシグナルで終了させます。まず \key{Ctrl}+\key{C} や \cmd{kill} を使い、終了しないときだけ \cmd{kill -9} を使います。名前で指定するなら \cmd{pgrep} と \cmd{pkill} が便利です。
+  \item \cmd{df -h} でストレージの空き容量を、\cmd{du -sh} でディレクトリの使用量を、\cmd{free -h} でメモリの使用量を確認します。
+  \item \cmd{journalctl} でシステムのログを、\cmd{sudo dmesg} でカーネルのメッセージを確認します。センサが認識されないときは、まず \cmd{dmesg} を見ましょう。
+\end{itemize}

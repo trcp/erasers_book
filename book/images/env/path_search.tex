@@ -1,0 +1,13 @@
+% 図：PATH を使ったコマンドの検索（chapters/commandline/env.tex）
+\begin{tikzpicture}[dir/.style={figbox, minimum width=30mm, font=\small\ttfamily}]
+  \node[figpart, minimum width=22mm] (in) at (0,0) {\texttt{\$ ls} と入力};
+  \node[dir] (d1) at (4.3,1.4) {/usr/local/bin};
+  \node[dir] (d2) at (4.3,0) {/usr/bin};
+  \node[dir, fill=black!4, text=black!50] (d3) at (4.3,-1.2) {/bin ...};
+  \node[figbox, minimum width=24mm, fill=green!8] (run) at (9.0,0) {\texttt{/usr/bin/ls}\\を実行};
+  \draw[figarrow] (in.east) -- node[figlabel, above, pos=0.6]{\tikz\node[fignum]{1};} (d1.west);
+  \draw[figarrow] (d1.south) -- node[figlabel, right]{\tikz\node[fignum]{2}; なければ次へ} (d2.north);
+  \draw[figarrow] (d2.east) -- node[figlabel, above]{\tikz\node[fignum]{3}; 見つかった} (run.west);
+  \draw[black!40, dashed] (d2.south) -- (d3.north);
+  \node[figlabel, text=black!60, anchor=north] at (4.3,-1.75) {\texttt{PATH} に書かれた順に探す};
+\end{tikzpicture}

@@ -1,0 +1,18 @@
+% 図：ジョブの状態の切り替え（chapters/commandline/process.tex）
+\begin{tikzpicture}[
+    >=Stealth, auto, node distance=26mm and 50mm, on grid,
+    every state/.style={draw, rounded corners, rectangle, fill=blue!6,
+      minimum width=28mm, minimum height=10mm, font=\small, align=center}]
+  \node[state, fill=blue!15] (fg) {\textbf{フォアグラウンド}\\{\footnotesize 端末を占有して実行}};
+  \node[state, right=of fg, fill=green!8] (bg) {\textbf{バックグラウンド}\\{\footnotesize 裏で実行}};
+  \node[state, below right=26mm and 25mm of fg, fill=orange!10] (st) {\textbf{停止中}\\{\footnotesize 一時停止}};
+  \path[->, thick]
+    (bg) edge node[font=\footnotesize, swap]{\texttt{fg}} (fg)
+    (fg) edge node[font=\footnotesize]{\texttt{Ctrl+Z}} (st)
+    (st) edge[bend right=20] node[font=\footnotesize, swap]{\texttt{bg}} (bg)
+    (st) edge[bend left=40] node[font=\footnotesize]{\texttt{fg}} (fg);
+  \node[font=\footnotesize, anchor=south] (s1) at ([yshift=6mm]fg.north) {\texttt{コマンド}};
+  \node[font=\footnotesize, anchor=south] (s2) at ([yshift=6mm]bg.north) {\texttt{コマンド \&}};
+  \draw[->, thick] (s1) -- (fg);
+  \draw[->, thick] (s2) -- (bg);
+\end{tikzpicture}

@@ -1,0 +1,10 @@
+% 図：パイプでコマンドをつなぐ（chapters/commandline/text_pipe.tex）
+\begin{tikzpicture}
+  \node[figpart, minimum width=20mm] (a) at (0,0) {\texttt{cat robot.log}};
+  \node[figpart, minimum width=20mm] (b) at (4.0,0) {\texttt{grep ERROR}};
+  \node[figpart, minimum width=20mm] (c) at (8.0,0) {\texttt{wc -l}};
+  \node[figbox, minimum width=12mm] (s) at (8.0,-1.3) {画面};
+  \draw[figarrow] (a) -- node[figlabel, above]{\texttt{|}} node[figlabel, below]{全部の行} (b);
+  \draw[figarrow] (b) -- node[figlabel, above]{\texttt{|}} node[figlabel, below]{ERROR の行} (c);
+  \draw[figarrow] (c) -- node[figlabel, right]{行数} (s);
+\end{tikzpicture}

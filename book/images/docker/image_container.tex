@@ -1,0 +1,13 @@
+% 図：イメージ・コンテナ・レジストリの関係（chapters/tools/docker.tex）
+\begin{tikzpicture}
+  \node[figpart, minimum width=24mm, minimum height=12mm, fill=orange!10] (hub) at (0,0) {\textbf{レジストリ}\\{\footnotesize（Docker Hub など）}};
+  \node[figbox, minimum width=20mm, minimum height=12mm, fill=black!4] (file) at (0,-2.4) {\texttt{Dockerfile}\\{\footnotesize（設計図）}};
+  \node[figpart, minimum width=22mm, minimum height=12mm] (img) at (3.9,-1.2) {\textbf{イメージ}\\{\footnotesize（ひな形）}};
+  \node[figbox, minimum width=20mm, fill=green!8] (c1) at (7.9,-0.3) {コンテナ 1};
+  \node[figbox, minimum width=20mm, fill=green!8] (c2) at (7.9,-1.2) {コンテナ 2};
+  \node[figbox, minimum width=20mm, fill=green!8] (c3) at (7.9,-2.1) {コンテナ 3};
+  \draw[figarrow] (hub.east) -- node[figlabel, above, sloped]{\texttt{docker pull}} (img.north west);
+  \draw[figarrow] (file.east) -- node[figlabel, below, sloped]{\texttt{docker build}} (img.south west);
+  \foreach \c in {c1,c2,c3} \draw[figarrow] (img.east) -- (\c.west);
+  \node[figlabel, above] at (5.9,-0.75) {\texttt{docker run}};
+\end{tikzpicture}

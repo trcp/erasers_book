@@ -1,0 +1,23 @@
+% 図：パーミッションの表記の読み方（chapters/commandline/permission.tex）
+\begin{tikzpicture}[ch/.style={font=\Large\ttfamily, inner sep=0pt, outer sep=0pt, anchor=base west, minimum width=5mm}]
+  \foreach \c [count=\i from 0] in {-,r,w,x,r,-,x,r,-,-}
+    \node[ch] (c\i) at (\i*0.5,0) {\c};
+  % 区切りの色
+  \begin{scope}[on background layer]
+    \fill[black!10] ([yshift=-1mm]c0.south west) rectangle ([yshift=5mm]c0.south east);
+    \fill[blue!15] ([yshift=-1mm]c1.south west) rectangle ([yshift=5mm]c3.south east);
+    \fill[green!15] ([yshift=-1mm]c4.south west) rectangle ([yshift=5mm]c6.south east);
+    \fill[orange!15] ([yshift=-1mm]c7.south west) rectangle ([yshift=5mm]c9.south east);
+  \end{scope}
+  \node[figlabel, below=3mm of c0] {種類};
+  \node[figlabel, below=3mm of c2, align=center] {所有者\\（user）};
+  \node[figlabel, below=3mm of c5, align=center] {グループ\\（group）};
+  \node[figlabel, below=3mm of c8, align=center] {その他\\（others）};
+  % 右側の説明
+  \node[figlabel, anchor=west, align=left] at (5.6,-0.2)
+    {\texttt{-}：通常のファイル　\texttt{d}：ディレクトリ\\
+     \texttt{r}：読み取り（read）\\
+     \texttt{w}：書き込み（write）\\
+     \texttt{x}：実行（execute）\\
+     \texttt{-}：その権限がない};
+\end{tikzpicture}

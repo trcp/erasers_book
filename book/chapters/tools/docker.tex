@@ -4,30 +4,451 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item コンテナとは何か、仮想マシンとの違い
+    \item Docker のインストールと、イメージ・コンテナの基本操作
+    \item Dockerfile を書いて、自分用のイメージを作る方法
+    \item コンテナの中で GUI アプリやデバイスを使う方法
+    \item Docker Compose と Dev Containers を使った、ROS 2 の開発環境の構築
   \end{itemize}
 \end{goalbox}
 
-\section{コンテナとは}
+「自分の PC では動いたのに、ロボットの PC では動かない」「先輩の環境では動くのに、自分の環境では動かない」。
+ソフトウェア開発では、このような環境の違いによるトラブルがよく起こります。
+この章では、ソフトウェアとその動作環境をまるごとまとめて持ち運べるようにする \textbf{Docker} の使い方を学びます。
 
-TODO
+\section{コンテナとは}
+\label{sec:docker-container}
+
+\subsection{環境の違いという問題}
+
+プログラムが動くかどうかは、プログラムそのものだけでなく、OS のバージョンや、インストールされているライブラリの種類とバージョンなど、そのコンピュータの\textbf{環境}に大きく左右されます。
+ROS 2 のように多くのソフトウェアを組み合わせて使う場合は、特にその影響が大きくなります。
+たとえば、ROS 2 Jazzy は Ubuntu 24.04 向けに作られているので、Ubuntu 22.04 の PC にはそのままインストールできません（\ref{sec:linux-distribution}節）。
+
+\subsection{コンテナ}
+
+\textbf{コンテナ}は、アプリケーションと、それが動くのに必要なライブラリや設定をひとまとめにして、ほかの部分から隔離された環境で動かすしくみです。
+コンテナの中は、あたかも別のコンピュータのように見えます。
+たとえば、Ubuntu 22.04 の PC の上で Ubuntu 24.04 のコンテナを動かし、その中で ROS 2 Jazzy を使う、といったことができます。
+\textbf{Docker} は、このコンテナを作ったり動かしたりするための、最も広く使われているソフトウェアです。
+
+コンテナを使うと、次のような利点があります。
+
+\begin{itemize}
+  \item 開発用 PC、ロボットの PC、チームのメンバーの PC で、まったく同じ環境を再現できる
+  \item いろいろなソフトウェアを試しても、自分の PC の環境が汚れない（いらなくなったらコンテナを消すだけ）
+  \item 異なるバージョンの ROS 2 を、1 台の PC で使い分けられる
+\end{itemize}
+
+\subsection{仮想マシンとの違い}
+
+1 台の PC の上で別の OS を動かす方法には、VirtualBox などの\textbf{仮想マシン}もあります（\ref{sec:linux-setup}節）。
+仮想マシンは、ハードウェアをまるごとソフトウェアで再現し、その上で OS（ゲスト OS）を丸ごと動かします。
+一方、コンテナは、ホストの OS のカーネル（\ref{sec:linux-internals-kernel}節）をそのまま共有し、カーネルの機能を使ってプロセスを隔離しているだけです（図\ref{fig:docker-vm}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/docker/vm_vs_container}
+  \caption{仮想マシンとコンテナの違い}
+  \label{fig:docker-vm}
+\end{figure}
+
+そのため、コンテナは仮想マシンに比べて、起動が速く（数秒以内）、メモリやストレージの使用量も少なくて済みます。
+ただし、カーネルを共有しているので、Linux の上では Linux のコンテナしか直接は動かせません。
+
+\subsection{イメージとコンテナ}
+
+Docker を使ううえで、次の言葉を押さえておきましょう（図\ref{fig:docker-image}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/docker/image_container}
+  \caption{イメージ・コンテナ・レジストリの関係}
+  \label{fig:docker-image}
+\end{figure}
+
+\begin{description}
+  \item[イメージ]
+    コンテナのひな形です。
+    OS の基本的なファイルや、インストール済みのソフトウェア、設定などがまとめて入っています。
+    イメージそのものは読み取り専用で、変更されることはありません。
+  \item[コンテナ]
+    イメージから作られた、実際に動いている環境です。
+    1 つのイメージから、いくつでもコンテナを作れます。
+    料理にたとえると、イメージはレシピ、コンテナは実際に作った料理です。
+  \item[レジストリ]
+    イメージを保管・配布するための場所です。
+    \textbf{Docker Hub}（\url{https://hub.docker.com}）には、Ubuntu や Python、ROS 2 など、さまざまな公式のイメージが公開されています。
+  \item[Dockerfile]
+    イメージの作り方を書いた設計図です（\ref{sec:docker-dockerfile}節）。
+\end{description}
 
 \section{イメージとコンテナの操作}
+\label{sec:docker-basic}
 
-TODO
+\subsection{Docker のインストール}
+
+Docker は、Docker 社の公式リポジトリを追加してインストールします（\ref{sec:package-repository}節）。
+手順は変わることがあるので、実際には公式ドキュメント（\url{https://docs.docker.com/engine/install/ubuntu/}）を確認してください。
+本書の執筆時点では、次のような手順です。
+
+\begin{terminal}[Docker をインストールする]
+$ sudo apt update
+$ sudo apt install ca-certificates curl
+$ sudo install -m 0755 -d /etc/apt/keyrings
+$ sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+$ sudo chmod a+r /etc/apt/keyrings/docker.asc
+$ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+$ sudo apt update
+$ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+\end{terminal}
+
+\ref{chap:package}章で学んだとおり、GPG 鍵を保存し、リポジトリを登録してから、\cmd{apt install} でインストールしています。
+
+インストールが終わったら、自分のユーザを \cmd{docker} グループ（\ref{sec:linux-internals-users}節）に追加します。
+こうすると、\cmd{docker} コマンドを \cmd{sudo} なしで実行できるようになります。
+設定を反映させるために、一度ログアウトしてログインし直してください。
+
+\begin{terminal}[docker グループに自分を追加する]
+$ sudo usermod -aG docker $USER
+\end{terminal}
+
+\begin{caution}[docker グループの権限]
+  \cmd{docker} グループのメンバーは、コンテナを通じて、実質的に root と同じ権限でシステムを操作できてしまいます。
+  自分専用の開発用 PC では問題ありませんが、共用のコンピュータでは、誰を \cmd{docker} グループに入れるかに注意しましょう。
+\end{caution}
+
+動作を確認するために、\cmd{hello-world} というテスト用のイメージを動かしてみます。
+
+\begin{terminal}[Docker の動作を確認する]
+$ docker run hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+...
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+...
+\end{terminal}
+
+手元に \cmd{hello-world} のイメージがなかったので、Docker Hub から自動でダウンロードしてから、コンテナを動かしたことがわかります。
+
+\subsection{イメージを取得する}
+
+Docker Hub からイメージをダウンロードするには、\cmd{docker pull} を使います。
+イメージの名前の後ろの \cmd{:} に続く部分は\textbf{タグ}と呼ばれ、バージョンなどを表します。
+ここでは、Ubuntu 24.04 のイメージを取得してみます。
+
+\begin{terminal}[イメージを取得して一覧を見る]
+$ docker pull ubuntu:24.04
+$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED       SIZE
+ubuntu        24.04     b1d9df8ab815   3 weeks ago   78.1MB
+hello-world   latest    d2c94e258dcb   1 year ago    13.3kB
+\end{terminal}
+
+\subsection{コンテナを動かす}
+
+イメージからコンテナを作って動かすには、\cmd{docker run} を使います。
+\cmd{-it} を付けると、コンテナの中のシェルを対話的に操作できます。
+
+\begin{terminal}[コンテナの中のシェルを使う]
+$ docker run -it --name test ubuntu:24.04 bash
+root@3f2a1b4c5d6e:/# cat /etc/os-release | head -n 2
+PRETTY_NAME="Ubuntu 24.04.1 LTS"
+NAME="Ubuntu"
+root@3f2a1b4c5d6e:/# exit
+\end{terminal}
+
+プロンプトが \cmd{root@3f2a1b4c5d6e:/\#} に変わりました。
+これはコンテナの中のシェルで、ホスト名にはコンテナの ID が使われています。
+コンテナの中では root ユーザとして動いていて、ホストの PC とは別の、まっさらな Ubuntu の環境になっています。
+\cmd{exit} でシェルを終了すると、コンテナも停止します。
+
+\cmd{docker run} のよく使うオプションは、次のとおりです。
+
+\begin{center}
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    オプション & 意味 \\
+    \midrule
+    \cmd{-it} & コンテナの中のシェルを対話的に操作する \\
+    \cmd{--name 名前} & コンテナに名前を付ける \\
+    \cmd{--rm} & コンテナが停止したら自動で削除する \\
+    \cmd{-v ホストのパス:コンテナのパス} & ホストのディレクトリをコンテナの中から使えるようにする \\
+    \cmd{-e 変数=値} & 環境変数（\ref{chap:env}章）を設定する \\
+    \cmd{-d} & バックグラウンドで動かす \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\subsection{コンテナの管理}
+
+コンテナの一覧は \cmd{docker ps} で確認できます。
+\cmd{-a} を付けると、停止しているコンテナも表示されます。
+
+\begin{terminal}[コンテナの一覧を見る]
+$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND   CREATED         STATUS                     NAMES
+3f2a1b4c5d6e   ubuntu:24.04   "bash"    2 minutes ago   Exited (0) 1 minute ago    test
+\end{terminal}
+
+停止したコンテナは、\cmd{docker start} で再び動かせます。
+動いているコンテナの中で、別のシェルを開くには \cmd{docker exec} を使います。
+ROS 2 では、1 つのコンテナの中で複数のノードを動かすために、この方法でシェルを追加することがよくあります。
+
+\begin{terminal}[コンテナを再び動かして、シェルを開く]
+$ docker start test
+$ docker exec -it test bash
+\end{terminal}
+
+\begin{center}
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    コマンド & 動作 \\
+    \midrule
+    \cmd{docker pull イメージ} & イメージを取得する \\
+    \cmd{docker images} & イメージの一覧を見る \\
+    \cmd{docker run イメージ} & コンテナを作って動かす \\
+    \cmd{docker ps -a} & コンテナの一覧を見る \\
+    \cmd{docker start 名前} / \cmd{stop 名前} & コンテナを動かす / 止める \\
+    \cmd{docker exec -it 名前 bash} & 動いているコンテナでシェルを開く \\
+    \cmd{docker rm 名前} & コンテナを削除する \\
+    \cmd{docker rmi イメージ} & イメージを削除する \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{caution}[コンテナの中の変更は消える]
+  コンテナの中で作ったファイルやインストールしたソフトウェアは、そのコンテナを削除すると消えてしまいます。
+  残しておきたいプログラムやデータは、\cmd{-v} オプションでホストのディレクトリを共有して、そこに保存しましょう。
+  必要なソフトウェアは、次の節で説明する Dockerfile に書いておき、いつでも同じ環境を作り直せるようにするのが基本です。
+\end{caution}
 
 \section{Dockerfile の書き方}
+\label{sec:docker-dockerfile}
 
-TODO
+\subsection{Dockerfile とは}
+
+公式のイメージに、自分が必要なソフトウェアを追加したイメージを作りたいときは、\textbf{Dockerfile} を書きます。
+Dockerfile には、元にするイメージと、そこに対して行う作業を順番に書きます。
+Dockerfile があれば、誰でも、何度でも、同じイメージを作ることができます。
+
+\subsection{Dockerfile の例}
+
+ここでは、ROS 2 Jazzy の公式イメージに、亀のシミュレータ turtlesim を追加したイメージを作ってみます。
+新しいディレクトリを作り、その中に \cmd{Dockerfile} という名前のファイルを作ります。
+
+\begin{lstlisting}[style=bash, caption={Dockerfile}, label={lst:docker-dockerfile}]
+# 元にするイメージ（ROS 2 Jazzy の公式イメージ）
+FROM ros:jazzy
+
+# 追加のパッケージをインストールする
+RUN apt-get update && apt-get install -y \
+    ros-jazzy-turtlesim \
+    && rm -rf /var/lib/apt/lists/*
+
+# 作業ディレクトリ
+WORKDIR /root/ros2_ws
+
+# コンテナを起動したときに実行するコマンド
+CMD ["bash"]
+\end{lstlisting}
+
+主な命令の意味は、次のとおりです。
+
+\begin{description}
+  \item[FROM] 元にするイメージを指定します。Dockerfile の最初に書きます。
+  \item[RUN] イメージを作るときに実行するコマンドを書きます。ここでは \cmd{apt-get} でパッケージをインストールしています。最後の \cmd{rm -rf /var/lib/apt/lists/*} は、不要になったパッケージの一覧を消して、イメージを小さくするためのものです。
+  \item[WORKDIR] コンテナの中で作業するディレクトリを指定します。
+  \item[COPY] ホストのファイルをイメージの中にコピーします（この例では使っていません）。
+  \item[CMD] コンテナを起動したときに、標準で実行するコマンドを指定します。
+\end{description}
+
+\subsection{イメージを作って動かす}
+
+Dockerfile からイメージを作るには、Dockerfile のあるディレクトリで \cmd{docker build} を実行します。
+\cmd{-t} でイメージに名前（とタグ）を付けます。
+最後の \cmd{.} は、カレントディレクトリの Dockerfile を使う、という意味です。
+
+\begin{terminal}[イメージを作る]
+$ docker build -t my_ros:jazzy .
+...
+ => => naming to docker.io/library/my_ros:jazzy
+$ docker run -it --rm my_ros:jazzy
+root@a1b2c3d4e5f6:~/ros2_ws# ros2 pkg list | grep turtlesim
+turtlesim
+\end{terminal}
+
+turtlesim がインストールされたコンテナを動かせました。
+ただし、turtlesim は GUI のウィンドウを開くアプリなので、このままでは画面を表示できません。
+その方法を、次の節で説明します。
 
 \section{GUI アプリやデバイスをコンテナで使う}
+\label{sec:docker-gui-device}
 
-TODO
+\subsection{GUI アプリを表示する}
+
+コンテナの中で起動した GUI アプリのウィンドウをホストの画面に表示するには、ホストの X サーバ（画面を描くしくみ）にコンテナからアクセスできるようにします。
+まず、ホストで \cmd{xhost} コマンドを実行して、ローカルのコンテナからの接続を許可します。
+次に、環境変数 \cmd{DISPLAY} と、X サーバとの通信に使うディレクトリをコンテナに渡して起動します。
+
+\begin{terminal}[コンテナの中の GUI アプリを表示する]
+$ xhost +local:
+$ docker run -it --rm \
+    -e DISPLAY=$DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    my_ros:jazzy \
+    ros2 run turtlesim turtlesim_node
+\end{terminal}
+
+行末の \cmd{\textbackslash} は、長いコマンドを複数の行に分けて書くための記号です。
+うまくいけば、ホストの画面に turtlesim のウィンドウが表示されます。
+Ubuntu 24.04 の標準の画面（Wayland）でも、XWayland というしくみによって、この方法で表示できます。
+
+\begin{caution}[xhost の設定]
+  \cmd{xhost +local:} は、同じコンピュータの中のすべてのユーザやコンテナに、画面へのアクセスを許可する設定です。
+  使い終わったら \cmd{xhost -local:} で元に戻しておくと安全です。
+\end{caution}
+
+RViz や Gazebo のように 3D の描画を行うアプリでは、GPU を使えるようにしないと動作が非常に遅くなります。
+Intel や AMD の GPU では \cmd{--device /dev/dri} を、NVIDIA の GPU では NVIDIA Container Toolkit をインストールしたうえで \cmd{--gpus all} を、\cmd{docker run} に追加します。
+
+\subsection{デバイスを使う}
+
+USB でつないだセンサやマイコンをコンテナの中から使うには、\cmd{--device} オプションで、デバイスファイル（\ref{sec:linux-internals-device}節）をコンテナに渡します。
+
+\begin{terminal}[USB のデバイスをコンテナに渡す]
+$ docker run -it --rm --device /dev/ttyUSB0 my_ros:jazzy
+\end{terminal}
+
+すべてのデバイスにアクセスできるようにする \cmd{--privileged} というオプションもありますが、コンテナの隔離の意味がほとんどなくなってしまうので、できるだけ必要なデバイスだけを渡すようにしましょう。
+
+\subsection{ネットワーク}
+
+ROS 2 のノードは、ネットワークを通じてお互いを見つけ、通信します。
+コンテナとホスト、あるいはコンテナと別の PC の ROS 2 のノードが通信できるようにするには、\cmd{--network host} を付けて、コンテナがホストと同じネットワークをそのまま使うようにするのが簡単です。
+あわせて \cmd{--ipc host} も付けておくと、同じ PC の中のノード間の通信がうまくいかないトラブルを避けられます。
+
+\begin{terminal}[ホストのネットワークを使うコンテナ]
+$ docker run -it --rm --network host --ipc host my_ros:jazzy
+\end{terminal}
 
 \section{ROS 開発環境をコンテナで構築する}
+\label{sec:docker-ros}
 
-TODO
+\subsection{ROS 2 の公式イメージ}
+
+ROS 2 には、Docker Hub で公式のイメージが用意されています。
+用途に合わせて、次のようなイメージを選びます。
+
+\begin{center}
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    イメージ & 内容 \\
+    \midrule
+    \cmd{ros:jazzy-ros-core} & ROS 2 の最小限の機能 \\
+    \cmd{ros:jazzy}（\cmd{ros:jazzy-ros-base}） & 基本的な機能と、ビルドの道具 \\
+    \cmd{osrf/ros:jazzy-desktop} & RViz などの GUI ツールやデモも含む \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+試しに、2 つのターミナルでそれぞれコンテナを動かし、ROS 2 のデモのノードどうしを通信させてみましょう。
+自分の PC に ROS 2 をインストールしていなくても、ROS 2 を体験できます。
+
+\begin{terminal}[1 つ目のターミナル：メッセージを送るノード]
+$ docker run -it --rm --network host --ipc host osrf/ros:jazzy-desktop \
+    ros2 run demo_nodes_cpp talker
+[INFO] [1727660000.123456789] [talker]: Publishing: 'Hello World: 1'
+[INFO] [1727660001.123456789] [talker]: Publishing: 'Hello World: 2'
+...
+\end{terminal}
+
+\begin{terminal}[2 つ目のターミナル：メッセージを受け取るノード]
+$ docker run -it --rm --network host --ipc host osrf/ros:jazzy-desktop \
+    ros2 run demo_nodes_cpp listener
+[INFO] [1727660002.234567890] [listener]: I heard: [Hello World: 3]
+...
+\end{terminal}
+
+2 つのコンテナの間で、メッセージがやり取りされていることがわかります。
+ノードやメッセージの意味は、\ref{chap:ros2_concepts}章で学びます。
+止めるときは、それぞれのターミナルで \key{Ctrl}+\key{C} を押します。
+
+\subsection{Docker Compose で設定をまとめる}
+
+ここまで見てきたように、ROS 2 のコンテナを動かす \cmd{docker run} のコマンドは、オプションが多くて長くなりがちです。
+\textbf{Docker Compose} を使うと、これらの設定を \cmd{compose.yaml} というファイルに書いておき、短いコマンドでコンテナを起動できます。
+
+\begin{lstlisting}[caption={compose.yaml}, label={lst:docker-compose}]
+services:
+  ros:
+    build: .                     # 同じディレクトリの Dockerfile からイメージを作る
+    image: my_ros:jazzy
+    network_mode: host
+    ipc: host
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./ros2_ws/src:/root/ros2_ws/src   # 自分のプログラムを共有する
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    tty: true
+\end{lstlisting}
+
+\cmd{volumes} の 2 行目で、ホストの \cmd{./ros2\_ws/src} をコンテナの中の \cmd{/root/ros2\_ws/src} と共有しています。
+ホストのエディタで書いたプログラムを、そのままコンテナの中でビルドして動かせます。
+
+\begin{terminal}[Docker Compose でコンテナを起動する]
+$ docker compose up -d           # バックグラウンドで起動する
+$ docker compose exec ros bash   # コンテナの中のシェルを開く
+$ docker compose down            # コンテナを停止して削除する
+\end{terminal}
+
+\subsection{VS Code の Dev Containers}
+
+\ref{sec:editor-remote}節で紹介した VS Code の Dev Containers を使うと、VS Code そのものをコンテナの中に接続して開発できます。
+プロジェクトのディレクトリに \cmd{.devcontainer/devcontainer.json} というファイルを置き、使う Dockerfile やオプションを書いておきます。
+
+\begin{lstlisting}[caption={.devcontainer/devcontainer.json}, label={lst:docker-devcontainer}]
+{
+  "name": "ROS 2 Jazzy",
+  "build": { "dockerfile": "../Dockerfile" },
+  "runArgs": ["--network=host", "--ipc=host"],
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"]
+    }
+  }
+}
+\end{lstlisting}
+
+VS Code でこのディレクトリを開き、コマンドパレット（\key{Ctrl}+\key{Shift}+\key{P}）で「Dev Containers: Reopen in Container」を選ぶと、イメージが作られてコンテナが起動し、VS Code がコンテナの中に接続されます。
+統合ターミナルもコンテナの中のシェルになり、指定した拡張機能もコンテナの中に自動でインストールされます。
+\cmd{.devcontainer} ディレクトリを Git で共有しておけば（\ref{chap:git}章）、チームの誰もが同じ開発環境をすぐに用意できます。
+
+\begin{point}[コンテナとの付き合い方]
+  本書では、ROS 2 を Ubuntu 24.04 に直接インストールして使う方法を中心に説明します（\ref{chap:ros2_install}章）。
+  そのほうが、しくみを理解しやすく、トラブルの原因も探しやすいからです。
+  ROS 2 に慣れてきたら、チームでの開発や、異なるバージョンの ROS 2 を使い分けたいときに、コンテナを活用してみましょう。
+\end{point}
+
+\begin{column}{Windows や macOS で ROS 2 を使うには}
+  Windows や macOS の PC でも、Docker Desktop というアプリを使えば、Linux のコンテナを動かせます。
+  Docker Desktop は、内部で小さな Linux の仮想マシンを動かし、その上でコンテナを動かしています。
+  そのため、Windows や macOS の PC でも、ROS 2 のコンテナを使って開発を始めることができます。
+  ただし、GUI の表示や USB のデバイスの利用、ネットワークの設定には制限や追加の設定が必要なことが多く、Linux の PC に比べて手間がかかります。
+  本格的にロボットを動かすなら、Ubuntu をインストールした PC を用意するのがおすすめです（\ref{sec:linux-setup}節）。
+  なお、Docker Desktop は、大きな組織で使う場合には有料のライセンスが必要です。
+\end{column}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item コンテナは、アプリケーションとその動作環境をまとめて隔離して動かすしくみで、Docker はそのための代表的なソフトウェアです。仮想マシンと違ってホストのカーネルを共有するので、軽くて速く動きます。
+  \item イメージはコンテナのひな形で、Docker Hub から \cmd{docker pull} で取得するか、Dockerfile から \cmd{docker build} で作ります。\cmd{docker run} でイメージからコンテナを作って動かします。
+  \item コンテナを削除すると中の変更は消えるので、残したいファイルは \cmd{-v} でホストと共有し、必要なソフトウェアは Dockerfile に書いておきます。
+  \item GUI アプリは \cmd{DISPLAY} と X サーバとの通信用のディレクトリを、デバイスは \cmd{--device} でコンテナに渡します。ROS 2 では \cmd{--network host} を使うと通信が簡単です。
+  \item Docker Compose で設定をファイルにまとめたり、VS Code の Dev Containers でコンテナの中で直接開発したりできます。
+\end{itemize}

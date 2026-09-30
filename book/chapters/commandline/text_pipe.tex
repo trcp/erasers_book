@@ -4,30 +4,374 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item 標準入力・標準出力・標準エラー出力の考え方
+    \item リダイレクトを使って、コマンドの結果をファイルに保存する方法
+    \item パイプを使って、複数のコマンドをつなげる方法
+    \item \cmd{grep}, \cmd{sort}, \cmd{uniq}, \cmd{wc}, \cmd{cut} によるテキストの検索と加工
+    \item \cmd{sed} と \cmd{awk} の基本的な使い方
   \end{itemize}
 \end{goalbox}
 
-\section{標準入力・標準出力・標準エラー出力}
+\ref{sec:linux-history}節で紹介した UNIX 哲学には、「1 つのことをうまくやるプログラムを書け」「協調して動くプログラムを書け」「テキストを扱うプログラムを書け」という考え方がありました。
+この章では、その考え方を実際に体験します。
+小さなコマンドを組み合わせることで、ロボットのログから必要な情報を探したり、記録したデータを集計したりといった作業を、あっという間にこなせるようになります。
 
-TODO
+\section{標準入力・標準出力・標準エラー出力}
+\label{sec:text-pipe-stream}
+
+コマンドは、データの入り口と出口を 3 つ持っています（図\ref{fig:text-pipe-streams}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/text_pipe/streams}
+  \caption{標準入力・標準出力・標準エラー出力}
+  \label{fig:text-pipe-streams}
+\end{figure}
+
+\begin{description}
+  \item[標準入力（stdin）] コマンドがデータを受け取る入り口です。ふだんはキーボードにつながっています。
+  \item[標準出力（stdout）] コマンドが結果を出す出口です。ふだんは画面（ターミナル）につながっています。
+  \item[標準エラー出力（stderr）] コマンドがエラーメッセージを出す出口です。ふだんは標準出力と同じく画面につながっています。
+\end{description}
+
+それぞれには 0, 1, 2 という番号が付いていて、後で説明するリダイレクトのときに使います。
+標準出力と標準エラー出力は、画面ではどちらも同じように表示されるので区別できませんが、コマンドの中では別々の出口から出ています。
+次の例では、\cmd{/home} の中身は標準出力に、存在しないディレクトリについてのエラーは標準エラー出力に出ています。
+
+\begin{terminal}[標準出力と標準エラー出力]
+$ ls /home /nonexistent
+ls: cannot access '/nonexistent': No such file or directory
+/home:
+user
+\end{terminal}
 
 \section{リダイレクト}
+\label{sec:text-pipe-redirect}
 
-TODO
+\textbf{リダイレクト}を使うと、コマンドの入り口や出口の行き先を、画面やキーボードからファイルに切り替えられます。
 
-\section{パイプでコマンドをつなぐ}
+\subsection{出力をファイルに保存する}
 
-TODO
+\cmd{>} を使うと、標準出力をファイルに書き込めます。
+ファイルがなければ新しく作られ、すでにあれば\textbf{中身が上書き}されます。
+\cmd{>>} を使うと、ファイルの末尾に追記します。
+
+\begin{terminal}[出力をファイルに書き込む]
+$ echo "first line" > memo.txt
+$ echo "second line" >> memo.txt
+$ cat memo.txt
+first line
+second line
+\end{terminal}
+
+\begin{caution}[\cmd{>} による上書きに注意]
+  \cmd{>} は、確認なしにファイルの中身を上書きします。
+  追記するつもりで \cmd{>>} ではなく \cmd{>} と書いてしまうと、それまでの内容が消えてしまいます。
+  大事なファイルに書き込むときは、\cmd{>} と \cmd{>>} を間違えていないか確かめましょう。
+\end{caution}
+
+この章で使う練習用のファイルを、リダイレクトを使って作っておきましょう。
+1 つ目は、ロボットのプログラムが出力したログを想定した \cmd{robot.log} です。
+各行は「日付 時刻 [レベル] 部品名: メッセージ」という形になっています。
+
+\begin{terminal}[練習用のログファイルを作る]
+$ echo "2026-09-30 10:00:01 [INFO] driver: started" > robot.log
+$ echo "2026-09-30 10:00:02 [INFO] lidar: started" >> robot.log
+$ echo "2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V" >> robot.log
+$ echo "2026-09-30 10:00:07 [ERROR] lidar: timeout" >> robot.log
+$ echo "2026-09-30 10:00:08 [INFO] lidar: reconnected" >> robot.log
+$ echo "2026-09-30 10:00:12 [ERROR] motor: overcurrent" >> robot.log
+\end{terminal}
+
+2 つ目は、ロボットの位置と速度を記録した CSV ファイル（値をカンマで区切ったテキストファイル）の \cmd{data.csv} です。
+1 行目は各列の名前（時刻、x 座標、y 座標、速度）です。
+
+\begin{terminal}[練習用の CSV ファイルを作る]
+$ echo "time,x,y,speed" > data.csv
+$ echo "0.0,0.00,0.00,0.00" >> data.csv
+$ echo "0.5,0.10,0.00,0.20" >> data.csv
+$ echo "1.0,0.25,0.02,0.30" >> data.csv
+$ echo "1.5,0.42,0.05,0.35" >> data.csv
+$ echo "2.0,0.60,0.10,0.36" >> data.csv
+\end{terminal}
+
+実際には、ファイルはエディタ（\ref{chap:editor}章）で作ったり、プログラムが書き出したりすることがほとんどです。
+
+\subsection{エラーをファイルに保存する・捨てる}
+
+\cmd{2>} を使うと、標準エラー出力（2 番）だけをファイルに書き込めます。
+標準出力と標準エラー出力の両方を同じファイルに書き込むには、\cmd{> ファイル 2>\&1} と書きます（\cmd{2>\&1} は「2 番の出口を 1 番と同じ行き先にする」という意味です）。
+bash では、同じことを \cmd{\&> ファイル} と短く書くこともできます。
+
+\begin{terminal}[エラーの出力先を切り替える]
+$ ls /home /nonexistent 2> error.txt
+/home:
+user
+$ cat error.txt
+ls: cannot access '/nonexistent': No such file or directory
+$ ls /home /nonexistent > all.txt 2>&1
+\end{terminal}
+
+\cmd{/dev/null} は、書き込んだものをすべて捨てる特別なファイルです（\ref{sec:linux-internals-device}節）。
+エラーメッセージを表示したくないときは、\cmd{2> /dev/null} で捨てることができます。
+
+\begin{terminal}[エラーメッセージを捨てる]
+$ find / -name "setup.bash" 2> /dev/null
+/opt/ros/jazzy/setup.bash
+\end{terminal}
+
+システム全体を \cmd{find} で探すと、権限のないディレクトリについてのエラーが大量に表示されます（\ref{sec:files-find}節）が、この方法で見つかった結果だけを表示できます。
+
+\subsection{ファイルを入力にする}
+
+\cmd{<} を使うと、ファイルの内容を標準入力としてコマンドに渡せます。
+\cmd{wc -l}（行数を数えるコマンド、\ref{sec:text-pipe-tools}節）で試してみましょう。
+
+\begin{terminal}[ファイルを標準入力に渡す]
+$ wc -l < robot.log
+6
+\end{terminal}
+
+\section{パイプ}
+\label{sec:text-pipe-pipe}
+
+\subsection{コマンドをつなぐ}
+
+\textbf{パイプ}（\cmd{|}）を使うと、あるコマンドの標準出力を、次のコマンドの標準入力に直接つなげられます（図\ref{fig:text-pipe-pipe}）。
+パイプでつなげば、途中の結果をファイルに保存しなくても、複数のコマンドを流れ作業のように組み合わせられます。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/text_pipe/pipe}
+  \caption{パイプでコマンドをつなぐ}
+  \label{fig:text-pipe-pipe}
+\end{figure}
+
+\begin{terminal}[パイプでコマンドをつなぐ]
+$ cat robot.log | grep ERROR | wc -l
+2
+\end{terminal}
+
+この例では、\cmd{cat} がログの全体を出力し、\cmd{grep} がその中から \cmd{ERROR} を含む行だけを選び、\cmd{wc -l} がその行数を数えています。
+\key{|} は、日本語配列のキーボードでは \key{Shift}+\key{¥}、英語配列のキーボードでは \key{Shift}+\key{\textbackslash} で入力できます。
+
+パイプは、次のような場面でよく使います。
+
+\begin{terminal}[パイプの便利な使い方]
+$ ls /usr/bin | less             # 長い出力を 1 画面ずつ見る
+$ history | grep ssh             # 過去に入力した ssh のコマンドを探す
+$ ros2 topic list | grep scan    # ROS 2 のトピックの中から scan を含むものを探す
+\end{terminal}
+
+最後の例の \cmd{ros2} コマンドは、\ref{chap:ros2_concepts}章で学びます。
+ROS 2 のコマンドはたくさんの情報を出力するので、パイプと \cmd{grep} を組み合わせて必要な情報だけを取り出す場面がよくあります。
+
+\subsection{画面に表示しながらファイルにも保存する}
+
+\cmd{tee} は、標準入力から受け取った内容を、画面（標準出力）に表示しながら、同時にファイルにも書き込むコマンドです。
+T 字型の配管のように、流れを 2 つに分けるイメージです。
+
+\begin{terminal}[画面に表示しながらファイルにも保存する]
+$ grep ERROR robot.log | tee errors.txt
+2026-09-30 10:00:07 [ERROR] lidar: timeout
+2026-09-30 10:00:12 [ERROR] motor: overcurrent
+\end{terminal}
+
+\cmd{tee -a} とすると、ファイルに追記します。
+\cmd{sudo} と組み合わせて、root しか書き込めないファイルに書き込むときにも使います（\ref{sec:permission-sudo}節）。
 
 \section{検索と加工}
+\label{sec:text-pipe-tools}
 
-TODO
+ここからは、テキストを検索したり加工したりする代表的なコマンドを紹介します。
+どれも、ファイル名を引数に指定するか、パイプで標準入力からデータを受け取って使います。
+
+\subsection{\cmd{grep}：文字列を含む行を探す}
+
+\cmd{grep} は、指定した文字列を含む行だけを取り出すコマンドです。
+
+\begin{terminal}[文字列を含む行を探す]
+$ grep ERROR robot.log
+2026-09-30 10:00:07 [ERROR] lidar: timeout
+2026-09-30 10:00:12 [ERROR] motor: overcurrent
+\end{terminal}
+
+\begin{center}
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    オプション & 意味 \\
+    \midrule
+    \cmd{-i} & 大文字と小文字を区別しない \\
+    \cmd{-v} & 文字列を\textbf{含まない}行を取り出す \\
+    \cmd{-n} & 行番号も表示する \\
+    \cmd{-c} & 一致した行の数だけを表示する \\
+    \cmd{-r} & ディレクトリの中のすべてのファイルを検索する \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{terminal}[grep のオプションを使う]
+$ grep -n lidar robot.log
+2:2026-09-30 10:00:02 [INFO] lidar: started
+4:2026-09-30 10:00:07 [ERROR] lidar: timeout
+5:2026-09-30 10:00:08 [INFO] lidar: reconnected
+$ grep -v INFO robot.log
+2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V
+2026-09-30 10:00:07 [ERROR] lidar: timeout
+2026-09-30 10:00:12 [ERROR] motor: overcurrent
+$ grep -rn "max_speed" ~/ros2_ws/src
+\end{terminal}
+
+最後の例のように \cmd{-r} を使うと、たくさんのファイルの中から、ある設定やある関数がどこに書かれているかを探せます。
+
+\begin{column}{正規表現}
+  \cmd{grep} では、\textbf{正規表現}という記法で、検索する文字列のパターンを指定できます。
+  たとえば、\cmd{\textasciicircum} は行の先頭、\cmd{\$} は行の末尾、\cmd{.} は任意の 1 文字、\cmd{*} は直前の文字の 0 回以上の繰り返しを表します。
+  \cmd{grep "\textasciicircum 2026-09-30 10:00:0" robot.log} とすると、10 時 0 分 0〜9 秒の行だけを取り出せます。
+  正規表現は、\cmd{sed} や \cmd{awk}、多くのエディタやプログラミング言語でも使える便利な道具です。
+\end{column}
+
+\subsection{\cmd{wc}：行数や文字数を数える}
+
+\cmd{wc}（word count）は、行数・単語数・バイト数を数えるコマンドです。
+\cmd{-l} を付けると、行数だけを表示します。
+
+\begin{terminal}[行数を数える]
+$ wc -l robot.log
+6 robot.log
+\end{terminal}
+
+\subsection{\cmd{cut}：列を取り出す}
+
+\cmd{cut} は、各行から特定の列（フィールド）だけを取り出すコマンドです。
+\cmd{-d} で区切り文字を、\cmd{-f} で取り出す列の番号を指定します。
+
+\begin{terminal}[CSV ファイルから速度の列を取り出す]
+$ cut -d, -f4 data.csv
+speed
+0.00
+0.20
+0.30
+0.35
+0.36
+\end{terminal}
+
+\subsection{\cmd{sort} と \cmd{uniq}：並べ替えと重複の除去}
+
+\cmd{sort} は、行を並べ替えるコマンドです。
+標準では文字の順に並べますが、\cmd{-n} で数値として並べ、\cmd{-r} で逆順（大きい順）にします。
+区切り文字と並べ替えに使う列は、\cmd{-t} と \cmd{-k} で指定します。
+
+\cmd{uniq} は、\textbf{隣り合った}同じ行を 1 行にまとめるコマンドです。
+\cmd{-c} を付けると、それぞれの行が何回出てきたかを数えます。
+隣り合った行しかまとめないので、\cmd{sort} で並べ替えてから使うのが決まりです。
+
+これらを組み合わせて、ログのレベルごとに行数を数えてみましょう。
+
+\begin{terminal}[ログのレベルごとに行数を数える]
+$ cut -d' ' -f3 robot.log | sort | uniq -c
+      2 [ERROR]
+      3 [INFO]
+      1 [WARN]
+$ cut -d' ' -f3 robot.log | sort | uniq -c | sort -rn
+      3 [INFO]
+      2 [ERROR]
+      1 [WARN]
+\end{terminal}
+
+\cmd{cut} で 3 列目（レベル）を取り出し、\cmd{sort} で並べ替え、\cmd{uniq -c} で数え、最後に \cmd{sort -rn} で多い順に並べています。
+4 つの小さなコマンドを組み合わせるだけで、集計ができました。
+
+同じように、CSV ファイルから速度が最も大きい行を探すこともできます。
+\cmd{tail -n +2} は、2 行目以降（見出しの行を除いた部分）を表示するという意味です。
+
+\begin{terminal}[速度が最も大きい行を探す]
+$ tail -n +2 data.csv | sort -t, -k4 -rn | head -n 1
+2.0,0.60,0.10,0.36
+\end{terminal}
 
 \section{sed と awk の入門}
+\label{sec:text-pipe-sed-awk}
 
-TODO
+\subsection{\cmd{sed}：文字列を置き換える}
+
+\cmd{sed} は、テキストを一定の規則で書き換えるコマンドです。
+最もよく使うのは、\cmd{s/置き換える前/置き換えた後/} という形で文字列を置き換える使い方です。
+末尾に \cmd{g} を付けると、1 行の中で一致したすべての部分を置き換えます（付けないと、各行の最初の 1 か所だけ）。
+
+\begin{terminal}[文字列を置き換える]
+$ sed 's/ERROR/FAILED/' robot.log | grep FAILED
+2026-09-30 10:00:07 [FAILED] lidar: timeout
+2026-09-30 10:00:12 [FAILED] motor: overcurrent
+\end{terminal}
+
+\cmd{sed} は、標準では結果を画面に表示するだけで、元のファイルは変わりません。
+\cmd{-i} を付けると、ファイルそのものを書き換えます。
+設定ファイルの値をまとめて書き換えるときなどに便利ですが、元に戻せないので、\cmd{-i.bak} のようにしてバックアップ（\cmd{ファイル名.bak}）を残しておくと安心です。
+
+\begin{terminal}[ファイルの中の値を書き換える（バックアップ付き）]
+$ sed -i.bak 's/max_speed: 0.5/max_speed: 0.3/' params.yaml
+\end{terminal}
+
+\cmd{-n} と \cmd{p} を組み合わせると、特定の行だけを表示できます。
+
+\begin{terminal}[2〜3 行目だけを表示する]
+$ sed -n '2,3p' robot.log
+2026-09-30 10:00:02 [INFO] lidar: started
+2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V
+\end{terminal}
+
+\subsection{\cmd{awk}：列ごとに処理する}
+
+\cmd{awk} は、テキストを列（フィールド）ごとに扱い、条件に合う行を選んだり、計算したりできるコマンドです。
+awk は、小さなプログラミング言語でもあります。
+各行は空白で区切られて \cmd{\$1}, \cmd{\$2}, \ldots に入り、\cmd{\$0} は行全体を表します。
+
+\begin{terminal}[列を選んで表示する]
+$ awk '{print $2, $3}' robot.log
+10:00:01 [INFO]
+10:00:02 [INFO]
+10:00:05 [WARN]
+10:00:07 [ERROR]
+10:00:08 [INFO]
+10:00:12 [ERROR]
+\end{terminal}
+
+\cmd{\{ \}} の前に条件を書くと、条件に合う行だけを処理します。
+\cmd{-F} で区切り文字を指定でき、\cmd{NR} は今処理している行の番号を表します。
+
+\begin{terminal}[条件に合う行を選ぶ]
+$ awk '$3 == "[ERROR]" {print $4, $5}' robot.log
+lidar: timeout
+motor: overcurrent
+$ awk -F, 'NR > 1 && $4 > 0.3 {print $1, $4}' data.csv
+1.5 0.35
+2.0 0.36
+\end{terminal}
+
+\cmd{END \{ \}} に書いた処理は、すべての行を読み終わった後に 1 回だけ実行されます。
+これを使って、速度の平均を計算してみましょう。
+
+\begin{terminal}[速度の平均を計算する]
+$ awk -F, 'NR > 1 {sum += $4; n++} END {print sum / n}' data.csv
+0.242
+\end{terminal}
+
+2 行目以降の 4 列目（速度）を \cmd{sum} に足していき、行数を \cmd{n} で数え、最後に平均を表示しています。
+複雑な集計はプログラム（第IV部の Python など）で行うほうがわかりやすいこともありますが、ちょっとした確認なら、このように 1 行のコマンドで済ませられます。
+
+\begin{point}[小さな道具を組み合わせる]
+  この章で紹介したコマンドは、どれも単純なことしかしません。
+  しかし、パイプでつなげることで、ログの分析やデータの集計といった複雑な作業を、プログラムを書かずにこなせます。
+  「やりたいことを小さな作業に分けて、それぞれに合ったコマンドをつなぐ」という考え方に慣れていきましょう。
+\end{point}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item コマンドには、標準入力（0）・標準出力（1）・標準エラー出力（2）の 3 つの入り口と出口があります。
+  \item リダイレクトを使うと、出力をファイルに保存（\cmd{>} で上書き、\cmd{>>} で追記、\cmd{2>} でエラー）したり、ファイルを入力にしたり（\cmd{<}）できます。\cmd{/dev/null} に送った出力は捨てられます。
+  \item パイプ（\cmd{|}）でコマンドをつなぐと、前のコマンドの出力を次のコマンドの入力にできます。\cmd{tee} を使うと、画面に表示しながらファイルにも保存できます。
+  \item \cmd{grep} で検索、\cmd{wc} で行数を数え、\cmd{cut} で列を取り出し、\cmd{sort} と \cmd{uniq} で並べ替えと集計ができます。
+  \item \cmd{sed} で文字列を置き換え、\cmd{awk} で列ごとの処理や計算ができます。
+\end{itemize}
