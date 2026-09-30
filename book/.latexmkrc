@@ -7,6 +7,6 @@ $out_dir = 'build';
 use File::Path qw(make_path);
 make_path(map { "$out_dir/$_" } qw(
   frontmatter appendix
-  chapters/part1_linux chapters/part2_commandline
-  chapters/part3_tools chapters/part4_ros2
+  chapters/linux chapters/commandline
+  chapters/tools chapters/ros2
 ));

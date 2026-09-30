@@ -33,7 +33,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 | 言語 | Python 3.12（一部 C++） |
 | シミュレータ | Gazebo (Harmonic) |
 
-> Windows / macOS を使っている場合は、デュアルブート・仮想マシン・WSL2・Docker のいずれかで Ubuntu 環境を用意してください（第1章で解説します）。
+> Windows / macOS を使っている場合は、デュアルブート・仮想マシン・WSL2・Docker のいずれかで Ubuntu 環境を用意してください（第2章で解説します）。
 
 ---
 
@@ -41,179 +41,185 @@ Linux とは何かというところから始め、コマンドラインの基�
 
 ### 第I部 Linux 入門
 
-#### 第1章 Linux とは
-- 1.1 OS とは何か
-- 1.2 Linux の歴史と UNIX 哲学
-- 1.3 オープンソースソフトウェア（OSS）
-- 1.4 ディストリビューション（Ubuntu, Debian, Fedora など）
-- 1.5 なぜロボット開発で Linux が使われるのか
-- 1.6 Ubuntu 環境の用意（インストール / 仮想マシン / WSL2 / Docker）
-- 1.7 デスクトップ環境の基本操作
+#### 第1章 コンピュータとは
+- 1.1 コンピュータの構成要素（CPU・メモリ・ストレージ・GPU・入出力装置）
+- 1.2 各部品が連携して動くしくみ
+- 1.3 ハードウェアとソフトウェア
+- 1.4 OS とは何か
+- 1.5 ロボットに載っているコンピュータ
 
-#### 第2章 Linux の仕組み
-- 2.1 カーネルとユーザ空間
-- 2.2 ファイルシステムとディレクトリ構成（`/`, `/home`, `/etc`, `/usr`, `/opt` など）
-- 2.3 ユーザとグループ、root 権限
-- 2.4 プロセスとは
-- 2.5 デバイスファイルと「すべてはファイル」という考え方
+#### 第2章 Linux とは
+- 2.1 Linux の歴史と UNIX 哲学
+- 2.2 オープンソースソフトウェア（OSS）
+- 2.3 ディストリビューション（Ubuntu, Debian, Fedora など）
+- 2.4 なぜロボット開発で Linux が使われるのか
+- 2.5 Ubuntu 環境の用意（インストール / 仮想マシン / WSL2 / Docker）
+- 2.6 デスクトップ環境の基本操作
+
+#### 第3章 Linux の仕組み
+- 3.1 カーネルとユーザ空間
+- 3.2 ファイルシステムとディレクトリ構成（`/`, `/home`, `/etc`, `/usr`, `/opt` など）
+- 3.3 ユーザとグループ、root 権限
+- 3.4 プロセスとは
+- 3.5 デバイスファイルと「すべてはファイル」という考え方
 
 ### 第II部 コマンドラインの基本
 
-#### 第3章 ターミナルとシェル
-- 3.1 GUI と CUI（CLI）
-- 3.2 ターミナル・シェル・コマンドの関係
-- 3.3 プロンプトの読み方
-- 3.4 コマンドの構造（コマンド・オプション・引数）
-- 3.5 ヘルプの調べ方（`--help`, `man`, `tldr`）
-- 3.6 便利なキー操作（Tab 補完、履歴、`Ctrl+C` / `Ctrl+R` など）
+#### 第4章 ターミナルとシェル
+- 4.1 GUI と CUI（CLI）
+- 4.2 ターミナル・シェル・コマンドの関係
+- 4.3 プロンプトの読み方
+- 4.4 コマンドの構造（コマンド・オプション・引数）
+- 4.5 ヘルプの調べ方（`--help`, `man`, `tldr`）
+- 4.6 便利なキー操作（Tab 補完、履歴、`Ctrl+C` / `Ctrl+R` など）
 
-#### 第4章 ファイルとディレクトリの操作
-- 4.1 現在地の確認と移動（`pwd`, `cd`, `ls`）
-- 4.2 絶対パスと相対パス、`~` と `.` / `..`
-- 4.3 作成・コピー・移動・削除（`mkdir`, `touch`, `cp`, `mv`, `rm`）
-- 4.4 ファイルの中身を見る（`cat`, `less`, `head`, `tail`）
-- 4.5 ファイルを探す（`find`, `locate`）
-- 4.6 ワイルドカードとブレース展開
+#### 第5章 ファイルとディレクトリの操作
+- 5.1 現在地の確認と移動（`pwd`, `cd`, `ls`）
+- 5.2 絶対パスと相対パス、`~` と `.` / `..`
+- 5.3 作成・コピー・移動・削除（`mkdir`, `touch`, `cp`, `mv`, `rm`）
+- 5.4 ファイルの中身を見る（`cat`, `less`, `head`, `tail`）
+- 5.5 ファイルを探す（`find`, `locate`）
+- 5.6 ワイルドカードとブレース展開
 
-#### 第5章 パーミッションとユーザ管理
-- 5.1 パーミッションの読み方（`rwx`）
-- 5.2 `chmod`, `chown` の使い方
-- 5.3 `sudo` と安全な権限の扱い方
-- 5.4 デバイスへのアクセス権（`dialout` グループなど、ロボットで頻出の例）
+#### 第6章 パーミッションとユーザ管理
+- 6.1 パーミッションの読み方（`rwx`）
+- 6.2 `chmod`, `chown` の使い方
+- 6.3 `sudo` と安全な権限の扱い方
+- 6.4 デバイスへのアクセス権（`dialout` グループなど、ロボットで頻出の例）
 
-#### 第6章 テキスト処理とパイプ
-- 6.1 標準入力・標準出力・標準エラー出力
-- 6.2 リダイレクト（`>`, `>>`, `2>`, `<`）
-- 6.3 パイプ（`|`）でコマンドをつなぐ
-- 6.4 検索と加工（`grep`, `sort`, `uniq`, `wc`, `cut`）
-- 6.5 `sed` と `awk` の入門
+#### 第7章 テキスト処理とパイプ
+- 7.1 標準入力・標準出力・標準エラー出力
+- 7.2 リダイレクト（`>`, `>>`, `2>`, `<`）
+- 7.3 パイプ（`|`）でコマンドをつなぐ
+- 7.4 検索と加工（`grep`, `sort`, `uniq`, `wc`, `cut`）
+- 7.5 `sed` と `awk` の入門
 
-#### 第7章 プロセスとシステム管理
-- 7.1 プロセスの確認（`ps`, `top`, `htop`）
-- 7.2 フォアグラウンドとバックグラウンド（`&`, `jobs`, `fg`, `bg`）
-- 7.3 プロセスの終了（`kill`, `pkill`）とシグナル
-- 7.4 ディスク・メモリの確認（`df`, `du`, `free`）
-- 7.5 ログの確認（`journalctl`, `dmesg`）
+#### 第8章 プロセスとシステム管理
+- 8.1 プロセスの確認（`ps`, `top`, `htop`）
+- 8.2 フォアグラウンドとバックグラウンド（`&`, `jobs`, `fg`, `bg`）
+- 8.3 プロセスの終了（`kill`, `pkill`）とシグナル
+- 8.4 ディスク・メモリの確認（`df`, `du`, `free`）
+- 8.5 ログの確認（`journalctl`, `dmesg`）
 
-#### 第8章 パッケージ管理
-- 8.1 `apt` によるソフトウェアのインストール・更新・削除
-- 8.2 リポジトリと GPG 鍵
-- 8.3 `pip` と Python 仮想環境（`venv`）
-- 8.4 ソースからのビルド（`make`, `cmake` の基礎）
+#### 第9章 パッケージ管理
+- 9.1 `apt` によるソフトウェアのインストール・更新・削除
+- 9.2 リポジトリと GPG 鍵
+- 9.3 `pip` と Python 仮想環境（`venv`）
+- 9.4 ソースからのビルド（`make`, `cmake` の基礎）
 
-#### 第9章 環境変数とシェルの設定
-- 9.1 環境変数とは（`PATH`, `HOME` など）
-- 9.2 `export` と `source`
-- 9.3 `.bashrc` のカスタマイズ
-- 9.4 エイリアスと関数
+#### 第10章 環境変数とシェルの設定
+- 10.1 環境変数とは（`PATH`, `HOME` など）
+- 10.2 `export` と `source`
+- 10.3 `.bashrc` のカスタマイズ
+- 10.4 エイリアスと関数
 
-#### 第10章 シェルスクリプト入門
-- 10.1 はじめてのシェルスクリプト（shebang と実行権限）
-- 10.2 変数・引数・クォート
-- 10.3 条件分岐とループ
-- 10.4 終了ステータスとエラー処理
-- 10.5 実践：開発環境セットアップスクリプトを書く
+#### 第11章 シェルスクリプト入門
+- 11.1 はじめてのシェルスクリプト（shebang と実行権限）
+- 11.2 変数・引数・クォート
+- 11.3 条件分岐とループ
+- 11.4 終了ステータスとエラー処理
+- 11.5 実践：開発環境セットアップスクリプトを書く
 
 ### 第III部 開発のための周辺ツール
 
-#### 第11章 エディタ
-- 11.1 ターミナルエディタ（`nano`, `vim` の最低限の操作）
-- 11.2 VS Code のセットアップと拡張機能
-- 11.3 リモート開発（Remote-SSH / Dev Containers）
+#### 第12章 エディタ
+- 12.1 ターミナルエディタ（`nano`, `vim` の最低限の操作）
+- 12.2 VS Code のセットアップと拡張機能
+- 12.3 リモート開発（Remote-SSH / Dev Containers）
 
-#### 第12章 Git によるバージョン管理
-- 12.1 バージョン管理とは
-- 12.2 基本操作（`init`, `add`, `commit`, `status`, `log`, `diff`）
-- 12.3 ブランチとマージ
-- 12.4 GitHub との連携（`clone`, `push`, `pull`, Pull Request）
-- 12.5 チーム開発のワークフロー
+#### 第13章 Git によるバージョン管理
+- 13.1 バージョン管理とは
+- 13.2 基本操作（`init`, `add`, `commit`, `status`, `log`, `diff`）
+- 13.3 ブランチとマージ
+- 13.4 GitHub との連携（`clone`, `push`, `pull`, Pull Request）
+- 13.5 チーム開発のワークフロー
 
-#### 第13章 ネットワークとリモート操作
-- 13.1 IP アドレスとホスト名の基礎
-- 13.2 ネットワークの確認（`ip`, `ping`, `ss`）
-- 13.3 SSH によるリモートログインと鍵認証
-- 13.4 ファイル転送（`scp`, `rsync`）
-- 13.5 `tmux` で複数ターミナルを管理する
+#### 第14章 ネットワークとリモート操作
+- 14.1 IP アドレスとホスト名の基礎
+- 14.2 ネットワークの確認（`ip`, `ping`, `ss`）
+- 14.3 SSH によるリモートログインと鍵認証
+- 14.4 ファイル転送（`scp`, `rsync`）
+- 14.5 `tmux` で複数ターミナルを管理する
 
-#### 第14章 Docker 入門
-- 14.1 コンテナとは
-- 14.2 イメージとコンテナの操作
-- 14.3 Dockerfile の書き方
-- 14.4 GUI アプリやデバイスをコンテナで使う
-- 14.5 ROS 開発環境をコンテナで構築する
+#### 第15章 Docker 入門
+- 15.1 コンテナとは
+- 15.2 イメージとコンテナの操作
+- 15.3 Dockerfile の書き方
+- 15.4 GUI アプリやデバイスをコンテナで使う
+- 15.5 ROS 開発環境をコンテナで構築する
 
 ### 第IV部 ROS 2 入門
 
-#### 第15章 ROS とは
-- 15.1 ロボットソフトウェアの構成要素
-- 15.2 ROS の歴史と ROS 1 / ROS 2 の違い
-- 15.3 ROS 2 のアーキテクチャと DDS
-- 15.4 ディストリビューションとサポート期間
+#### 第16章 ROS とは
+- 16.1 ロボットソフトウェアの構成要素
+- 16.2 ROS の歴史と ROS 1 / ROS 2 の違い
+- 16.3 ROS 2 のアーキテクチャと DDS
+- 16.4 ディストリビューションとサポート期間
 
-#### 第16章 ROS 2 のインストールと環境構築
-- 16.1 ROS 2 Jazzy のインストール
-- 16.2 環境のセットアップ（`source /opt/ros/jazzy/setup.bash`）
-- 16.3 turtlesim で動作確認
-- 16.4 `ROS_DOMAIN_ID` とネットワーク設定
+#### 第17章 ROS 2 のインストールと環境構築
+- 17.1 ROS 2 Jazzy のインストール
+- 17.2 環境のセットアップ（`source /opt/ros/jazzy/setup.bash`）
+- 17.3 turtlesim で動作確認
+- 17.4 `ROS_DOMAIN_ID` とネットワーク設定
 
-#### 第17章 ROS 2 の基本概念とコマンドラインツール
-- 17.1 ノード（`ros2 node`）
-- 17.2 トピック（`ros2 topic`）とメッセージ型（`ros2 interface`）
-- 17.3 サービス（`ros2 service`）
-- 17.4 アクション（`ros2 action`）
-- 17.5 パラメータ（`ros2 param`）
-- 17.6 `rqt` と `rqt_graph` による可視化
+#### 第18章 ROS 2 の基本概念とコマンドラインツール
+- 18.1 ノード（`ros2 node`）
+- 18.2 トピック（`ros2 topic`）とメッセージ型（`ros2 interface`）
+- 18.3 サービス（`ros2 service`）
+- 18.4 アクション（`ros2 action`）
+- 18.5 パラメータ（`ros2 param`）
+- 18.6 `rqt` と `rqt_graph` による可視化
 
-#### 第18章 ワークスペースとパッケージ
-- 18.1 ワークスペースの構成（`src`, `build`, `install`, `log`）
-- 18.2 `colcon` によるビルド
-- 18.3 パッケージの作成（`ros2 pkg create`）
-- 18.4 `package.xml` と `setup.py` / `CMakeLists.txt`
-- 18.5 依存関係の解決（`rosdep`）
-- 18.6 オーバーレイとアンダーレイ
+#### 第19章 ワークスペースとパッケージ
+- 19.1 ワークスペースの構成（`src`, `build`, `install`, `log`）
+- 19.2 `colcon` によるビルド
+- 19.3 パッケージの作成（`ros2 pkg create`）
+- 19.4 `package.xml` と `setup.py` / `CMakeLists.txt`
+- 19.5 依存関係の解決（`rosdep`）
+- 19.6 オーバーレイとアンダーレイ
 
-#### 第19章 Python でノードを書く
-- 19.1 はじめてのノード（`rclpy` の基本）
-- 19.2 パブリッシャとサブスクライバ
-- 19.3 タイマとコールバック
-- 19.4 サービスサーバとクライアント
-- 19.5 アクションサーバとクライアント
-- 19.6 パラメータの宣言と利用
-- 19.7 カスタムメッセージ・サービスの定義
-- 19.8 （コラム）C++ で書く場合（`rclcpp`）
+#### 第20章 Python でノードを書く
+- 20.1 はじめてのノード（`rclpy` の基本）
+- 20.2 パブリッシャとサブスクライバ
+- 20.3 タイマとコールバック
+- 20.4 サービスサーバとクライアント
+- 20.5 アクションサーバとクライアント
+- 20.6 パラメータの宣言と利用
+- 20.7 カスタムメッセージ・サービスの定義
+- 20.8 （コラム）C++ で書く場合（`rclcpp`）
 
-#### 第20章 launch と設定ファイル
-- 20.1 launch ファイルとは
-- 20.2 Python launch ファイルの書き方
-- 20.3 YAML によるパラメータ設定
-- 20.4 名前空間とリマップ
-- 20.5 複数ノードをまとめて起動する
+#### 第21章 launch と設定ファイル
+- 21.1 launch ファイルとは
+- 21.2 Python launch ファイルの書き方
+- 21.3 YAML によるパラメータ設定
+- 21.4 名前空間とリマップ
+- 21.5 複数ノードをまとめて起動する
 
-#### 第21章 座標変換と可視化
-- 21.1 ロボットにおける座標系
-- 21.2 tf2 の仕組み（`static_transform_publisher`, `tf2_ros`）
-- 21.3 URDF によるロボットモデルの記述
-- 21.4 `robot_state_publisher` と `joint_state_publisher`
-- 21.5 RViz2 の使い方
+#### 第22章 座標変換と可視化
+- 22.1 ロボットにおける座標系
+- 22.2 tf2 の仕組み（`static_transform_publisher`, `tf2_ros`）
+- 22.3 URDF によるロボットモデルの記述
+- 22.4 `robot_state_publisher` と `joint_state_publisher`
+- 22.5 RViz2 の使い方
 
-#### 第22章 シミュレーション
-- 22.1 Gazebo の概要
-- 22.2 Gazebo と ROS 2 の連携（`ros_gz_bridge`）
-- 22.3 移動ロボットをシミュレーションで動かす
-- 22.4 センサ（LiDAR・カメラ・IMU）のシミュレーション
+#### 第23章 シミュレーション
+- 23.1 Gazebo の概要
+- 23.2 Gazebo と ROS 2 の連携（`ros_gz_bridge`）
+- 23.3 移動ロボットをシミュレーションで動かす
+- 23.4 センサ（LiDAR・カメラ・IMU）のシミュレーション
 
-#### 第23章 データの記録とデバッグ
-- 23.1 rosbag2 による記録と再生
-- 23.2 ログ出力とログレベル
-- 23.3 よくあるトラブルと対処法（ノードが見えない、トピックが届かない等）
-- 23.4 QoS 設定の基礎
+#### 第24章 データの記録とデバッグ
+- 24.1 rosbag2 による記録と再生
+- 24.2 ログ出力とログレベル
+- 24.3 よくあるトラブルと対処法（ノードが見えない、トピックが届かない等）
+- 24.4 QoS 設定の基礎
 
-#### 第24章 実践：移動ロボットを動かす
-- 24.1 キーボードでロボットを操作する（`teleop_twist_keyboard`）
-- 24.2 センサデータを読んで障害物を避けるノードを作る
-- 24.3 SLAM による地図作成の体験（`slam_toolbox`）
-- 24.4 Navigation2 による自律移動の体験
-- 24.5 次のステップへ
+#### 第25章 実践：移動ロボットを動かす
+- 25.1 キーボードでロボットを操作する（`teleop_twist_keyboard`）
+- 25.2 センサデータを読んで障害物を避けるノードを作る
+- 25.3 SLAM による地図作成の体験（`slam_toolbox`）
+- 25.4 Navigation2 による自律移動の体験
+- 25.5 次のステップへ
 
 ### 付録
 
@@ -241,13 +247,13 @@ Linux とは何かというところから始め、コマンドラインの基�
     ├── frontmatter/       # はじめに・おわりに
     ├── chapters/          # 各章の原稿
     │   ├── _template.tex  # 執筆用サンプル（環境・マクロの使用例）
-    │   ├── part1_linux/
-    │   ├── part2_commandline/
-    │   ├── part3_tools/
-    │   └── part4_ros2/
+    │   ├── linux/         # 第I部 Linux 入門
+    │   ├── commandline/   # 第II部 コマンドラインの基本
+    │   ├── tools/         # 第III部 開発のための周辺ツール
+    │   └── ros2/          # 第IV部 ROS 2 入門
     ├── appendix/          # 付録
-    ├── samples/           # 各章のサンプルコード・ROS 2 パッケージ
-    └── images/            # 図版
+    ├── samples/           # 各章のサンプルコード・ROS 2 パッケージ（章ごとにサブディレクトリ）
+    └── images/            # 図版（章ごとにサブディレクトリ）
 ```
 
 以降の説明に出てくる原稿のパス（`main.tex`, `chapters/...`, `images/...` など）は、すべて `book/` からの相対パスです。
@@ -264,7 +270,7 @@ make watch    # ファイルの変更を監視して自動で再ビルド
 make clean    # 生成物を削除
 ```
 
-特定の章だけを確認したいときは、`main.tex` の先頭に `\includeonly{chapters/part4_ros2/ch19_rclpy}` のように書くと、その章だけを組版できます。
+特定の章だけを確認したいときは、`main.tex` の先頭に `\includeonly{chapters/ros2/rclpy}` のように書くと、その章だけを組版できます。
 
 ### 最新版 PDF
 
@@ -281,38 +287,42 @@ make clean    # 生成物を削除
 
 | 章 | タイトル | ファイル |
 | --- | --- | --- |
-| 1 | Linux とは | `chapters/part1_linux/ch01_what_is_linux.tex` |
-| 2 | Linux の仕組み | `chapters/part1_linux/ch02_linux_internals.tex` |
-| 3 | ターミナルとシェル | `chapters/part2_commandline/ch03_terminal_shell.tex` |
-| 4 | ファイルとディレクトリの操作 | `chapters/part2_commandline/ch04_files.tex` |
-| 5 | パーミッションとユーザ管理 | `chapters/part2_commandline/ch05_permission.tex` |
-| 6 | テキスト処理とパイプ | `chapters/part2_commandline/ch06_text_pipe.tex` |
-| 7 | プロセスとシステム管理 | `chapters/part2_commandline/ch07_process.tex` |
-| 8 | パッケージ管理 | `chapters/part2_commandline/ch08_package.tex` |
-| 9 | 環境変数とシェルの設定 | `chapters/part2_commandline/ch09_env.tex` |
-| 10 | シェルスクリプト入門 | `chapters/part2_commandline/ch10_shellscript.tex` |
-| 11 | エディタ | `chapters/part3_tools/ch11_editor.tex` |
-| 12 | Git によるバージョン管理 | `chapters/part3_tools/ch12_git.tex` |
-| 13 | ネットワークとリモート操作 | `chapters/part3_tools/ch13_network.tex` |
-| 14 | Docker 入門 | `chapters/part3_tools/ch14_docker.tex` |
-| 15 | ROS とは | `chapters/part4_ros2/ch15_what_is_ros.tex` |
-| 16 | ROS 2 のインストールと環境構築 | `chapters/part4_ros2/ch16_ros2_install.tex` |
-| 17 | ROS 2 の基本概念とコマンドラインツール | `chapters/part4_ros2/ch17_ros2_concepts.tex` |
-| 18 | ワークスペースとパッケージ | `chapters/part4_ros2/ch18_workspace.tex` |
-| 19 | Python でノードを書く | `chapters/part4_ros2/ch19_rclpy.tex` |
-| 20 | launch と設定ファイル | `chapters/part4_ros2/ch20_launch.tex` |
-| 21 | 座標変換と可視化 | `chapters/part4_ros2/ch21_tf_viz.tex` |
-| 22 | シミュレーション | `chapters/part4_ros2/ch22_simulation.tex` |
-| 23 | データの記録とデバッグ | `chapters/part4_ros2/ch23_debug.tex` |
-| 24 | 実践：移動ロボットを動かす | `chapters/part4_ros2/ch24_practice.tex` |
-| 付録A | コマンド早見表 | `appendix/appA_cheatsheet.tex` |
-| 付録B | よく使うキーボードショートカット | `appendix/appB_shortcuts.tex` |
-| 付録C | トラブルシューティング集 | `appendix/appC_troubleshooting.tex` |
-| 付録D | 用語集 | `appendix/appD_glossary.tex` |
-| 付録E | 参考文献・オンラインリソース | `appendix/appE_references.tex` |
+| 1 | コンピュータとは | `chapters/linux/computer.tex` |
+| 2 | Linux とは | `chapters/linux/what_is_linux.tex` |
+| 3 | Linux の仕組み | `chapters/linux/linux_internals.tex` |
+| 4 | ターミナルとシェル | `chapters/commandline/terminal_shell.tex` |
+| 5 | ファイルとディレクトリの操作 | `chapters/commandline/files.tex` |
+| 6 | パーミッションとユーザ管理 | `chapters/commandline/permission.tex` |
+| 7 | テキスト処理とパイプ | `chapters/commandline/text_pipe.tex` |
+| 8 | プロセスとシステム管理 | `chapters/commandline/process.tex` |
+| 9 | パッケージ管理 | `chapters/commandline/package.tex` |
+| 10 | 環境変数とシェルの設定 | `chapters/commandline/env.tex` |
+| 11 | シェルスクリプト入門 | `chapters/commandline/shellscript.tex` |
+| 12 | エディタ | `chapters/tools/editor.tex` |
+| 13 | Git によるバージョン管理 | `chapters/tools/git.tex` |
+| 14 | ネットワークとリモート操作 | `chapters/tools/network.tex` |
+| 15 | Docker 入門 | `chapters/tools/docker.tex` |
+| 16 | ROS とは | `chapters/ros2/what_is_ros.tex` |
+| 17 | ROS 2 のインストールと環境構築 | `chapters/ros2/ros2_install.tex` |
+| 18 | ROS 2 の基本概念とコマンドラインツール | `chapters/ros2/ros2_concepts.tex` |
+| 19 | ワークスペースとパッケージ | `chapters/ros2/workspace.tex` |
+| 20 | Python でノードを書く | `chapters/ros2/rclpy.tex` |
+| 21 | launch と設定ファイル | `chapters/ros2/launch.tex` |
+| 22 | 座標変換と可視化 | `chapters/ros2/tf_viz.tex` |
+| 23 | シミュレーション | `chapters/ros2/simulation.tex` |
+| 24 | データの記録とデバッグ | `chapters/ros2/debug.tex` |
+| 25 | 実践：移動ロボットを動かす | `chapters/ros2/practice.tex` |
+| 付録A | コマンド早見表 | `appendix/cheatsheet.tex` |
+| 付録B | よく使うキーボードショートカット | `appendix/shortcuts.tex` |
+| 付録C | トラブルシューティング集 | `appendix/troubleshooting.tex` |
+| 付録D | 用語集 | `appendix/glossary.tex` |
+| 付録E | 参考文献・オンラインリソース | `appendix/references.tex` |
 | — | はじめに / おわりに | `frontmatter/preface.tex` / `frontmatter/afterword.tex` |
 
 章の追加・削除・順番の入れ替えは `main.tex` の `\include` を編集して行います。
+章番号は LaTeX が自動で振るので、ファイル名やディレクトリ名（`images/`, `samples/` のサブディレクトリを含む）には章番号を付けず、章の内容を表す名前を使ってください。
+こうしておけば、章の順番を入れ替えてもファイル名を変更する必要がありません。
+本文中で章や図を参照するときも、番号を直接書かずに `\ref` を使います。
 
 ---
 
@@ -323,10 +333,10 @@ make clean    # 生成物を削除
 ### 作業の進め方（Git）
 
 1. 担当する章を決めたら、Issue を立てて自分をアサインします（同じ章を複数人が同時に編集しないため）。
-2. `master` から作業用ブランチを切ります。ブランチ名は `chXX-<内容>` とします（例：`ch19-publisher`, `appA-cheatsheet`）。
+2. `master` から作業用ブランチを切ります。ブランチ名は `<章のファイル名>-<内容>` とします（例：`rclpy-publisher`, `cheatsheet-git`）。
 3. `make` でエラーなくビルドできることを確認してからコミットします。
 4. Pull Request を作成し、**最低 1 人のレビュー**を受けてから `master` にマージします。
-5. コミットメッセージの先頭に対象の章を書きます（例：`ch19: パブリッシャの節を執筆`）。
+5. コミットメッセージの先頭に対象の章を書きます（例：`rclpy: パブリッシャの節を執筆`）。
 
 次のファイルは全員に影響するため、変更する場合は事前に Issue で相談してください。
 
@@ -351,7 +361,7 @@ make clean    # 生成物を削除
 | --- | --- |
 | ターミナル操作例 | `\begin{terminal}[タイトル] ... \end{terminal}` |
 | ソースコード | `\begin{lstlisting}[style=python, caption={...}, label={lst:...}] ... \end{lstlisting}` |
-| 外部ファイルのコード | `\lstinputlisting[style=python]{samples/chXX/foo.py}` |
+| 外部ファイルのコード | `\lstinputlisting[style=python]{samples/rclpy/foo.py}` |
 | この章で学ぶこと | `\begin{goalbox} ... \end{goalbox}` |
 | ポイント | `\begin{point}[タイトル] ... \end{point}`（タイトル省略時は「ポイント」） |
 | 注意 | `\begin{caution}[タイトル] ... \end{caution}`（タイトル省略時は「注意」） |
@@ -376,7 +386,7 @@ make clean    # 生成物を削除
 - 実行結果は `$` を付けずにそのまま書きます。長い出力は途中を `...` で省略して構いません。
 - 読者が自分の環境に合わせて置き換える部分は `<ファイル名>` のように山括弧で囲みます。
 - コマンドに説明を添えるときは、行末に `# 説明` の形でコメントを書きます（例：`$ cd ~/Documents     # ホームの Documents に移動`）。
-- 実行結果とエラーメッセージは英語の表示で掲載します（日本語環境では日本語で表示されることを、第3章で断っています）。
+- 実行結果とエラーメッセージは英語の表示で掲載します（日本語環境では日本語で表示されることを、第4章で断っています）。
 - プロンプトを含めて書く必要があるときは、ユーザ名を `user`、ホスト名を `robot` とします（例：`user@robot:~$`）。
 - 掲載するコマンドとコードは、必ず**動作環境（Ubuntu 24.04 + ROS 2 Jazzy）で実際に実行して確認**してください。
 
@@ -397,7 +407,7 @@ make clean    # 生成物を削除
 
 ### 図版
 
-- 画像は `images/chXX/` に置きます（例：`images/ch17/rqt_graph.png`）。`\includegraphics{ch17/rqt_graph.png}` のように `images/` を省略して参照できます。
+- 画像は、章のファイル名と同じ名前のディレクトリ `images/<章のファイル名>/` に置きます（例：`ros2_concepts.tex` の図なら `images/ros2_concepts/rqt_graph.png`）。`\includegraphics{ros2_concepts/rqt_graph.png}` のように `images/` を省略して参照できます。
 - ファイル名は半角英数字・ハイフン・アンダースコアのみとし、日本語や空白は使いません。
 - スクリーンショットは PNG、図は可能な限り PDF か SVG から変換した PDF を使います。
 - 図には必ず `\caption` と `\label` を付け、本文から `\ref` で参照します。
@@ -423,7 +433,7 @@ PDF 上には「Sample」と書かれた枠が表示されます（TikZ は `pre
   \end{tikzpicture}
   %% 入れる画像：ターミナルを起動した直後のウィンドウのスクリーンショット
   % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{ch03/terminal_window.png}
+  % \includegraphics[width=0.8\linewidth]{terminal_shell/terminal_window.png}
   \caption{Ubuntu のターミナル}
   \label{fig:terminal-window}
 \end{figure}
@@ -432,13 +442,13 @@ PDF 上には「Sample」と書かれた枠が表示されます（TikZ は `pre
 - `%% 入れる画像：` の行に、どのような画像が必要かを具体的に書きます。
 - `\includegraphics` の行には、置く予定のファイル名を書いておきます。
 - プレースホルダの段階でも `\caption` と `\label` を付け、本文から `\ref` で参照しておきます。
-- 画像ができたら `images/chXX/` に置き、`tikzpicture` 環境を削除して `\includegraphics` の行のコメントを外します。
+- 画像ができたら `images/<章のファイル名>/` に置き、`tikzpicture` 環境を削除して `\includegraphics` の行のコメントを外します。
 
 プレースホルダが残っている箇所は、`grep -rn '入れる画像' book/` で一覧できます。
 
 ### サンプルコード
 
-- 本文で扱う ROS 2 パッケージやスクリプトは `samples/chXX/` に置き、実際にビルド・実行できる状態に保ちます。
+- 本文で扱う ROS 2 パッケージやスクリプトは `samples/<章のファイル名>/` に置き、実際にビルド・実行できる状態に保ちます。
 - 長いコードは本文に直接書かず、`\lstinputlisting` で `samples/` から読み込みます。これにより本文とサンプルコードの食い違いを防ぎます。
 - Python コードは PEP 8 に従ってください。
 
@@ -455,7 +465,7 @@ PDF 上には「Sample」と書かれた枠が表示されます（TikZ は `pre
 | --- | --- |
 | ディレクトリ | フォルダ |
 | ターミナル | 端末、コンソール（Ubuntu のアプリ名「端末」を指す場合を除く） |
-| CLI | CUI（第3章で両者を紹介する箇所を除く） |
+| CLI | CUI（第4章で両者を紹介する箇所を除く） |
 | ROS 2 | ROS2、ros2（コマンド名を除く） |
 | ノード / トピック / サービス / アクション | node / topic などの英語表記 |
 | パッケージ | pkg |
