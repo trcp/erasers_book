@@ -8,7 +8,7 @@
     \item オープンソースソフトウェア（OSS）の考え方とライセンス
     \item ディストリビューションとは何か、Ubuntu のバージョンの読み方
     \item ロボット開発で Linux が使われる理由
-    \item Ubuntu 環境の用意の仕方と、デスクトップ環境の基本操作
+    \item Ubuntu 環境の用意の仕方と、デスクトップ環境の基本操作、最初の設定
   \end{itemize}
 \end{goalbox}
 
@@ -340,7 +340,7 @@ Linux には、プログラミング言語の開発環境、バージョン管�
 
 \begin{point}[Windows や macOS を使っている人へ]
   ふだん Windows や macOS を使っている人も、Linux のためにパソコンを買い替える必要はありません。
-  仮想マシンや WSL2、Docker などを使えば、今のパソコンの上で Ubuntu を動かすことができます。
+  本書では、VirtualBox という仮想化ソフトウェアを使って、今のパソコンの中に Ubuntu の環境を作ります。
   具体的な方法は、次の\ref{sec:linux-setup}節で説明します。
 \end{point}
 
@@ -348,92 +348,141 @@ Linux には、プログラミング言語の開発環境、バージョン管�
 \label{sec:linux-setup}
 
 本書の内容を実際に試すには、Ubuntu 24.04 が動く環境が必要です。
-ここでは、Ubuntu の環境を用意するいくつかの方法を紹介し、その中から自分に合った方法を選べるようにします。
+本書では、\textbf{VirtualBox}（バーチャルボックス）という仮想化ソフトウェアを使って、今使っているパソコンの中に Ubuntu の環境を作ります。
 
-\subsection{環境を用意する方法}
+\subsection{本書で VirtualBox を使う理由}
 
-Ubuntu の環境を用意する方法には、主に次のようなものがあります。
+\textbf{仮想化ソフトウェア}を使うと、Windows や macOS などの OS（\textbf{ホスト OS}）の上に、ソフトウェアで再現した仮想的なコンピュータ（\textbf{仮想マシン}）を作り、その中で別の OS（\textbf{ゲスト OS}）を動かせます（図\ref{fig:linux-virtualbox}）。
+VirtualBox は、Oracle 社が開発している無料の仮想化ソフトウェアです。
+本書では、次の理由から、VirtualBox の上の Ubuntu を標準の環境にします。
 
-\begin{center}
-  \begin{tabular}{lp{0.3\linewidth}p{0.3\linewidth}}
-    \toprule
-    方法 & 良いところ & 気になるところ \\
-    \midrule
-    専用の PC にインストール & 性能を最大限に使え、トラブルが最も少ない & PC が 1 台必要 \\
-    デュアルブート & 1 台の PC で Windows と使い分けられる & 起動のたびに OS を選ぶ。設定を誤ると既存のデータを失うおそれ \\
-    仮想マシン & 今の OS の上で手軽に試せる & 動作が遅く、GPU や USB 機器の扱いに制限がある \\
-    WSL2 & Windows の上で手軽に使える & USB 機器やネットワークの扱いに追加の設定が必要 \\
-    Docker & 環境を丸ごと再現・共有できる & しくみの理解が必要（\ref{chap:docker}章） \\
-    \bottomrule
-  \end{tabular}
-\end{center}
+\begin{figure}[tb]
+  \centering
+  \input{images/what_is_linux/virtualbox}
+  \caption{本書の実行環境（VirtualBox の上の Ubuntu）}
+  \label{fig:linux-virtualbox}
+\end{figure}
 
-ロボットを実際に動かすことを考えると、\textbf{Ubuntu を専用の PC にインストールする}方法が最もおすすめです。
-センサやモータを USB でつないだり、シミュレータで 3D の描画をしたりするときに、ほかの方法では思わぬ制限にぶつかることがあるからです。
-古いノートパソコンなどを 1 台、Ubuntu 専用にできると理想的です。
-まずは手元の PC で試してみたいという場合は、仮想マシンや WSL2 から始めても構いません。
+\begin{description}
+  \item[デスクトップ環境をそのまま使える]
+    仮想マシンには、Ubuntu のデスクトップ版をそのままインストールできるので、デスクトップ環境（\ref{sec:linux-desktop}節）やターミナル、RViz などの GUI のツールを、実機の PC と同じように使えます。
+  \item[Docker もその上で動かせる]
+    仮想マシンの中の Ubuntu は、ふつうの Ubuntu と同じなので、Docker（\ref{chap:docker}章）もそのままインストールして使えます。
+  \item[Windows でも macOS でも同じ手順で学べる]
+    ホスト OS が Windows でも macOS でも Linux でも、仮想マシンの中は同じ Ubuntu 24.04 になります。
+    そのため、本書の説明を OS ごとに分けることなく、全員が同じ手順で進められます。
+  \item[壊しても元に戻せる]
+    仮想マシンの状態を\textbf{スナップショット}として保存しておけば、設定を間違えて動かなくなっても、保存した時点にすぐ戻せます。
+    今使っているパソコンの環境にも影響しないので、安心していろいろ試せます。
+\end{description}
 
-PC の性能の目安は、次のとおりです。
-シミュレータ（\ref{chap:simulation}章）を快適に動かすには、これより余裕があると安心です。
+\subsection{必要な PC の性能}
+
+仮想マシンは、ホスト OS と同時に動くので、PC にはある程度の性能が必要です。
+目安は次のとおりです（仮想マシンには、このうち半分程度を割り当てます）。
 
 \begin{itemize}
-  \item CPU：4 コア以上
-  \item メモリ：8 GB 以上（16 GB 以上を推奨）
-  \item ストレージ：空き容量 50 GB 以上
+  \item CPU：4 コア以上（8 コア以上を推奨）
+  \item メモリ：16 GB 以上（8 GB でも動きますが、仮想マシンに割り当てられる量が少なくなります）
+  \item ストレージ：空き容量 60 GB 以上
 \end{itemize}
 
-\subsection{PC に Ubuntu をインストールする}
+また、CPU の\textbf{仮想化支援機能}（Intel VT-x や AMD-V）が有効になっている必要があります。
+多くの PC では最初から有効になっていますが、仮想マシンが起動しないときは、PC の BIOS（UEFI）の設定で有効にしてください。
 
-PC に Ubuntu をインストールする流れは、おおむね次のとおりです。
+\subsection{VirtualBox をインストールする}
 
-\begin{enumerate}
-  \item \textbf{インストール用のファイルを入手する}：
-    Ubuntu の公式サイト（\url{https://jp.ubuntu.com/download} など）から、Ubuntu 24.04 LTS のデスクトップ版のファイル（拡張子が \cmd{.iso} のファイル）をダウンロードします。
-  \item \textbf{インストール用の USB メモリを作る}：
-    8 GB 以上の USB メモリに、balenaEtcher や Rufus といったツールを使ってダウンロードしたファイルを書き込みます。
-    USB メモリの中身はすべて消えるので注意してください。
-  \item \textbf{USB メモリから起動する}：
-    インストールしたい PC に USB メモリを差して電源を入れ、起動するときに特定のキー（\key{F12} や \key{F2} など、機種によって異なります）を押して、USB メモリから起動します。
-  \item \textbf{インストーラの指示に従う}：
-    言語（日本語）、キーボードの配列、ネットワーク、インストールの種類などを選びます。
-    ディスクの設定で「ディスクを削除して Ubuntu をインストール」を選ぶと、その PC の中のデータはすべて消えます。
-  \item \textbf{ユーザを作る}：
-    自分の名前、コンピュータの名前（ホスト名、\ref{sec:terminal-prompt}節）、ユーザ名、パスワードを設定します。
-    ユーザ名とホスト名は、ターミナルで何度も目にすることになるので、半角英小文字の短い名前にしておくと便利です。
-  \item \textbf{再起動する}：
-    インストールが終わったら USB メモリを抜いて再起動し、設定したユーザでログインします。
-\end{enumerate}
+では、ここから実際に手を動かしていきましょう。
+VirtualBox の公式サイト（\url{https://www.virtualbox.org/}）のダウンロードページから、自分のホスト OS に合ったインストーラをダウンロードして、インストールします。
+インストールの途中の設定は、基本的に標準のままで構いません。
 
-\begin{caution}[インストールの前にバックアップを]
-  Ubuntu のインストールでは、ディスクの設定を誤ると、PC の中のデータがすべて消えてしまいます。
-  特にデュアルブートにする場合は、インストールの前に、大切なデータを必ず別の場所にバックアップしておきましょう。
+\begin{caution}[Apple シリコンの Mac の場合]
+  M1 や M2 などの Apple シリコンを搭載した Mac では、ARM 向けの VirtualBox と、ARM 版（arm64）の Ubuntu を使います。
+  Intel の CPU を搭載した PC 向けの Ubuntu（amd64）は動かないので、ダウンロードするときに注意してください。
+  ROS 2 Jazzy は ARM 版の Ubuntu にも対応しています。
 \end{caution}
 
-インストールが終わったら、最初にソフトウェアを最新の状態に更新しておきます。
-ターミナル（\ref{chap:terminal_shell}章）を開いて、次のコマンドを実行します（\ref{chap:package}章で詳しく説明します）。
+\subsection{Ubuntu のインストール用ファイルを入手する}
 
-\begin{terminal}[インストール後にソフトウェアを更新する]
-$ sudo apt update
-$ sudo apt upgrade
-\end{terminal}
+Ubuntu の公式サイト（\url{https://jp.ubuntu.com/download} など）から、Ubuntu 24.04 LTS のデスクトップ版のインストール用ファイルをダウンロードします。
+拡張子が \cmd{.iso} のファイル（\textbf{ISO イメージ}）で、5 GB 以上あるので、ダウンロードには少し時間がかかります。
 
-NVIDIA の GPU を搭載した PC では、「ソフトウェアとアップデート」の「追加のドライバー」から、NVIDIA のドライバをインストールしておくと、3D の描画が快適になります。
+\subsection{仮想マシンを作る}
 
-\subsection{仮想マシン・WSL2 で使う}
+VirtualBox を起動し、「新規」ボタンを押して、仮想マシンを作ります（図\ref{fig:linux-virtualbox-new}）。
 
-\textbf{仮想マシン}を使う場合は、VirtualBox や VMware Workstation などのソフトウェアをインストールし、ダウンロードした Ubuntu の \cmd{.iso} ファイルを使って、仮想マシンの中に Ubuntu をインストールします。
-Apple シリコン（M1 など）を搭載した Mac では、UTM や Parallels Desktop などを使って、ARM 版の Ubuntu をインストールします。
-仮想マシンには、メモリを 8 GB 程度、CPU を 4 コア程度割り当てると、ROS 2 の学習には十分です。
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：VirtualBox で仮想マシンを新しく作るときの画面（名前・ISO イメージ・「自動インストールをスキップ」の項目が見える状態）のスクリーンショット
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{what_is_linux/virtualbox_new_vm.png}
+  \caption{VirtualBox で仮想マシンを作る画面}
+  \label{fig:linux-virtualbox-new}
+\end{figure}
 
-Windows 11 の PC では、\textbf{WSL2}（Windows Subsystem for Linux）を使うと、Windows の中で Ubuntu を手軽に使えます。
-管理者として開いた PowerShell で、次のコマンドを実行すると、Ubuntu 24.04 がインストールされます。
+\begin{enumerate}
+  \item \textbf{名前と OS}：仮想マシンの名前（たとえば \cmd{ubuntu2404}）を入力し、「ISO イメージ」にダウンロードした \cmd{.iso} ファイルを指定します。
+    「自動インストールをスキップ」（Skip Unattended Installation）にチェックを入れておきます\footnote{自動インストールを使うと、ユーザが \cmd{sudo} を使えない状態で作られるなど、本書の手順と合わないことがあるため、自分の手でインストールします。}。
+  \item \textbf{ハードウェア}：メモリを 8192 MB（8 GB）程度、CPU を 4 個程度割り当てます。PC の性能に余裕があれば、もっと増やしても構いません。
+  \item \textbf{仮想ハードディスク}：容量を 50 GB 以上にします。実際に使った分だけ PC のストレージを消費する設定（事前に確保しない設定）が標準なので、大きめにしておいて構いません。
+  \item 設定を確認して「完了」を押すと、仮想マシンができます。
+\end{enumerate}
 
-\begin{terminal}[WSL2 で Ubuntu 24.04 をインストールする（PowerShell）]
-PS> wsl --install -d Ubuntu-24.04
-\end{terminal}
+\subsection{仮想マシンに Ubuntu をインストールする}
 
-WSL2 では、Linux の GUI アプリを Windows の画面に表示することもできるので、本書の内容の多くを試せます。
-ただし、USB でつないだ機器を使うには追加のツールが必要など、実機のロボットを動かすには不便な点もあります。
+作った仮想マシンを選んで「起動」を押すと、仮想マシンの画面が開き、ISO イメージから Ubuntu のインストーラが起動します。
+あとは、実機にインストールするときと同じように、インストーラの指示に従います。
+
+\begin{enumerate}
+  \item 言語（日本語）、キーボードの配列、ネットワークなどを選びます。
+  \item インストールの種類は「対話式インストール」、アプリは「規定の選択」を選びます。
+  \item ディスクの設定は「ディスクを削除して Ubuntu をインストール」を選びます。消えるのは仮想マシンの中の仮想ハードディスクだけで、ホスト OS のデータには影響しません。
+  \item 自分の名前、コンピュータの名前（ホスト名、\ref{sec:terminal-prompt}節）、ユーザ名、パスワードを設定します。ユーザ名とホスト名は、ターミナルで何度も目にするので、半角英小文字の短い名前にしておくと便利です。
+  \item インストールが終わったら、「今すぐ再起動」を押し、設定したユーザでログインします。
+\end{enumerate}
+
+ログインすると、Ubuntu のデスクトップが表示されます。
+仮想マシンの画面が小さく表示される場合がありますが、\ref{sec:linux-first-setup}節で Guest Additions を入れると、ウィンドウの大きさに合わせて表示されるようになります。
+デスクトップ環境の基本的な操作は、\ref{sec:linux-desktop}節で説明します。
+
+\subsection{仮想マシンを使ううえでのポイント}
+
+\begin{description}
+  \item[スナップショットをとる]
+    メニューの「仮想マシン」→「スナップショットを作成」で、その時点の状態を保存できます。
+    Ubuntu のインストールが終わった直後や、大きな設定の変更をする前にとっておくと安心です。
+  \item[USB 機器を使う]
+    センサやマイコンなどの USB 機器を仮想マシンの中で使うには、メニューの「デバイス」→「USB」から、その機器を選んで仮想マシンにつなぎます。
+    つないでいる間は、ホスト OS からはその機器を使えなくなります。
+    USB 3.0 の機器を使うときは、仮想マシンの設定の「USB」で、USB 3.0（xHCI）コントローラを選んでおきます。
+  \item[ネットワークの設定]
+    標準の設定（NAT）では、仮想マシンからインターネットに接続できますが、ほかのコンピュータから仮想マシンに接続することはできません。
+    ロボットの PC と SSH で接続したり（\ref{chap:network}章）、ROS 2 で通信したりするときは、仮想マシンの設定の「ネットワーク」で、割り当てを「ブリッジアダプター」に変えます。
+    こうすると、仮想マシンがホストの PC と同じネットワークに、1 台のコンピュータとして参加できるようになります。
+  \item[3D の描画は遅い]
+    仮想マシンでは、PC の GPU の性能を十分に生かせないため、シミュレータ（\ref{chap:simulation}章）のような 3D の描画は、実機の PC に比べて遅くなります。
+    動作が重いときは、仮想マシンに割り当てるメモリや CPU を増やしてみましょう。
+\end{description}
+
+\begin{column}{ほかの方法で Ubuntu を用意する}
+  本書では VirtualBox を使いますが、Ubuntu の環境を用意する方法はほかにもあります。
+  \begin{itemize}
+    \item \textbf{PC に直接インストールする}：PC の性能を最大限に生かせ、GPU や USB 機器も制限なく使えます。本格的にロボットを動かすようになったら、Ubuntu 専用の PC を 1 台用意するのが理想的です。インストールの手順は、仮想マシンへのインストールとほぼ同じです（USB メモリにインストール用のファイルを書き込み、そこから起動します）。
+    \item \textbf{デュアルブート}：1 台の PC に Windows と Ubuntu の両方をインストールし、起動するときにどちらを使うかを選びます。設定を誤ると既存のデータを失うおそれがあるので、慣れてから挑戦しましょう。
+    \item \textbf{WSL2}：Windows 11 の中で Ubuntu を手軽に動かせるしくみです。手軽な反面、デスクトップ環境はなく、USB 機器やネットワークの扱いには追加の設定が必要です。
+  \end{itemize}
+  どの方法でも、中で動く Ubuntu 24.04 は同じなので、本書の第3章以降の内容はそのまま使えます。
+\end{column}
 
 \section{デスクトップ環境の基本操作}
 \label{sec:linux-desktop}
@@ -517,6 +566,46 @@ Ubuntu 24.04 には、\textbf{GNOME}（グノーム）という\textbf{デスク
   全角の文字やスペースが混ざると、コマンドは正しく動きません（\ref{sec:terminal-command-structure}節）。
 \end{point}
 
+\section{最初の設定}
+\label{sec:linux-first-setup}
+
+デスクトップ環境の操作に慣れたら、仮想マシンの Ubuntu を使いやすくするための最初の設定をしておきましょう。
+ここでは初めてターミナルを使いますが、ターミナルについては\ref{chap:terminal_shell}章で詳しく説明します。
+
+\subsection{ソフトウェアを更新する}
+
+最初に、Ubuntu のソフトウェアを最新の状態に更新しておきます。
+\key{Ctrl}+\key{Alt}+\key{T} でターミナル（端末）を開き、次の 2 行のコマンドを 1 行ずつ入力して、それぞれ \key{Enter} を押してください。
+\cmd{\$} は入力しません（本書のコマンドの表記は\ref{sec:terminal-prompt}節で説明します）。
+
+\begin{terminal}[インストール後にソフトウェアを更新する]
+$ sudo apt update
+$ sudo apt upgrade
+\end{terminal}
+
+\cmd{sudo} を付けたコマンドを実行すると、パスワードを聞かれるので、インストールのときに設定したパスワードを入力して \key{Enter} を押します（入力中の文字は画面に表示されません）。
+途中で \cmd{Do you want to continue? [Y/n]} と聞かれたら、\key{Y} を入力して \key{Enter} を押します。
+コマンドの意味は、\ref{chap:terminal_shell}章以降で少しずつ学んでいくので、今はこのとおりに入力するだけで構いません（\cmd{apt} については\ref{chap:package}章で詳しく説明します）。
+
+\subsection{Guest Additions を入れる}
+
+\textbf{Guest Additions} は、仮想マシンを快適に使うための追加のソフトウェアです。
+入れておくと、ウィンドウの大きさに合わせて画面の解像度が自動で変わるようになり、ホスト OS との間でコピー・貼り付けやファイルの共有ができるようになります。
+
+仮想マシンのウィンドウのメニューで「デバイス」→「Guest Additions CD イメージの挿入」を選びます。
+次に、仮想マシンの中のターミナルで、必要なパッケージをインストールしてから、Guest Additions のインストーラを実行し、再起動します。
+
+\begin{terminal}[Guest Additions をインストールする]
+$ sudo apt install build-essential bzip2
+$ sudo /media/$USER/VBox_GAs_*/VBoxLinuxAdditions.run
+$ sudo reboot
+\end{terminal}
+
+再起動したら、メニューの「デバイス」→「クリップボードの共有」を「双方向」にしておくと、ホスト OS でコピーしたコマンドを、仮想マシンの中のターミナルに貼り付けられるようになります（\ref{sec:terminal-keys}節）。
+
+ここまで設定できたら、\ref{sec:linux-setup}節で説明したスナップショットをとっておくと安心です。
+この状態に、いつでも戻れるようになります。
+
 \section*{この章のまとめ}
 
 \begin{itemize}
@@ -525,6 +614,7 @@ Ubuntu 24.04 には、\textbf{GNOME}（グノーム）という\textbf{デスク
   \item Linux は OSS であり、ソースコードを読み、改良し、共有する自由があります。他人のコードを使うときはライセンスを確認します。
   \item Linux カーネルにさまざまなソフトウェアを組み合わせて配布しているものをディストリビューションといいます。本書では Ubuntu 24.04 LTS を使います。
   \item ROS 2 が Ubuntu を中心に開発されていること、さまざまなハードウェアで動くこと、リモートから操作しやすいことなどから、ロボット開発では Linux が広く使われています。
-  \item Ubuntu の環境は、専用の PC にインストールするのがおすすめです。手軽に試すなら、仮想マシンや WSL2 も使えます。
+  \item 本書では、VirtualBox で作った仮想マシンに Ubuntu 24.04 をインストールして使います。Windows でも macOS でも同じ環境で学べ、デスクトップ環境や Docker もそのまま使えます。
   \item Ubuntu 24.04 のデスクトップ環境は GNOME です。\key{Super} キーでアプリを検索し、\key{Ctrl}+\key{Alt}+\key{T} でターミナルを開きます。
+  \item Ubuntu をインストールしたら、ソフトウェアを更新し、Guest Additions を入れて、仮想マシンを使いやすくしておきます。
 \end{itemize}

@@ -640,7 +640,7 @@ VS Code では、行番号の左をクリックして止める場所（ブレー
 \begin{exercise}
 \begin{enumerate}
   \item 次のプログラムは、1 から 9 の乱数を作り、5 が出たら繰り返しを終了して、最後に出た 5 を表示するつもりです。ところが、実行すると 10 が出ることがあり、最後の 5 も 2 回表示されます。正しく動くように直してください。
-\begin{lstlisting}[style=python, numbers=none]
+\begin{lstlisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt]
 import random
 
 while True:
@@ -652,7 +652,7 @@ while True:
 print("生成された乱数:" + str(num))
 \end{lstlisting}
   \item 次のプログラムは、入力した数までの整数を順に 5 で割り、あまりが 2 か 3 のときにその数を表示するつもりです。誤りが 3 か所あります。見つけて直してください。
-\begin{lstlisting}[style=python, numbers=none]
+\begin{lstlisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt]
 num = input("数値を入力=> ")
 
 for i in range(num):
@@ -660,7 +660,7 @@ for i in range(num):
         print("i")
 \end{lstlisting}
   \item 次のじゃんけんのプログラムには、誤りが 5 か所あります。エラーメッセージを読んで、すべて直してください（\cmd{try...except} は使わないこと）。
-\begin{lstlisting}[style=python, numbers=none]
+\begin{lstlisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt]
 import random
 
 hands = ["グー", "チョキ", "パー"]

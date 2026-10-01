@@ -1,0 +1,13 @@
+% 図：本書の実行環境（VirtualBox の上の Ubuntu）（chapters/linux/what_is_linux.tex）
+\begin{tikzpicture}[layer/.style={draw, rounded corners=2pt, align=center, font=\small, minimum height=8mm, inner sep=2pt}]
+  \def\w{96mm}
+  \node[layer, minimum width=\w, fill=black!12] (hw) at (0,0) {PC のハードウェア};
+  \node[layer, minimum width=\w, fill=black!5, above=1mm of hw] (host) {ホスト OS（Windows / macOS / Linux）};
+  \node[layer, minimum width=\w, fill=orange!12, above=1mm of host] (vb) {\textbf{VirtualBox}};
+  \node[layer, minimum width=\w, fill=blue!10, above=1mm of vb, minimum height=24mm] (ubuntu) {};
+  \node[font=\small\bfseries, anchor=north west] at (ubuntu.north west) {ゲスト OS：Ubuntu 24.04（デスクトップ環境付き）};
+  \node[layer, fill=white, minimum width=28mm, font=\footnotesize, anchor=south west] at ([xshift=2mm,yshift=2mm]ubuntu.south west) {ターミナル・エディタ\\（第II部・第III部）};
+  \node[layer, fill=white, minimum width=28mm, font=\footnotesize, anchor=south] at ([yshift=2mm]ubuntu.south) {ROS 2 Jazzy\\（第V部）};
+  \node[layer, fill=white, minimum width=28mm, font=\footnotesize, anchor=south east] at ([xshift=-2mm,yshift=2mm]ubuntu.south east) {Docker\\（第15章）};
+  \node[figlabel, anchor=west, text=black!60, align=left] at ([xshift=2mm]vb.east) {どの OS でも\\同じ環境};
+\end{tikzpicture}

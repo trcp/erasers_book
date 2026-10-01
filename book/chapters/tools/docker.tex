@@ -434,13 +434,15 @@ VS Code でこのディレクトリを開き、コマンドパレット（\key{C
   ROS 2 に慣れてきたら、チームでの開発や、異なるバージョンの ROS 2 を使い分けたいときに、コンテナを活用してみましょう。
 \end{point}
 
-\begin{column}{Windows や macOS で ROS 2 を使うには}
-  Windows や macOS の PC でも、Docker Desktop というアプリを使えば、Linux のコンテナを動かせます。
-  Docker Desktop は、内部で小さな Linux の仮想マシンを動かし、その上でコンテナを動かしています。
-  そのため、Windows や macOS の PC でも、ROS 2 のコンテナを使って開発を始めることができます。
-  ただし、GUI の表示や USB のデバイスの利用、ネットワークの設定には制限や追加の設定が必要なことが多く、Linux の PC に比べて手間がかかります。
-  本格的にロボットを動かすなら、Ubuntu をインストールした PC を用意するのがおすすめです（\ref{sec:linux-setup}節）。
-  なお、Docker Desktop は、大きな組織で使う場合には有料のライセンスが必要です。
+\begin{column}{VirtualBox の中で Docker を使う}
+  本書の環境では、VirtualBox の仮想マシンの中の Ubuntu に Docker をインストールしています（\ref{sec:linux-setup}節）。
+  仮想マシンの中の Ubuntu はふつうの Ubuntu と同じなので、この章の手順はそのまま使えます。
+  「仮想マシンの中でコンテナを動かす」と聞くと重そうに思えるかもしれませんが、コンテナは仮想マシンと違って OS を丸ごと動かすわけではないので、それほど負担にはなりません。
+
+  なお、Windows や macOS には、Docker Desktop というアプリもあります。
+  Docker Desktop も、内部で小さな Linux の仮想マシンを動かし、その上でコンテナを動かしています。
+  ただし、GUI の表示や USB の機器の利用に追加の設定が必要なことが多く、大きな組織で使う場合には有料のライセンスも必要です。
+  本書では、どの OS でも同じ手順で進められるよう、VirtualBox の中の Ubuntu で Docker を使います。
 \end{column}
 
 \section*{この章のまとめ}

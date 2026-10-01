@@ -28,12 +28,13 @@ Linux とは何かというところから始め、コマンドラインの基�
 
 | 項目 | バージョン |
 | --- | --- |
+| 実行環境 | VirtualBox の仮想マシン（ホスト OS は Windows / macOS / Linux のいずれでもよい） |
 | OS | Ubuntu 24.04 LTS |
 | ROS | ROS 2 Jazzy Jalisco |
 | 言語 | Python 3.12（一部 C++） |
 | シミュレータ | Gazebo (Harmonic) |
 
-> Windows / macOS を使っている場合は、デュアルブート・仮想マシン・WSL2・Docker のいずれかで Ubuntu 環境を用意してください（第2章で解説します）。
+> 本書では、VirtualBox の仮想マシンに Ubuntu 24.04 をインストールして使います。Windows・macOS・Linux のどれを使っていても、同じ手順で進められます（第2章で解説します）。
 
 ---
 
@@ -53,8 +54,9 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 2.2 オープンソースソフトウェア（OSS）
 - 2.3 ディストリビューション（Ubuntu, Debian, Fedora など）
 - 2.4 なぜロボット開発で Linux が使われるのか
-- 2.5 Ubuntu 環境の用意（インストール / 仮想マシン / WSL2 / Docker）
+- 2.5 Ubuntu 環境の用意（VirtualBox で仮想マシンを作り、Ubuntu をインストールする。USB・ネットワークの設定）
 - 2.6 デスクトップ環境の基本操作
+- 2.7 最初の設定（ソフトウェアの更新、Guest Additions）
 
 #### 第3章 Linux の仕組み
 - 3.1 カーネルとユーザ空間
