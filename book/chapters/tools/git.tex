@@ -311,11 +311,11 @@ __pycache__/
   \end{tabular}
 \end{center}
 
-\begin{column}{エディタから Git を使う}
+\begin{tips}{エディタから Git を使う}
   VS Code（\ref{chap:editor}章）には Git の機能が組み込まれていて、変更されたファイルの一覧や差分を画面で見ながら、ボタン操作でコミットすることもできます。
   ただし、画面の操作の裏側で実行されているのは、この章で学ぶコマンドと同じです。
   まずはコマンドで Git のしくみを理解しておくと、エディタの画面の意味もよくわかるようになります。
-\end{column}
+\end{tips}
 
 \section{ブランチとマージ}
 \label{sec:git-branch}
@@ -506,7 +506,8 @@ OSS を使っていて不具合を見つけたら、Issue で報告したり、�
 \subsection{GitHub Flow}
 
 複数人で開発するときは、ブランチや Pull Request をどのように使うかをあらかじめ決めておきます。
-代表的な進め方が \textbf{GitHub Flow} と呼ばれるもので、次のようなシンプルなルールで運用します。
+gitを用いたチーム開発手法は、企業や部署によって、それぞれ様々な運用方法があります。
+今回は、代表的な進め方の例として \textbf{GitHub Flow} を紹介します。次のようなシンプルなルールで運用します。
 
 \begin{enumerate}
   \item \cmd{main} ブランチは、常に動く状態に保つ

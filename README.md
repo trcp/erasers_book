@@ -460,6 +460,7 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | ポイント | `\begin{point}[タイトル] ... \end{point}`（タイトル省略時は「ポイント」） |
 | 注意 | `\begin{caution}[タイトル] ... \end{caution}`（タイトル省略時は「注意」） |
 | コラム | `\begin{column}{タイトル} ... \end{column}` |
+| TIPS | `\begin{tips}{タイトル} ... \end{tips}`（本筋とは別の、すぐに役立つ実践的なアドバイス。コラムは読み物・背景知識に使う） |
 | 練習問題 | `\begin{exercise} \begin{enumerate} \item ... \end{enumerate} \end{exercise}`（章ごとに「練習問題 18.1」と番号が付き、中の問題は (1), (2), ... になる。解答例では「練習問題 18.1 (2)」のように参照する） |
 | 文中のコマンド・ファイル名 | `\cmd{ls -l}` |
 | キー入力 | `\key{Ctrl}+\key{C}` |

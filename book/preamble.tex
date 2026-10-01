@@ -101,6 +101,14 @@
   title={コラム：#1}, fonttitle=\sffamily\bfseries,
 }
 
+% TIPS：本筋とは別の、すぐに役立つ実践的なアドバイス（長くてもページをまたげる）
+%   \begin{tips}{タイトル} ... \end{tips}
+\newtcolorbox{tips}[1]{
+  enhanced, breakable,
+  colback=teal!4, colframe=teal!60!black, arc=2pt,
+  title={TIPS：#1}, fonttitle=\sffamily\bfseries,
+}
+
 % 練習問題：\begin{exercise}[label={ex:...}] \begin{enumerate} \item ... \end{enumerate} \end{exercise}
 % 章ごとに「練習問題 18.1」のように番号が振られ、中の問題は (1), (2), ... になる。ページをまたげる。
 \newtcolorbox[auto counter, number within=chapter]{exercise}[1][]{

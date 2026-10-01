@@ -243,11 +243,11 @@ $ ssh robot
 user@robot:~$
 \end{terminal}
 
-\begin{column}{GUI のアプリをリモートで表示する}
+\begin{tips}{GUI のアプリをリモートで表示する}
   \cmd{ssh -X robot} のように \cmd{-X} オプションを付けて接続すると、ロボットの PC で起動した GUI のアプリの画面を、手元の PC に表示できます（X11 転送）。
   ただし、画面のデータをネットワークで送るため動作が重く、RViz のような 3D の表示には向いていません。
   ROS 2 では、GUI のツールは手元の PC で動かし、ネットワーク越しにロボットのノードと通信するのが一般的です（\ref{chap:ros2_install}章）。
-\end{column}
+\end{tips}
 
 \section{ファイル転送}
 \label{sec:network-transfer}

@@ -86,6 +86,7 @@
 - [ ] 推奨する PC の性能（CPU 4 コア以上・メモリ 16 GB 以上・空き容量 60 GB 以上）と、仮想マシンへの割り当て（メモリ 8 GB・CPU 4 個・ディスク 50 GB 以上）が妥当か
 - [ ] 日本語でインストールしたときに Mozc が使える状態になっているか、`半角/全角` キーで切り替えられるか（仮想マシンでもキーが渡るか）
 - [ ] GNOME のショートカットキー（`Super`+矢印、`Print` など）と、「App Center」「ソフトウェアとアップデート」の名称。`Super` キーなどがホスト OS に取られずに仮想マシンに渡るか
+- [ ] 第2章の TIPS「タッチタイピングを身につけよう」：脚注の寿司打の URL（`https://sushida.net/`）が正しいか。ほかに紹介したい練習サイトがあれば追加する
 
 ### 第6章 パーミッションとユーザ管理（`chapters/commandline/permission.tex`）
 
@@ -184,7 +185,7 @@
   - 第15章：コンテナ、Docker、仮想マシン、ハイパーバイザ、イメージ、タグ、レジストリ、Docker Hub、Dockerfile、ボリューム（`-v`）、Docker Compose、Dev Containers、Docker Desktop
   - 第16章：インタプリタ、コンパイラ、コンパイル、ソースコード、静的型付け、動的型付け、ガベージコレクション、ライブラリ
   - 第17章：対話モード、スクリプト、shebang、標準ライブラリ、パッケージ、PyPI、pip、仮想環境、venv、PEP 668、pipx
-  - 第2章（追加）：VirtualBox、仮想化ソフトウェア、ホスト OS、ゲスト OS、スナップショット、Guest Additions、ブリッジアダプター、仮想化支援機能、デュアルブート、仮想マシン、WSL2、ISO イメージ、GNOME、デスクトップ環境、Dock、ワークスペース、Super キー、Mozc
+  - 第2章（追加）：VirtualBox、仮想化ソフトウェア、ホスト OS、ゲスト OS、スナップショット、Guest Additions、ブリッジアダプター、仮想化支援機能、タッチタイピング、ホームポジション、デュアルブート、仮想マシン、WSL2、ISO イメージ、GNOME、デスクトップ環境、Dock、ワークスペース、Super キー、Mozc
   - 第6章：パーミッション、所有者、chmod、chown、sudoers、tee、dialout、udev、ルールファイル、ベンダ ID、プロダクト ID
   - 第7章：標準入力、標準出力、標準エラー出力、リダイレクト、/dev/null、パイプ、CSV、grep、正規表現、wc、cut、sort、uniq、sed、awk
   - 第8章：ps、top、htop、load average、フォアグラウンド、バックグラウンド、ジョブ、シグナル、SIGINT、SIGTERM、SIGKILL、kill、pkill、df、du、free、スワップ、サービス、journalctl、systemctl、dmesg
@@ -239,6 +240,7 @@
 ## 6. `preamble.tex` の変更・不具合（要 Issue での相談）
 
 - [ ] `\section` / `\subsection` の直後に文章を挟まずに表を置くとビルドエラーになる（jlreq と `tabular` の組み合わせで発生）。原因を調べて直すか、README の注意書きのままにするか
+- [ ] TIPS 用の `tips` 環境（青緑の囲み・ページをまたげる）を追加した。共同執筆者に共有する
 - [ ] 練習問題用の `exercise` 環境（章ごとの番号付き・ページをまたげる囲み）を追加した。共同執筆者に共有する
 - [ ] `column` 環境（コラム）はページをまたげないため、長いコラムは版面からはみ出す。`preamble.tex` の `column` の定義に `breakable` を付けて、ページをまたげるようにするか
 - [ ] 図のために `\usepackage{tikz}`、`\usetikzlibrary{...}`、共通スタイル（`figbox` など）を追加した。共同執筆者に共有する
