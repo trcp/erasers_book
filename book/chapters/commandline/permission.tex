@@ -271,15 +271,23 @@ Bus 001 Device 005: ID 10c4:ea60 Silicon Labs CP210x UART Bridge
 
 \cmd{ID} の後ろの \cmd{10c4} がベンダ ID、\cmd{ea60} がプロダクト ID です。
 次に、ルールファイルを作ります（ファイル名の先頭の数字はルールを読み込む順番で、末尾は \cmd{.rules} にします）。
+ルールファイルを置く \cmd{/etc/udev/rules.d/} には root しか書き込めないので、まずホームディレクトリの中でテキストエディター（\ref{sec:files-edit}節）を使ってファイルを作ります。
 
-\begin{lstlisting}[caption={/etc/udev/rules.d/99-lidar.rules}, label={lst:permission-udev}]
+\begin{terminal}[ホームディレクトリの中でルールファイルを作る]
+$ gnome-text-editor ~/99-lidar.rules
+\end{terminal}
+
+次の 1 行を書いて保存します。
+
+\begin{lstlisting}[caption={99-lidar.rules}, label={lst:permission-udev}]
 SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="lidar", MODE="0666"
 \end{lstlisting}
 
 このルールは、「ベンダ ID が \cmd{10c4}、プロダクト ID が \cmd{ea60} の USB シリアルの機器がつながったら、\cmd{/dev/lidar} という別名を作り、誰でも読み書きできる権限にする」という意味です。
-ルールファイルを保存したら、次のコマンドでルールを読み込み直し、デバイスを差し直します。
+ルールファイルを保存したら、\cmd{sudo cp} で \cmd{/etc/udev/rules.d/} にコピーし、次のコマンドでルールを読み込み直して、デバイスを差し直します。
 
-\begin{terminal}[udev のルールを読み込み直す]
+\begin{terminal}[ルールファイルを置いて読み込み直す]
+$ sudo cp ~/99-lidar.rules /etc/udev/rules.d/
 $ sudo udevadm control --reload-rules
 $ sudo udevadm trigger
 $ ls -l /dev/lidar

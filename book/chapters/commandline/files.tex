@@ -7,7 +7,7 @@
     \item カレントディレクトリの確認と移動（\cmd{pwd}, \cmd{cd}, \cmd{ls}）
     \item 絶対パスと相対パスの考え方
     \item ファイルやディレクトリの作成・コピー・移動・削除
-    \item ファイルの中身の確認と、ファイルの探し方
+    \item ファイルの中身の確認と、テキストエディターによる編集、ファイルの探し方
     \item ワイルドカードとブレース展開を使った効率的な指定方法
   \end{itemize}
 \end{goalbox}
@@ -439,6 +439,115 @@ LOGO=ubuntu-logo
 $ tail -f ~/.ros/log/latest/launch.log
 \end{terminal}
 
+\section{ファイルを編集する}
+\label{sec:files-edit}
+
+ここまでは、ファイルを作ったり、中身を表示したりする方法を学びました。
+この後の章では、設定ファイルを書き換えたり、シェルスクリプトやプログラムを書いたりと、ファイルの中身を自分で編集する場面が増えていきます。
+ファイルの中身を編集するためのソフトウェアを\textbf{テキストエディタ}（以下、エディタ）といいます。
+ここでは、Ubuntu 24.04 に最初から入っている「\textbf{テキストエディター}」の使い方を学びます。
+ほかのエディタについては、\ref{chap:editor}章で紹介します。
+
+\subsection{テキストエディターを起動する}
+
+テキストエディターは、次のどの方法でも起動できます。
+
+\begin{itemize}
+  \item アクティビティ画面（\key{Super} キー、\ref{sec:linux-desktop}節）で「テキストエディター」と入力して起動する
+  \item ファイルマネージャ（「ファイル」）で、テキストファイルをダブルクリックする（または右クリックして「テキストエディターで開く」を選ぶ）
+  \item ターミナルから、\cmd{gnome-text-editor} コマンドに開きたいファイル名を指定して起動する
+\end{itemize}
+
+ターミナルで作業しているときは、3 つ目の方法が便利です。
+指定したファイルがなければ、その名前の新しいファイルとして開かれます（保存したときにファイルが作られます）。
+
+\begin{terminal}[ターミナルからテキストエディターを起動する]
+$ cd ~/practice
+$ gnome-text-editor memo.txt
+\end{terminal}
+
+起動すると、図\ref{fig:files-text-editor}のようなウィンドウが開きます。
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：Ubuntu 24.04 のテキストエディターで memo.txt を開き、行番号を表示した状態のスクリーンショット（ファイル名・保存ボタン・メニューボタンに番号を付ける）
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{files/text_editor.png}
+  \caption{Ubuntu のテキストエディター}
+  \label{fig:files-text-editor}
+\end{figure}
+
+\subsection{基本の操作}
+
+テキストエディターでは、ふつうのアプリケーションと同じように、マウスでカーソルを動かしてキーボードから文字を入力できます。
+よく使うキー操作は次のとおりです。
+
+\begin{center}
+  \begin{tabular}{ll}
+    \toprule
+    キー & 動作 \\
+    \midrule
+    \key{Ctrl}+\key{S} & 保存する \\
+    \key{Ctrl}+\key{Shift}+\key{S} & 名前を付けて保存する \\
+    \key{Ctrl}+\key{O} & ファイルを開く \\
+    \key{Ctrl}+\key{N} & 新しいファイルを作る（新しいタブが開く） \\
+    \key{Ctrl}+\key{F} & 文字列を検索する \\
+    \key{Ctrl}+\key{H} & 文字列を置換する \\
+    \key{Ctrl}+\key{Z} & 元に戻す \\
+    \key{Ctrl}+\key{W} & 今のタブを閉じる \\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+保存していない変更があるときは、ウィンドウの上部のファイル名の横に印が付きます。
+編集したら、こまめに \key{Ctrl}+\key{S} で保存する習慣をつけましょう。
+保存すれば、ターミナルで \cmd{cat memo.txt} を実行して、書いた内容を確かめられます。
+
+\subsection{プログラムを書くための設定}
+
+テキストエディターの右上のメニューボタンから「設定」を開くと、表示や編集の方法を変えられます。
+プログラムや設定ファイルを書くときは、次の設定をしておくと便利です。
+
+\begin{itemize}
+  \item \textbf{行番号を表示する}：エラーメッセージに「〇行目」と書かれていたときに、すぐにその行を探せます。
+  \item \textbf{インデントにスペースを使う}：タブ文字の代わりに半角スペースでインデントするようにし、幅を 4 にします。Python のプログラム（第IV部）を書くときに役立ちます。
+\end{itemize}
+
+\cmd{.py} や \cmd{.sh} などの拡張子のファイルを開くと、プログラムの文法に合わせて文字に色が付きます（シンタックスハイライト）。
+
+\subsection{隠しファイルやシステムのファイルを編集する}
+
+\cmd{\textasciitilde/.bashrc}（\ref{chap:env}章）のような隠しファイルも、ターミナルからファイル名を指定すれば、ほかのファイルと同じように開けます。
+
+\begin{terminal}[隠しファイルをテキストエディターで開く]
+$ gnome-text-editor ~/.bashrc
+\end{terminal}
+
+一方、\cmd{/etc} の下の設定ファイルのように、root しか書き込めないファイルは、テキストエディターで開いても保存できません。
+そのようなファイルを作るときは、まずホームディレクトリの中でファイルを作って保存し、それを \cmd{sudo cp}（\ref{chap:permission}章）でコピーする方法が安全です。
+
+\begin{caution}[ワープロでプログラムを書かない]
+  Word などの文書作成ソフト（ワープロ）は、文字のほかに、文字の大きさや色といった情報も一緒に保存します。
+  そのため、プログラムや設定ファイルを書くのには使えません。
+  プログラムや設定ファイルは、必ずテキストエディターのようなエディタで書きましょう。
+\end{caution}
+
+\begin{point}[ターミナルに戻ってこないとき]
+  ターミナルから \cmd{gnome-text-editor} を起動すると、テキストエディターを閉じるまで、ターミナルが次のコマンドを受け付けなくなることがあります。
+  そのときは、編集が終わったらテキストエディターを閉じるか、別のターミナルを開いて作業を続けましょう。
+  \cmd{gnome-text-editor memo.txt \&} のように最後に \cmd{\&} を付けると、テキストエディターを開いたまま、ターミナルで作業を続けられます（\ref{sec:process-job}節）。
+\end{point}
+
 \section{ファイルを探す}
 \label{sec:files-find}
 
@@ -616,6 +725,7 @@ $ rm -r ~/practice
   \item パスには、\cmd{/} から始まる絶対パスと、カレントディレクトリを起点とする相対パスがあります。\cmd{\textasciitilde} はホームディレクトリ、\cmd{.} はカレントディレクトリ、\cmd{..} は親ディレクトリを表します。
   \item \cmd{mkdir}, \cmd{touch}, \cmd{cp}, \cmd{mv}, \cmd{rm} で、ファイルやディレクトリを作成・コピー・移動・削除します。\cmd{rm} で消したファイルは元に戻せません。
   \item \cmd{cat}, \cmd{less}, \cmd{head}, \cmd{tail} でファイルの中身を確認します。
+  \item ファイルの中身は、Ubuntu に最初から入っている「テキストエディター」で編集できます。ターミナルからは \cmd{gnome-text-editor ファイル名} で起動します。
   \item \cmd{find} や \cmd{locate} でファイルを探します。
   \item ワイルドカードとブレース展開はシェルが展開するしくみで、複数のファイルをまとめて指定できます。
 \end{itemize}
