@@ -85,12 +85,12 @@ print(2 ** 10)   # 行の途中からコメントを書くこともできる
 \cmd{print( )} は、カッコの中の値を画面に表示する\textbf{関数}です（\ref{sec:python-basics-function}節）。
 スクリプトファイルで実行するときは、\cmd{print} を使わないと計算結果は表示されません。
 
-\subsection{練習問題}
-
-\begin{description}
-  \item[問 18.1] テンパズルに挑戦しましょう。\cmd{5}, \cmd{8}, \cmd{6}, \cmd{2} の 4 つの数字をこの順に並べ、間に演算子（\cmd{+}, \cmd{-}, \cmd{*}, \cmd{/}）とカッコを入れて、計算結果が 10 になる式を作ってください。
-  \item[問 18.2] ロボットが 200 秒間走りました。200 秒は何分何秒でしょうか。\cmd{//} と \cmd{\%} を使って計算してください。
-\end{description}
+\begin{exercise}
+\begin{enumerate}
+  \item テンパズルに挑戦しましょう。\cmd{5}, \cmd{8}, \cmd{6}, \cmd{2} の 4 つの数字をこの順に並べ、間に演算子（\cmd{+}, \cmd{-}, \cmd{*}, \cmd{/}）とカッコを入れて、計算結果が 10 になる式を作ってください。
+  \item ロボットが 200 秒間走りました。200 秒は何分何秒でしょうか。\cmd{//} と \cmd{\%} を使って計算してください。
+\end{enumerate}
+\end{exercise}
 
 \section{変数とデータ型}
 \label{sec:python-basics-variable}
@@ -257,13 +257,13 @@ print(f"面積は {radius * radius * 3.14} m^2 です")
   また、小数どうしを \cmd{==}（\ref{sec:python-basics-if}節）で比べると、誤差のせいで等しくならないことがあるので注意が必要です。
 \end{column}
 
-\subsection{練習問題}
-
-\begin{description}
-  \item[問 18.3] 所持金が 4000 円あります。本（980 円、税率 10\%）を 2 冊と、ポテトチップス（250 円、税率 8\%）とアイス（150 円、税率 8\%）を 1 つずつ買った後の所持金を計算してください。それぞれの値を、何の値かがわかる名前の変数に入れてから計算すること。結果は \cmd{round( )} で整数に丸めて表示してください。
-  \item[問 18.4] \cmd{input( )} で見たことのあるアニメの題名を入力し、「〇〇は△文字です。」と表示してください。文字数は \cmd{len(文字列)} で調べられます。
-  \item[問 18.5] ロボットの車輪の半径 [m] と、1 秒あたりの車輪の回転数を \cmd{input( )} で入力し、ロボットが進む速さ [m/s]（$2 \times 3.14 \times \text{半径} \times \text{回転数}$）を、小数点以下 2 桁まで表示してください。
-\end{description}
+\begin{exercise}
+\begin{enumerate}
+  \item 所持金が 4000 円あります。本（980 円、税率 10\%）を 2 冊と、ポテトチップス（250 円、税率 8\%）とアイス（150 円、税率 8\%）を 1 つずつ買った後の所持金を計算してください。それぞれの値を、何の値かがわかる名前の変数に入れてから計算すること。結果は \cmd{round( )} で整数に丸めて表示してください。
+  \item \cmd{input( )} で見たことのあるアニメの題名を入力し、「〇〇は△文字です。」と表示してください。文字数は \cmd{len(文字列)} で調べられます。
+  \item ロボットの車輪の半径 [m] と、1 秒あたりの車輪の回転数を \cmd{input( )} で入力し、ロボットが進む速さ [m/s]（$2 \times 3.14 \times \text{半径} \times \text{回転数}$）を、小数点以下 2 桁まで表示してください。
+\end{enumerate}
+\end{exercise}
 
 \section{リスト・タプル・辞書}
 \label{sec:python-basics-list}
@@ -394,14 +394,14 @@ print(params)
 辞書にないキーを指定するとエラーになります。
 \cmd{"max\_speed" in params} と書くと、そのキーがあるかどうかを確かめられます。
 
-\subsection{練習問題}
-
-\begin{description}
-  \item[問 18.6] \cmd{"green"}, \cmd{"blue"}, \cmd{"red"}, \cmd{"black"}, \cmd{"white"} の 5 つの要素を持つリストを作り、スライスを使って \cmd{['blue', 'red', 'black']} と表示してください。
-  \item[問 18.7] \cmd{["satou", "tanaka", "suzuki"]} というリストに \cmd{"itou"} を追加し、\cmd{"satou"} を削除してから、リスト全体とインデックス 1 の要素を表示してください。
-  \item[問 18.8] 3 人の身長 [cm] のリスト \cmd{[176, 158, 164]} から、平均の身長を計算して表示してください。
-  \item[問 18.9] ロボットの設定を表す辞書 \cmd{\{"name": "turtle", "max\_speed": 0.5\}} を作り、\cmd{max\_speed} を 0.8 に変更し、\cmd{"battery": 12.0} を追加して、「turtle の最高速度は 0.8 m/s」と表示してください。
-\end{description}
+\begin{exercise}
+\begin{enumerate}
+  \item \cmd{"green"}, \cmd{"blue"}, \cmd{"red"}, \cmd{"black"}, \cmd{"white"} の 5 つの要素を持つリストを作り、スライスを使って \cmd{['blue', 'red', 'black']} と表示してください。
+  \item \cmd{["satou", "tanaka", "suzuki"]} というリストに \cmd{"itou"} を追加し、\cmd{"satou"} を削除してから、リスト全体とインデックス 1 の要素を表示してください。
+  \item 3 人の身長 [cm] のリスト \cmd{[176, 158, 164]} から、平均の身長を計算して表示してください。
+  \item ロボットの設定を表す辞書 \cmd{\{"name": "turtle", "max\_speed": 0.5\}} を作り、\cmd{max\_speed} を 0.8 に変更し、\cmd{"battery": 12.0} を追加して、「turtle の最高速度は 0.8 m/s」と表示してください。
+\end{enumerate}
+\end{exercise}
 
 \section{条件分岐}
 \label{sec:python-basics-if}
@@ -491,14 +491,14 @@ False
   正しくは \cmd{x \% 5 == 2 or x \% 5 == 3} と書きます。
 \end{caution}
 
-\subsection{練習問題}
-
-\begin{description}
-  \item[問 18.10] \cmd{input( )} で 2 つの数値 a, b を入力し、「a の方が大きい」「b の方が大きい」「a と b は同じ」のいずれかを表示してください。
-  \item[問 18.11] 身長 [m] と体重 [kg] を入力して BMI（体重 ÷ 身長の 2 乗）を計算し、18.5 未満なら「やせ」、25 未満なら「標準」、30 未満なら「肥満」、それ以上なら「高度肥満」と表示してください。
-  \item[問 18.12] 入力した整数が偶数なら「偶数である」、さらにそれが 25 以上なら「25 以上である」と表示してください。また、偶数かどうかに関係なく、3 の倍数なら「3 の倍数である」と表示してください。
-  \item[問 18.13] ロボットのバッテリの電圧を入力し、12.0 V 以上なら「充電十分」、11.0 V 以上 12.0 V 未満なら「そろそろ充電」、11.0 V 未満なら「すぐに充電してください」と表示してください。ただし、0 V 以下や 15 V より大きい値が入力されたときは「センサの値が異常です」と表示すること。
-\end{description}
+\begin{exercise}
+\begin{enumerate}
+  \item \cmd{input( )} で 2 つの数値 a, b を入力し、「a の方が大きい」「b の方が大きい」「a と b は同じ」のいずれかを表示してください。
+  \item 身長 [m] と体重 [kg] を入力して BMI（体重 ÷ 身長の 2 乗）を計算し、18.5 未満なら「やせ」、25 未満なら「標準」、30 未満なら「肥満」、それ以上なら「高度肥満」と表示してください。
+  \item 入力した整数が偶数なら「偶数である」、さらにそれが 25 以上なら「25 以上である」と表示してください。また、偶数かどうかに関係なく、3 の倍数なら「3 の倍数である」と表示してください。
+  \item ロボットのバッテリの電圧を入力し、12.0 V 以上なら「充電十分」、11.0 V 以上 12.0 V 未満なら「そろそろ充電」、11.0 V 未満なら「すぐに充電してください」と表示してください。ただし、0 V 以下や 15 V より大きい値が入力されたときは「センサの値が異常です」と表示すること。
+\end{enumerate}
+\end{exercise}
 
 \section{繰り返し}
 \label{sec:python-basics-loop}
@@ -598,22 +598,22 @@ for i in range(5):
     print(random.randint(1, 6))
 \end{lstlisting}
 
-\subsection{練習問題}
-
-\begin{description}
-  \item[問 18.14] for 文を使って、1 から 30 までの整数の合計を計算して表示してください。
-  \item[問 18.15] リスト \cmd{[1, 62, 3, 6743, 51, 6783, 42, 4671, 5, 236]} から、1000 未満の値だけを表示してください。\cmd{continue} を使い、\cmd{print} は if 文の中に書かないこと。
-  \item[問 18.16] 整数を入力して、1 からその数までの棒グラフを表示してください（入力が 4 なら、下のように表示します）。\cmd{print("■", end="")} と書くと、改行せずに表示できます。また、\cmd{"■" * 3} のように文字列に整数を掛けると、文字列を繰り返せます。
+\begin{exercise}
+\begin{enumerate}
+  \item for 文を使って、1 から 30 までの整数の合計を計算して表示してください。
+  \item リスト \cmd{[1, 62, 3, 6743, 51, 6783, 42, 4671, 5, 236]} から、1000 未満の値だけを表示してください。\cmd{continue} を使い、\cmd{print} は if 文の中に書かないこと。
+  \item 整数を入力して、1 からその数までの棒グラフを表示してください（入力が 4 なら、下のように表示します）。\cmd{print("■", end="")} と書くと、改行せずに表示できます。また、\cmd{"■" * 3} のように文字列に整数を掛けると、文字列を繰り返せます。
 \begin{verbatim}
 1:■
 2:■■
 3:■■■
 4:■■■■
 \end{verbatim}
-  \item[問 18.17] 数を次々と入力し、負の数が入力されたら、それまでに入力された数の個数・合計・平均を表示してください。
-  \item[問 18.18] 数当てゲームを作りましょう。1 から 30 までの乱数を作り、5 回以内に当ててもらいます。外れたときは「それよりも大きいです」「それよりも小さいです」とヒントを出し、当たったら「正解です！」と表示して終了します。5 回で当てられなかったときは、正解を表示してください。
-  \item[問 18.19] じゃんけんのプログラムを作りましょう。グーを 0、チョキを 1、パーを 2 として自分の手を入力し、コンピュータの手を乱数で決めて、勝ち・負け・あいこを表示してください。ヒント：\cmd{(自分の手 - 相手の手 + 3) \% 3} を計算すると、あいこなら 0、負けなら 1、勝ちなら 2 になります。
-\end{description}
+  \item 数を次々と入力し、負の数が入力されたら、それまでに入力された数の個数・合計・平均を表示してください。
+  \item 数当てゲームを作りましょう。1 から 30 までの乱数を作り、5 回以内に当ててもらいます。外れたときは「それよりも大きいです」「それよりも小さいです」とヒントを出し、当たったら「正解です！」と表示して終了します。5 回で当てられなかったときは、正解を表示してください。
+  \item じゃんけんのプログラムを作りましょう。グーを 0、チョキを 1、パーを 2 として自分の手を入力し、コンピュータの手を乱数で決めて、勝ち・負け・あいこを表示してください。ヒント：\cmd{(自分の手 - 相手の手 + 3) \% 3} を計算すると、あいこなら 0、負けなら 1、勝ちなら 2 になります。
+\end{enumerate}
+\end{exercise}
 
 \section{関数}
 \label{sec:python-basics-function}
@@ -707,15 +707,15 @@ Traceback (most recent call last):
 NameError: name 'temp' is not defined
 \end{terminal}
 
-\subsection{練習問題}
-
-\begin{description}
-  \item[問 18.20] 「完璧を」「目指すよりも」「まずは」「終わらせろ」の 4 行を表示する関数を作り、3 回呼び出してください（ループは使わないこと）。
-  \item[問 18.21] 整数を 1 つ受け取り、偶数なら「偶数」、奇数なら「奇数」と表示する関数を作り、3 回以上呼び出してください。
-  \item[問 18.22] 3 つの数値を受け取り、その中で最も大きい数値を返す関数を作ってください。\cmd{max( )} を使わないこと。表示は関数の外で行うこと。
-  \item[問 18.23] リスト \cmd{[3, 62, 4, 56, 346, 8, 2, 893, 52, 46]} を受け取り、最大値と最小値の 2 つを返す関数を作ってください。表示は関数の外で行うこと。
-  \item[問 18.24] 距離のリストを受け取り、0 以上の値（正しく測れた値）だけの平均を返す関数を作ってください。正しい値が 1 つもないときは \cmd{None}（値がないことを表す特別な値）を返すこと。
-\end{description}
+\begin{exercise}
+\begin{enumerate}
+  \item 「完璧を」「目指すよりも」「まずは」「終わらせろ」の 4 行を表示する関数を作り、3 回呼び出してください（ループは使わないこと）。
+  \item 整数を 1 つ受け取り、偶数なら「偶数」、奇数なら「奇数」と表示する関数を作り、3 回以上呼び出してください。
+  \item 3 つの数値を受け取り、その中で最も大きい数値を返す関数を作ってください。\cmd{max( )} を使わないこと。表示は関数の外で行うこと。
+  \item リスト \cmd{[3, 62, 4, 56, 346, 8, 2, 893, 52, 46]} を受け取り、最大値と最小値の 2 つを返す関数を作ってください。表示は関数の外で行うこと。
+  \item 距離のリストを受け取り、0 以上の値（正しく測れた値）だけの平均を返す関数を作ってください。正しい値が 1 つもないときは \cmd{None}（値がないことを表す特別な値）を返すこと。
+\end{enumerate}
+\end{exercise}
 
 \section{練習問題の解答例}
 \label{sec:python-basics-answers}
@@ -724,11 +724,11 @@ NameError: name 'temp' is not defined
 同じ結果になれば、違う書き方でも構いません。
 
 \begin{description}
-  \item[問 18.1] たとえば \cmd{5 + 8 - 6 / 2} です（$6 / 2 = 3$ が先に計算されるので $5 + 8 - 3 = 10$）。\cmd{/} の計算結果は小数になるので、Python で実行すると \cmd{10.0} と表示されます。
-  \item[問 18.2] \cmd{200 // 60} で 3（分）、\cmd{200 \% 60} で 20（秒）なので、3 分 20 秒です。
+  \item[練習問題 18.1 (1)] たとえば \cmd{5 + 8 - 6 / 2} です（$6 / 2 = 3$ が先に計算されるので $5 + 8 - 3 = 10$）。\cmd{/} の計算結果は小数になるので、Python で実行すると \cmd{10.0} と表示されます。
+  \item[練習問題 18.1 (2)] \cmd{200 // 60} で 3（分）、\cmd{200 \% 60} で 20（秒）なので、3 分 20 秒です。
 \end{description}
 
-\begin{lstlisting}[style=python, caption={問 18.3 の解答例}, label={lst:python-basics-a3}]
+\begin{lstlisting}[style=python, caption={練習問題 18.2 (1) の解答例}, label={lst:python-basics-a3}]
 money = 4000
 book = 980
 chips = 250
@@ -740,34 +740,34 @@ total = book * 2 * (1 + book_tax) + (chips + ice) * (1 + food_tax)
 print(round(money - total))   # 1412
 \end{lstlisting}
 
-\begin{lstlisting}[style=python, caption={問 18.4・問 18.5 の解答例}, label={lst:python-basics-a4}]
-# 問 18.4
+\begin{lstlisting}[style=python, caption={練習問題 18.2 (2)・(3) の解答例}, label={lst:python-basics-a4}]
+# 練習問題 18.2 (2)
 title = input("アニメ名=> ")
 print(f"{title}は{len(title)}文字です。")
 
-# 問 18.5
+# 練習問題 18.2 (3)
 radius = float(input("車輪の半径 [m] => "))
 rps = float(input("1 秒あたりの回転数 => "))
 print(f"速さは {2 * 3.14 * radius * rps:.2f} m/s です")
 \end{lstlisting}
 
-\begin{lstlisting}[style=python, caption={問 18.6〜問 18.9 の解答例}, label={lst:python-basics-a6}]
-# 問 18.6
+\begin{lstlisting}[style=python, caption={練習問題 18.3 (1)〜(4) の解答例}, label={lst:python-basics-a6}]
+# 練習問題 18.3 (1)
 colors = ["green", "blue", "red", "black", "white"]
 print(colors[1:4])
 
-# 問 18.7
+# 練習問題 18.3 (2)
 members = ["satou", "tanaka", "suzuki"]
 members.append("itou")
 members.remove("satou")
 print(members)       # ['tanaka', 'suzuki', 'itou']
 print(members[1])    # suzuki
 
-# 問 18.8
+# 練習問題 18.3 (3)
 heights = [176, 158, 164]
 print(sum(heights) / len(heights))   # 166.0
 
-# 問 18.9
+# 練習問題 18.3 (4)
 robot = {"name": "turtle", "max_speed": 0.5}
 robot["max_speed"] = 0.8
 robot["battery"] = 12.0
@@ -776,8 +776,8 @@ print(f"{robot['name']} の最高速度は {robot['max_speed']} m/s")
 
 f 文字列の \cmd{\{ \}} の中で辞書のキーを書くときは、外側の \cmd{"} とぶつからないように \cmd{'} を使います。
 
-\begin{lstlisting}[style=python, caption={問 18.10〜問 18.13 の解答例}, label={lst:python-basics-a10}]
-# 問 18.10
+\begin{lstlisting}[style=python, caption={練習問題 18.4 (1)〜(4) の解答例}, label={lst:python-basics-a10}]
+# 練習問題 18.4 (1)
 a = float(input("a => "))
 b = float(input("b => "))
 if a > b:
@@ -787,7 +787,7 @@ elif a < b:
 else:
     print("a と b は同じ")
 
-# 問 18.11
+# 練習問題 18.4 (2)
 height = float(input("身長 [m] => "))
 weight = float(input("体重 [kg] => "))
 bmi = weight / height ** 2
@@ -801,7 +801,7 @@ elif bmi < 30:
 else:
     print("高度肥満")
 
-# 問 18.12
+# 練習問題 18.4 (3)
 num = int(input("整数 => "))
 if num % 2 == 0:
     print("偶数である")
@@ -810,7 +810,7 @@ if num % 2 == 0:
 if num % 3 == 0:
     print("3 の倍数である")
 
-# 問 18.13
+# 練習問題 18.4 (4)
 voltage = float(input("電圧 [V] => "))
 if voltage <= 0 or voltage > 15:
     print("センサの値が異常です")
@@ -822,28 +822,28 @@ else:
     print("すぐに充電してください")
 \end{lstlisting}
 
-問 18.12 のように、if 文の中に if 文を書くこともできます（インデントを 1 段深くします）。
+練習問題 18.4 (3) のように、if 文の中に if 文を書くこともできます（インデントを 1 段深くします）。
 
-\begin{lstlisting}[style=python, caption={問 18.14〜問 18.17 の解答例}, label={lst:python-basics-a14}]
-# 問 18.14
+\begin{lstlisting}[style=python, caption={練習問題 18.5 (1)〜(4) の解答例}, label={lst:python-basics-a14}]
+# 練習問題 18.5 (1)
 total = 0
 for i in range(1, 31):
     total += i
 print(total)   # 465
 
-# 問 18.15
+# 練習問題 18.5 (2)
 nums = [1, 62, 3, 6743, 51, 6783, 42, 4671, 5, 236]
 for n in nums:
     if n >= 1000:
         continue
     print(n)
 
-# 問 18.16
+# 練習問題 18.5 (3)
 n = int(input("数> "))
 for i in range(1, n + 1):
     print(f"{i}:" + "■" * i)
 
-# 問 18.17
+# 練習問題 18.5 (4)
 count = 0
 total = 0
 while True:
@@ -856,10 +856,10 @@ if count > 0:
     print(f"個数: {count} 合計: {total} 平均: {total / count}")
 \end{lstlisting}
 
-\begin{lstlisting}[style=python, caption={問 18.18・問 18.19 の解答例}, label={lst:python-basics-a18}]
+\begin{lstlisting}[style=python, caption={練習問題 18.5 (5)・(6) の解答例}, label={lst:python-basics-a18}]
 import random
 
-# 問 18.18
+# 練習問題 18.5 (5)
 answer = random.randint(1, 30)
 for i in range(5):
     guess = int(input("値を入力してください=> "))
@@ -872,7 +872,7 @@ for i in range(5):
         print("残念！それよりも小さいです！")
 print(f"正解は {answer} でした。")
 
-# 問 18.19
+# 練習問題 18.5 (6)
 hands = ["グー", "チョキ", "パー"]
 results = ["あいこ", "負け", "勝ち"]
 mine = int(input("あなたの手は？（0:グー, 1:チョキ, 2:パー）=> "))
@@ -881,11 +881,11 @@ print(f"あなた: {hands[mine]}  コンピュータ: {hands[computer]}")
 print(results[(mine - computer + 3) % 3])
 \end{lstlisting}
 
-問 18.19 では、手の名前や結果をリストに入れておき、インデックスで取り出しています。
+練習問題 18.5 (6) では、手の名前や結果をリストに入れておき、インデックスで取り出しています。
 if 文を何重にも書くよりも、短くわかりやすいプログラムになります。
 
-\begin{lstlisting}[style=python, caption={問 18.20〜問 18.24 の解答例}, label={lst:python-basics-a20}]
-# 問 18.20
+\begin{lstlisting}[style=python, caption={練習問題 18.6 (1)〜(5) の解答例}, label={lst:python-basics-a20}]
+# 練習問題 18.6 (1)
 def motto():
     print("完璧を")
     print("目指すよりも")
@@ -898,7 +898,7 @@ motto()
 motto()
 
 
-# 問 18.21
+# 練習問題 18.6 (2)
 def even_or_odd(num):
     if num % 2 == 0:
         print("偶数")
@@ -911,7 +911,7 @@ even_or_odd(20)
 even_or_odd(1)
 
 
-# 問 18.22
+# 練習問題 18.6 (3)
 def maximum(a, b, c):
     largest = a
     if b > largest:
@@ -924,7 +924,7 @@ def maximum(a, b, c):
 print(maximum(40, 23, 60))   # 60
 
 
-# 問 18.23
+# 練習問題 18.6 (4)
 def find_max_min(values):
     return max(values), min(values)
 
@@ -933,7 +933,7 @@ largest, smallest = find_max_min([3, 62, 4, 56, 346, 8, 2, 893, 52, 46])
 print(largest, smallest)   # 893 2
 
 
-# 問 18.24
+# 練習問題 18.6 (5)
 def valid_average(distances):
     valid = []
     for d in distances:

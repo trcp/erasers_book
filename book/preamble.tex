@@ -96,6 +96,16 @@
   title={コラム：#1}, fonttitle=\sffamily\bfseries,
 }
 
+% 練習問題：\begin{exercise}[label={ex:...}] \begin{enumerate} \item ... \end{enumerate} \end{exercise}
+% 章ごとに「練習問題 18.1」のように番号が振られ、中の問題は (1), (2), ... になる。ページをまたげる。
+\newtcolorbox[auto counter, number within=chapter]{exercise}[1][]{
+  enhanced, breakable,
+  colback=violet!3, colframe=violet!55!black, arc=2pt,
+  title={練習問題 \thetcbcounter}, fonttitle=\sffamily\bfseries,
+  before upper={\renewcommand{\labelenumi}{(\arabic{enumi})\hspace{0.5em}}\setlength{\leftmargini}{2.8em}},
+  #1
+}
+
 %% ---------- 共通マクロ ----------
 \newcommand{\cmd}[1]{\texttt{#1}}          % インラインのコマンド・ファイル名
 \newcommand{\key}[1]{\fbox{\small\texttt{#1}}} % キー入力 例: \key{Ctrl}+\key{C}
