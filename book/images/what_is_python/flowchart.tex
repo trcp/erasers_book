@@ -1,0 +1,22 @@
+% 図：障害物の前で止まるロボットのプログラムの流れ図（chapters/python/what_is_python.tex）
+\begin{tikzpicture}[
+    node distance=7mm,
+    proc/.style={figbox, minimum width=34mm},
+    term/.style={figbox, rounded corners=3mm, minimum width=24mm, fill=black!6},
+    decision/.style={draw, diamond, aspect=2.4, align=center, font=\small, fill=orange!10, inner sep=1pt}]
+  \node[term] (start) {開始};
+  \node[proc, below=of start] (read) {距離センサの値を読む};
+  \node[decision, below=of read] (check) {距離が 0.3 m\\より小さい？};
+  \node[proc, below left=9mm and -4mm of check] (stop) {モータを止める};
+  \node[proc, below right=9mm and -4mm of check] (go) {前に進む};
+  \draw[figarrow] (start) -- (read);
+  \draw[figarrow] (read) -- (check);
+  \draw[figarrow] (check.west) -| node[figlabel, above, pos=0.25]{はい} (stop.north);
+  \draw[figarrow] (check.east) -| node[figlabel, above, pos=0.25]{いいえ} (go.north);
+  \coordinate (join) at ($(stop.south)!0.5!(go.south) + (0,-0.6)$);
+  \draw[thick] (stop.south) |- (join);
+  \draw[thick] (go.south) |- (join);
+  \draw[figarrow] (join) -- ++(0,-0.3) -- ++(-4.2,0) |- node[figlabel, left, pos=0.25, text=green!50!black]{繰り返し} (read.west);
+  \node[figlabel, text=blue!60!black, anchor=west] at ([xshift=2mm]read.east) {順次};
+  \node[figlabel, text=orange!70!black, anchor=west] at ([xshift=1mm]check.east |- check.north) {分岐};
+\end{tikzpicture}

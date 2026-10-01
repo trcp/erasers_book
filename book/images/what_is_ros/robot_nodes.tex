@@ -1,0 +1,26 @@
+% 図：ロボットのソフトウェアをノードに分けた例（chapters/ros2/what_is_ros.tex）
+\begin{tikzpicture}[
+    node/.style={draw, ellipse, align=center, font=\footnotesize, fill=blue!8, minimum height=9mm, inner sep=1pt},
+    topic/.style={font=\scriptsize\ttfamily, text=black!70},
+    arr/.style={-{Stealth[length=2mm]}, thick}]
+  % 認識する（センサ）
+  \node[node, fill=green!10] (cam) at (0,1.3) {カメラ\\ドライバ};
+  \node[node, fill=green!10] (lidar) at (0,-0.2) {LiDAR\\ドライバ};
+  \node[node, fill=green!10] (odom) at (0,-1.7) {車輪の\\回転の計測};
+  % 考える
+  \node[node] (detect) at (3.3,1.3) {物体認識};
+  \node[node] (slam) at (3.3,-0.2) {地図作成・\\自己位置推定};
+  \node[node] (plan) at (6.3,-0.2) {経路計画};
+  % 動く
+  \node[node, fill=orange!12] (motor) at (6.3,-1.9) {モータ\\ドライバ};
+  \draw[arr] (cam) -- node[topic, above]{/image} (detect);
+  \draw[arr] (lidar) -- node[topic, above]{/scan} (slam);
+  \draw[arr] (odom) -- node[topic, below, sloped]{/odom} (slam);
+  \draw[arr] (slam) -- node[topic, above]{/map} (plan);
+  \draw[arr] (detect) -| node[topic, above, pos=0.25]{/objects} (plan);
+  \draw[arr] (plan) -- node[topic, right]{/cmd\_vel} (motor);
+  % 見出し
+  \node[font=\small\bfseries, text=green!40!black] at (0,2.4) {認識する};
+  \node[font=\small\bfseries, text=blue!60!black] at (4.8,2.4) {考える};
+  \node[font=\small\bfseries, text=orange!70!black] at (8.0,-1.9) {動く};
+\end{tikzpicture}

@@ -1,0 +1,11 @@
+% 図：ROS 2 のソフトウェアの層（chapters/ros2/what_is_ros.tex）
+\begin{tikzpicture}[layer/.style={draw, rounded corners=2pt, align=center, font=\small, minimum height=8mm, minimum width=92mm, inner sep=2pt}]
+  \node[layer, fill=green!8] (app) at (0,0) {自分で書くノード（Python / C++）};
+  \node[layer, fill=blue!8, below=1.5mm of app] (client) {クライアントライブラリ\quad \texttt{rclpy}（Python）・\texttt{rclcpp}（C++）};
+  \node[layer, fill=blue!14, below=1.5mm of client] (rcl) {\texttt{rcl}（共通の機能）};
+  \node[layer, fill=blue!20, below=1.5mm of rcl] (rmw) {\texttt{rmw}（通信の部分を取り替えるためのしくみ）};
+  \node[layer, fill=orange!12, below=1.5mm of rmw] (dds) {DDS の実装（Fast DDS・Cyclone DDS など）};
+  \node[layer, fill=black!6, below=1.5mm of dds] (os) {OS（Ubuntu）・ネットワーク};
+  \node[figlabel, anchor=west, text=black!60, align=left] at ([xshift=2mm]app.east) {本書で\\書く部分};
+  \node[figlabel, anchor=west, text=black!60, align=left] at ([xshift=2mm]dds.east) {通信を\\担当};
+\end{tikzpicture}
