@@ -4,26 +4,236 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item ロボットのソフトウェアがどのような部品でできているのか
+    \item ROS とは何か、何のために使うのか
+    \item ROS の歴史と、ROS 1 と ROS 2 の違い
+    \item ROS 2 のしくみと、通信を担う DDS の役割
+    \item ROS 2 のディストリビューションとサポート期間
   \end{itemize}
 \end{goalbox}
 
-\section{ロボットソフトウェアの構成要素}
+いよいよ第V部では、ROS 2 を使ってロボットを動かしていきます。
+この章では、実際に ROS 2 を触る前に、ROS とはどのようなもので、なぜロボット開発で広く使われているのかを見ていきます。
 
-TODO
+\section{ロボットソフトウェアの構成要素}
+\label{sec:what-is-ros-components}
+
+\subsection{ロボットのソフトウェアは部品の集まり}
+
+ロボットは、周りの様子をセンサで\textbf{認識し}、どう行動するかを\textbf{考え}、モータなどを使って\textbf{動く}、という 3 つのことを繰り返しています。
+たとえば、部屋の中を自動で移動するロボットのソフトウェアは、次のような部品に分けられます（図\ref{fig:what-is-ros-nodes}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/what_is_ros/robot_nodes}
+  \caption{移動ロボットのソフトウェアを部品（ノード）に分けた例。矢印はデータの流れを表す}
+  \label{fig:what-is-ros-nodes}
+\end{figure}
+
+\begin{description}
+  \item[認識する] カメラや LiDAR、車輪の回転を測るセンサなどから、データを読み取る部品
+  \item[考える] 画像から物体を見つける、地図を作って自分の位置を推定する、目的地までの経路を計画する、といった部品
+  \item[動く] 計画に従って、モータに指令を送る部品
+\end{description}
+
+これらの部品は、それぞれが独立したプログラムとして同時に動き、データをやり取りしながら協力して働きます。
+LiDAR の部品が測った距離のデータを、地図を作る部品が受け取り、その地図を使って経路を計画する部品が進む方向を決め、モータの部品がそれに従ってロボットを動かす、という具合です。
+
+\subsection{部品をつなぐしくみが必要}
+
+このようなソフトウェアを一から作ろうとすると、各部品の中身だけでなく、「部品どうしがどうやってデータをやり取りするか」という通信のしくみまで、自分で作らなければなりません。
+しかも、ロボットごと、研究室ごとに別々のしくみを作っていては、ほかの人が作った便利な部品を使い回すことができません。
+
+そこで、部品どうしをつなぐ共通のしくみと、よく使う部品や道具をまとめて提供してくれるのが、\textbf{ROS}（Robot Operating System、ロス）です。
+
+\subsection{ROS が提供するもの}
+
+ROS は「Operating System」という名前ですが、Linux のような OS ではありません。
+Linux（Ubuntu）の上で動き、ロボットのソフトウェアを作るための土台となる\textbf{ミドルウェア}（OS とアプリケーションの間に立つソフトウェア）や道具をまとめたものです。
+ROS は、主に次のものを提供しています。
+
+\begin{description}
+  \item[部品どうしの通信のしくみ]
+    ROS では、ロボットのソフトウェアの部品を\textbf{ノード}と呼びます。
+    ノードどうしは、\textbf{トピック}・\textbf{サービス}・\textbf{アクション}といった決まった方法でデータをやり取りします（\ref{chap:ros2_concepts}章）。
+    通信の細かい部分は ROS が引き受けてくれるので、開発者は各ノードの中身に集中できます。
+  \item[開発のための道具]
+    動いているノードやデータを確認するコマンド（\cmd{ros2} コマンド）、センサのデータや地図を 3D で表示する RViz（\ref{chap:tf_viz}章）、データを記録・再生する rosbag2（\ref{chap:debug}章）など、開発に役立つ道具が揃っています。
+  \item[たくさんのパッケージ]
+    世界中の開発者が作ったノードが、\textbf{パッケージ}として公開されています。
+    センサのドライバ、地図作成（SLAM）、自律移動（Navigation2）、ロボットアームの制御（MoveIt 2）など、すぐに使える部品がたくさんあり、組み合わせてロボットを作れます。
+  \item[シミュレータとの連携]
+    ロボットの実機がなくても、シミュレータ（Gazebo、\ref{chap:simulation}章）の中のロボットを、実機と同じプログラムで動かせます。
+\end{description}
+
+「1 つのことをうまくやる小さな部品を作り、それらを組み合わせる」という ROS の考え方は、\ref{sec:linux-history}節で紹介した UNIX 哲学にも通じています。
 
 \section{ROS の歴史と ROS 1 / ROS 2 の違い}
+\label{sec:what-is-ros-history}
 
-TODO
+\subsection{ROS の誕生}
+
+ROS の始まりは、2007 年ごろにアメリカのスタンフォード大学で行われていたロボットの研究にさかのぼります。
+その後、ロボットの研究開発を行う企業の Willow Garage が開発を引き継ぎ、2010 年に最初の正式なバージョンが公開されました。
+Willow Garage は、ROS を使って動く研究用のロボット PR2 を世界中の研究機関に提供し、ROS は研究者の間で急速に広まっていきました。
+
+ROS は最初から OSS（\ref{sec:linux-oss}節）として公開されていたので、世界中の研究者や開発者が自分の作ったパッケージを公開し、それをほかの人が改良して使う、という積み重ねが生まれました。
+現在は、Open Source Robotics Foundation（OSRF）を中心に、世界中の企業・大学・個人が参加するコミュニティによって開発が続けられています。
+ROS 2 の本体は、Apache 2.0 ライセンスで公開されています。
+
+\subsection{ROS 1 から ROS 2 へ}
+
+ROS が広く使われるようになると、研究用に作られた最初の ROS（現在は \textbf{ROS 1} と呼ばれます）では対応しにくい要望が増えてきました。
+たとえば、複数のロボットを連携させたい、製品として安全に使いたい、決められた時間内に確実に処理したい（リアルタイム性）、通信が不安定な環境でも動かしたい、といった要望です。
+
+そこで、ROS 1 の考え方を受け継ぎながら、しくみを根本から作り直したのが \textbf{ROS 2} です。
+ROS 2 の最初のバージョンは 2017 年に公開されました。
+ROS 1 は 2020 年に公開された Noetic が最後のバージョンで、そのサポートも 2025 年に終了しています。
+これから ROS を学ぶなら、ROS 2 を選びましょう。
+
+\subsection{ROS 1 と ROS 2 の主な違い}
+
+ROS 1 と ROS 2 の主な違いを、表にまとめておきます。
+
+\begin{tablebox}[ROS 1 と ROS 2 の主な違い][tab:what-is-ros-diff]
+  \begin{tabular}{p{0.2\linewidth}p{0.34\linewidth}p{0.34\linewidth}}
+    \toprule
+     & ROS 1 & ROS 2 \\
+    \midrule
+    ノードを見つけるしくみ & 中心となる「マスタ」（\cmd{roscore}）が必要 & マスタは不要。ノードどうしが自動で見つけ合う \\
+    通信のしくみ & ROS 独自の通信方式 & 産業界の標準規格である DDS を使う \\
+    通信の品質の設定 & ほとんど設定できない & QoS で細かく設定できる（\ref{chap:debug}章） \\
+    対応する OS & 主に Ubuntu & Ubuntu のほか、Windows や macOS にも対応 \\
+    Python & Python 2（後に Python 3） & Python 3 \\
+    ビルドの道具 & catkin & colcon（\ref{chap:workspace}章） \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+特に大きな違いは、ROS 1 では「マスタ」と呼ばれる中心のプログラムが止まると、すべてのノードの通信が止まってしまったのに対して、ROS 2 ではマスタがなく、ノードどうしが直接見つけ合って通信する点です。
+これにより、ROS 2 は、1 つのプログラムの故障がシステム全体に影響しにくい、より頑丈なしくみになっています。
+
+\begin{caution}[ROS 1 の情報に注意]
+  インターネットには、ROS 1 について書かれた情報もまだたくさん残っています。
+  ROS 1 と ROS 2 では、コマンドやプログラムの書き方が大きく異なります。
+  たとえば、ROS 1 では \cmd{rosrun} や \cmd{roslaunch}、\cmd{catkin\_make} といったコマンドを使いますが、ROS 2 では \cmd{ros2 run}、\cmd{ros2 launch}、\cmd{colcon build} を使います。
+  調べものをするときは、それが ROS 2 の情報かどうかを確かめましょう。
+  検索するときに「ROS 2」や、使っているディストリビューションの名前（「Jazzy」など）をキーワードに加えると、ROS 2 の情報が見つかりやすくなります。
+\end{caution}
 
 \section{ROS 2 のアーキテクチャと DDS}
+\label{sec:what-is-ros-architecture}
 
-TODO
+\subsection{ROS 2 の層の構造}
+
+ROS 2 は、いくつかの層を積み重ねた構造になっています（図\ref{fig:what-is-ros-architecture}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/what_is_ros/architecture}
+  \caption{ROS 2 のソフトウェアの層}
+  \label{fig:what-is-ros-architecture}
+\end{figure}
+
+\begin{description}
+  \item[自分で書くノード]
+    一番上は、私たちが書くプログラム（ノード）です。
+  \item[クライアントライブラリ]
+    ノードを書くためのライブラリで、Python 用の \cmd{rclpy} と、C++ 用の \cmd{rclcpp} があります。
+    本書では \cmd{rclpy} を使います（\ref{chap:rclpy}章）。
+  \item[rcl と rmw]
+    どの言語から使っても同じように動くように、共通の機能をまとめた層（\cmd{rcl}）と、その下の通信の部分を取り替えられるようにするための層（\cmd{rmw}）があります。
+  \item[DDS]
+    実際にネットワークを通じてデータを送り届けるのが、DDS という通信の層です。
+\end{description}
+
+ノードを書くときに意識するのは、一番上のクライアントライブラリだけです。
+下の層は、ROS 2 が自動で使ってくれます。
+
+\subsection{DDS}
+
+\textbf{DDS}（Data Distribution Service）は、データを必要としているプログラムに、データを効率よく、確実に届けるための通信の標準規格です。
+もともとは、軍事・航空・金融など、高い信頼性が求められる分野で使われてきました。
+ROS 2 は、通信のしくみを自分で作る代わりに、この実績のある規格を使っています。
+
+DDS には、次のような特徴があります。
+
+\begin{itemize}
+  \item 同じネットワークにいるノードどうしが、自動的にお互いを見つけて通信を始める（マスタが要らない）
+  \item 「データを送る側」と「データを受け取る側」が、お互いのことを知らなくても通信できる（\ref{chap:ros2_concepts}章のトピック）
+  \item 通信の信頼性や、古いデータを捨てるかどうかなどを、QoS（Quality of Service）で細かく設定できる
+\end{itemize}
+
+DDS にはいくつかの実装（製品）があり、Ubuntu 24.04 の ROS 2 Jazzy では、標準で Fast DDS が使われます。
+\cmd{rmw} の層があるおかげで、ノードのプログラムを書き換えずに、Cyclone DDS などのほかの実装に切り替えることもできます。
+
+\begin{point}[ネットワークと ROS 2]
+  DDS のおかげで、同じネットワークにつながっていれば、別々のコンピュータで動いているノードどうしも、自動で見つけ合って通信できます。
+  たとえば、ロボットの PC で動いているセンサのノードのデータを、手元の開発用 PC の RViz で表示する、といったことが簡単にできます（\ref{chap:network}章）。
+  一方で、同じネットワークの中にほかの人のロボットがいると、そのノードとも通信してしまうことがあります。
+  これを分けるための設定（\cmd{ROS\_DOMAIN\_ID}）については、\ref{chap:ros2_install}章で説明します。
+\end{point}
 
 \section{ディストリビューションとサポート期間}
+\label{sec:what-is-ros-distro}
 
-TODO
+\subsection{ROS 2 のディストリビューション}
+
+Linux に Ubuntu などのディストリビューションがあるように（\ref{sec:linux-distribution}節）、ROS 2 にも、特定の時点のバージョンをまとめた\textbf{ディストリビューション}があります。
+ROS 2 のディストリビューションには、「Jazzy Jalisco」のように、形容詞とカメの種類を組み合わせた名前が付けられています。
+名前の頭文字は、新しいディストリビューションが出るたびにアルファベット順に進んでいきます。
+ふだんは、最初の単語だけで「Jazzy」のように呼びます。
+
+新しいディストリビューションは、毎年 5 月に公開されます。
+偶数年の 5 月に公開されるディストリビューションは\textbf{LTS}（長期サポート）版で、5 年間サポートされます。
+それ以外のディストリビューションのサポート期間は 1 年半ほどです。
+LTS 版の ROS 2 は、同じ年に公開される Ubuntu の LTS 版に合わせて作られています（\ref{sec:linux-distribution}節）。
+
+最近の主なディストリビューションは、次のとおりです。
+
+\begin{tablebox}[最近の主な ROS 2 のディストリビューション][tab:what-is-ros-distros]
+  \begin{tabular}{llll}
+    \toprule
+    名前 & 公開 & 対応する Ubuntu & サポート \\
+    \midrule
+    Humble Hawksbill & 2022 年 5 月 & 22.04 & LTS（2027 年 5 月まで） \\
+    Jazzy Jalisco & 2024 年 5 月 & 24.04 & LTS（2029 年 5 月まで） \\
+    Kilted Kaiju & 2025 年 5 月 & 24.04 & 2026 年 12 月まで \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\subsection{本書で ROS 2 Jazzy を使う理由}
+
+本書では、\textbf{ROS 2 Jazzy Jalisco} を使います。
+
+\begin{itemize}
+  \item 本書で使う Ubuntu 24.04 LTS に合わせて作られた LTS 版で、2029 年までサポートされる
+  \item LTS 版なので、多くのパッケージが対応していて、インターネット上の情報も豊富にある
+\end{itemize}
+
+新しいディストリビューションが出ても、ROS 2 の基本的な考え方やコマンドはほとんど変わりません。
+本書で学んだことは、ほかのディストリビューションでもそのまま役に立ちます。
+
+\begin{caution}[ディストリビューションと Ubuntu の組み合わせ]
+  ROS 2 のディストリビューションごとに、対応する Ubuntu のバージョンが決まっています。
+  ROS 2 Jazzy は Ubuntu 24.04 用で、Ubuntu 22.04 には（公式には）インストールできません。
+  また、パッケージによっては、まだ新しいディストリビューションに対応していないこともあります。
+  インターネットの情報やパッケージを使うときは、どのディストリビューション向けのものかを確かめましょう（\ref{sec:what-is-ros-history}節の注意も参照）。
+\end{caution}
+
+\begin{column}{ROS とカメ}
+  ROS 2 のディストリビューションの名前には、必ずカメの種類が入っています。
+  これは、プログラミング教育で使われてきた「タートルグラフィックス」（画面の中のカメに命令を出して絵を描く）にちなんだもので、ROS のマスコットもカメです。
+  次の\ref{chap:ros2_install}章で動かす turtlesim も、画面の中のカメを ROS 2 で動かすシミュレータです。
+  毎年 5 月 23 日の「世界カメの日」に、新しいディストリビューションが公開されるのが恒例になっています。
+\end{column}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item ロボットのソフトウェアは、認識する・考える・動くための部品（ノード）が、データをやり取りしながら協力して動く構造になっています。
+  \item ROS は、ノードどうしの通信のしくみ、開発の道具、たくさんのパッケージをまとめて提供する、ロボットのソフトウェア開発の土台です。OS ではなく、Linux の上で動くミドルウェアです。
+  \item ROS 1 を作り直したのが ROS 2 です。ROS 2 ではマスタが不要になり、通信には産業界の標準規格である DDS を使います。これから学ぶなら ROS 2 を選び、調べものをするときは ROS 1 の情報と区別しましょう。
+  \item ROS 2 には、毎年 5 月に新しいディストリビューションが公開されます。偶数年の LTS 版は 5 年間サポートされ、本書では Ubuntu 24.04 に対応した LTS 版の Jazzy を使います。
+\end{itemize}
