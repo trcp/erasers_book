@@ -151,7 +151,7 @@ OSS だからといって、どのように使ってもよいわけではあり�
 OSS には、利用・改変・再配布の条件を定めた\textbf{ライセンス}が付いています。
 代表的なライセンスには、次のようなものがあります。
 
-\begin{center}
+\begin{tablebox}[代表的な OSS のライセンス][tab:linux-licenses]
   \begin{tabular}{lp{0.65\linewidth}}
     \toprule
     ライセンス & 特徴 \\
@@ -162,7 +162,7 @@ OSS には、利用・改変・再配布の条件を定めた\textbf{ライセ�
     Apache 2.0 & MIT に近い自由さに加え、特許の扱いを明確にしている（ROS 2、Gazebo など） \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 GPL のように、改変したものにも同じ自由を引き継がせるライセンスを\textbf{コピーレフト}型、MIT や Apache 2.0 のように条件がゆるやかなライセンスを\textbf{パーミッシブ}型と呼びます。
 
@@ -240,7 +240,7 @@ Linux カーネルと多くのソフトウェアは OSS なので、誰でも自
 ディストリビューションは、元になったディストリビューションによっていくつかの系統に分けられます。
 同じ系統のディストリビューションは、ソフトウェアのインストール方法（\textbf{パッケージ管理システム}）などが共通しています（\ref{chap:package}章）。
 
-\begin{center}
+\begin{tablebox}[ディストリビューションの主な系統][tab:linux-distributions]
   \begin{tabular}{lp{0.6\linewidth}}
     \toprule
     系統 & 主なディストリビューションと特徴 \\
@@ -250,7 +250,7 @@ Linux カーネルと多くのソフトウェアは OSS なので、誰でも自
     その他 & Arch Linux、openSUSE など \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \subsection{Ubuntu}
 
@@ -268,7 +268,7 @@ Ubuntu は毎年 4 月と 10 月の 2 回、新しいバージョンがリリー
 また、各バージョンには、形容詞と動物の名前を組み合わせたコードネームが付いています。
 コードネームの頭文字は、バージョンが上がるごとにアルファベット順に進んでいきます。
 
-\begin{center}
+\begin{tablebox}[Ubuntu のバージョンと ROS 2 の対応][tab:linux-ubuntu-versions]
   \begin{tabular}{lll}
     \toprule
     バージョン & コードネーム & 対応する主な ROS 2 \\
@@ -278,7 +278,7 @@ Ubuntu は毎年 4 月と 10 月の 2 回、新しいバージョンがリリー
     Ubuntu 24.04 LTS & Noble Numbat & ROS 2 Jazzy \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 コマンドやインターネット上の情報では、\cmd{noble} や \cmd{jammy} のように、コードネームの最初の単語を小文字にしてバージョンを表すことがよくあります。
 
@@ -542,7 +542,7 @@ Ubuntu 24.04 には、\textbf{GNOME}（グノーム）という\textbf{デスク
 キーボードの \key{Super} キーは、Windows のロゴが描かれたキーのことです。
 次のショートカットキーを覚えておくと、マウスを使わずに素早く操作できます。
 
-\begin{center}
+\begin{tablebox}[GNOME の便利なショートカットキー][tab:linux-shortcuts]
   \begin{tabular}{ll}
     \toprule
     キー & 動作 \\
@@ -556,7 +556,7 @@ Ubuntu 24.04 には、\textbf{GNOME}（グノーム）という\textbf{デスク
     \key{Print} & スクリーンショットを撮る \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 ターミナルとエディタを画面の左右に並べて作業することが多いので、\key{Super}+\key{\(\leftarrow\)} / \key{\(\rightarrow\)} は特に便利です。
 

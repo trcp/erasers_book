@@ -166,7 +166,7 @@ root@3f2a1b4c5d6e:/# exit
 
 \cmd{docker run} のよく使うオプションは、次のとおりです。
 
-\begin{center}
+\begin{tablebox}[\cmd{docker run} のよく使うオプション][tab:docker-run-options]
   \begin{tabular}{lp{0.6\linewidth}}
     \toprule
     オプション & 意味 \\
@@ -179,7 +179,7 @@ root@3f2a1b4c5d6e:/# exit
     \cmd{-d} & バックグラウンドで動かす \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \subsection{コンテナの管理}
 
@@ -201,7 +201,7 @@ $ docker start test
 $ docker exec -it test bash
 \end{terminal}
 
-\begin{center}
+\begin{tablebox}[Docker のよく使うコマンド][tab:docker-commands]
   \begin{tabular}{lp{0.55\linewidth}}
     \toprule
     コマンド & 動作 \\
@@ -216,7 +216,7 @@ $ docker exec -it test bash
     \cmd{docker rmi イメージ} & イメージを削除する \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{caution}[コンテナの中の変更は消える]
   コンテナの中で作ったファイルやインストールしたソフトウェアは、そのコンテナを削除すると消えてしまいます。
@@ -341,7 +341,7 @@ $ docker run -it --rm --network host --ipc host my_ros:jazzy
 ROS 2 には、Docker Hub で公式のイメージが用意されています。
 用途に合わせて、次のようなイメージを選びます。
 
-\begin{center}
+\begin{tablebox}[ROS 2 の公式イメージ][tab:docker-ros-images]
   \begin{tabular}{lp{0.55\linewidth}}
     \toprule
     イメージ & 内容 \\
@@ -351,7 +351,7 @@ ROS 2 には、Docker Hub で公式のイメージが用意されています。
     \cmd{osrf/ros:jazzy-desktop} & RViz などの GUI ツールやデモも含む \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 試しに、2 つのターミナルでそれぞれコンテナを動かし、ROS 2 のデモのノードどうしを通信させてみましょう。
 自分の PC に ROS 2 をインストールしていなくても、ROS 2 を体験できます。

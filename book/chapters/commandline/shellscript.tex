@@ -99,7 +99,7 @@ echo "backup_${NOW}.tar.gz"
 
 スクリプトを実行するときに渡した引数は、スクリプトの中で次の特別な変数を使って受け取れます。
 
-\begin{center}
+\begin{tablebox}[引数を受け取るための特別な変数][tab:shellscript-args]
   \begin{tabular}{lp{0.6\linewidth}}
     \toprule
     変数 & 内容 \\
@@ -110,7 +110,7 @@ echo "backup_${NOW}.tar.gz"
     \cmd{"\$@"} & すべての引数 \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{lstlisting}[style=bash, caption={引数を受け取る（greet.sh）}, label={lst:shellscript-args}]
 #!/usr/bin/env bash
@@ -176,7 +176,7 @@ fi
 最後は \cmd{fi}（\cmd{if} を逆から書いたもの）で閉じます。
 \cmd{[ ]} の中で使える主な条件は、次のとおりです。
 
-\begin{center}
+\begin{tablebox}[\cmd{[ ]} の中で使える主な条件][tab:shellscript-test]
   \begin{tabular}{lp{0.6\linewidth}}
     \toprule
     条件 & 意味 \\
@@ -191,7 +191,7 @@ fi
     \cmd{! 条件} & 条件が成り立たない \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \cmd{[ ]} の代わりに、コマンドをそのまま条件として書くこともできます。
 その場合は、コマンドが成功したかどうか（\ref{sec:shellscript-exit}節）で判断されます。

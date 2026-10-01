@@ -235,7 +235,7 @@ user@robot:~$
 
 Ubuntu の標準のプロンプトは、図\ref{fig:terminal-prompt}と次の表のような要素でできています。
 
-\begin{center}
+\begin{tablebox}[プロンプトの各部分の意味][tab:terminal-prompt]
   \begin{tabular}{ll}
     \toprule
     部分 & 意味 \\
@@ -248,7 +248,7 @@ Ubuntu の標準のプロンプトは、図\ref{fig:terminal-prompt}と次の表
     \cmd{\$} & 一般ユーザであることを表す記号 \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 ユーザ名とホスト名は、自分の環境に合わせて読み替えてください。
 プロンプトに表示される情報は、次のコマンドでも確認できます。
@@ -452,7 +452,7 @@ $ man ls
 man ページは、次のキーで操作します。
 特に、\textbf{終了するときは \key{q}} は必ず覚えておきましょう。
 
-\begin{center}
+\begin{tablebox}[man ページの操作][tab:terminal-man-keys]
   \begin{tabular}{ll}
     \toprule
     キー & 動作 \\
@@ -464,7 +464,7 @@ man ページは、次のキーで操作します。
     \key{q} & 終了する \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 man ページは、おおむね次のような見出しで構成されています。
 
@@ -627,7 +627,7 @@ PING localhost (127.0.0.1) 56(84) bytes of data.
 ほかにも、次のようなキー操作がよく使われます。
 最初からすべてを覚える必要はないので、必要になったときにこの表を見返してください。
 
-\begin{center}
+\begin{tablebox}[ターミナルで便利なキー操作][tab:terminal-keys]
   \begin{tabular}{lp{0.45\linewidth}}
     \toprule
     キー & 動作 \\
@@ -644,7 +644,7 @@ PING localhost (127.0.0.1) 56(84) bytes of data.
     \key{Ctrl}+\key{Shift}+\key{C} / \key{V} & コピー / 貼り付け \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 ターミナルを閉じるときは、ウィンドウの閉じるボタンを押すか、\cmd{exit} と入力します。
 

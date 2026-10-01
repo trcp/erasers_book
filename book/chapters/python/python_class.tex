@@ -444,7 +444,7 @@ $ python3 speed_input.py
 \cmd{except} の後ろには、捕まえたい例外の種類を書きます。
 よく出てくる例外には、次のようなものがあります。
 
-\begin{center}
+\begin{tablebox}[よく出てくる例外][tab:python-class-exceptions]
   \begin{tabular}{lp{0.6\linewidth}}
     \toprule
     例外 & 発生する場面 \\
@@ -458,7 +458,7 @@ $ python3 speed_input.py
     \cmd{KeyboardInterrupt} & \key{Ctrl}+\key{C} が押された \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \cmd{except:} のように例外の種類を書かないと、すべての例外を捕まえてしまいます。
 プログラムの誤り（打ち間違いなど）まで隠してしまい、原因がわかりにくくなるので、できるだけ捕まえたい例外の種類を書きましょう。
@@ -519,7 +519,7 @@ Python には、\textbf{PEP 8} というコーディングの決まり（スタ�
 
 名前の付け方にも、次のような決まりがあります。
 
-\begin{center}
+\begin{tablebox}[PEP 8 の名前の付け方][tab:python-class-naming]
   \begin{tabular}{lll}
     \toprule
     種類 & 書き方 & 例 \\
@@ -529,7 +529,7 @@ Python には、\textbf{PEP 8} というコーディングの決まり（スタ�
     定数（変えない値） & 大文字をアンダースコアでつなぐ & \cmd{WHEEL\_RADIUS} \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 また、ファイルの中は、次の順番で書くと読みやすくなります。
 
@@ -588,7 +588,7 @@ VS Code（\ref{sec:editor-vscode}節）でも、拡張機能を入れておく�
 
 よく出会うエラーと、主な原因は次のとおりです。
 
-\begin{center}
+\begin{tablebox}[よく出会うエラーと主な原因][tab:python-class-errors]
   \begin{tabular}{lp{0.6\linewidth}}
     \toprule
     エラー & 主な原因 \\
@@ -600,7 +600,7 @@ VS Code（\ref{sec:editor-vscode}節）でも、拡張機能を入れておく�
     \cmd{IndexError} & リストのインデックスが範囲外（0 から始まることを忘れたなど） \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 エラーメッセージをそのままインターネットで検索すると、同じエラーで困った人の情報が見つかることもよくあります。
 

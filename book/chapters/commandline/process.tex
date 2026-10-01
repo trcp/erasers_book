@@ -151,7 +151,7 @@ $ bg %1
 \key{Ctrl}+\key{C} や \key{Ctrl}+\key{Z} も、実はフォアグラウンドのプロセスにシグナルを送る操作です。
 よく使うシグナルには、次のようなものがあります。
 
-\begin{center}
+\begin{tablebox}[よく使うシグナル][tab:process-signals]
   \begin{tabular}{llp{0.5\linewidth}}
     \toprule
     シグナル & 番号 & 意味 \\
@@ -163,7 +163,7 @@ $ bg %1
     \cmd{SIGHUP} & 1 & 端末が切断された。ターミナルを閉じると送られる \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \cmd{SIGINT} や \cmd{SIGTERM} を受け取ったプログラムは、ファイルを保存したり、モータを止めたりといった後片付けをしてから終了できます。
 ROS 2 のノードも、\key{Ctrl}+\key{C}（\cmd{SIGINT}）を受け取ると、きちんと終了処理を行ってから終了するように作られています。
@@ -258,7 +258,7 @@ Linux では、システムやサービス（バックグラウンドで動き�
 このログは \cmd{journalctl} で見ることができます。
 ログは長いので、次のようなオプションで絞り込んで使います。
 
-\begin{center}
+\begin{tablebox}[\cmd{journalctl} のよく使うオプション][tab:process-journalctl]
   \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
     \toprule
     コマンド & 表示する内容 \\
@@ -270,7 +270,7 @@ Linux では、システムやサービス（バックグラウンドで動き�
     \cmd{journalctl --since "10 min ago"} & 直近 10 分間のログ \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 サービスが動いているかどうかは、\cmd{systemctl status} で確認できます。
 

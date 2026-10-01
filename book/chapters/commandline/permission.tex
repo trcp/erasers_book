@@ -61,7 +61,7 @@ drwxr-xr-x 2 user user 4096 Sep 30 10:00 scripts
 
 \cmd{r}, \cmd{w}, \cmd{x} の意味は、ファイルとディレクトリで少し異なります。
 
-\begin{center}
+\begin{tablebox}[ファイルとディレクトリでの権限の意味][tab:permission-rwx]
   \begin{tabular}{lp{0.35\linewidth}p{0.35\linewidth}}
     \toprule
     権限 & ファイルの場合 & ディレクトリの場合 \\
@@ -71,7 +71,7 @@ drwxr-xr-x 2 user user 4096 Sep 30 10:00 scripts
     \cmd{x} & プログラムとして実行できる & \cmd{cd} で中に入れる \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 シェルスクリプト（\ref{chap:shellscript}章）や Python のスクリプト（\ref{sec:python-run}節）を \cmd{./start\_robot.sh} のように直接実行するには、ファイルに \cmd{x} の権限が必要です。
 権限がないと、次のようなエラーになります。
@@ -101,7 +101,7 @@ $ chmod +x start_robot.sh       # 誰にも指定しないと、全員に追加
 
 \textbf{数字で指定する方法}では、\cmd{r} を 4、\cmd{w} を 2、\cmd{x} を 1 として、所有者・グループ・その他のそれぞれについて足し算した数字を 3 桁並べて書きます。
 
-\begin{center}
+\begin{tablebox}[\cmd{chmod} の数字による指定の例][tab:permission-numeric]
   \begin{tabular}{llll}
     \toprule
     数字 & 表記 & 意味 & よく使う場面 \\
@@ -112,7 +112,7 @@ $ chmod +x start_robot.sh       # 誰にも指定しないと、全員に追加
     \cmd{600} & \cmd{rw-------} & 所有者だけが読み書きできる & 秘密鍵など \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{terminal}[数字で権限を変える]
 $ chmod 755 start_robot.sh
@@ -240,7 +240,7 @@ $ sudo usermod -aG dialout $USER
 
 ロボット開発では、\cmd{dialout} のほかに、次のようなグループがよく出てきます。
 
-\begin{center}
+\begin{tablebox}[ロボット開発でよく出てくるグループ][tab:permission-groups]
   \begin{tabular}{lp{0.6\linewidth}}
     \toprule
     グループ & 使えるようになるもの \\
@@ -251,7 +251,7 @@ $ sudo usermod -aG dialout $USER
     \cmd{docker} & \cmd{sudo} なしでの \cmd{docker} コマンド（\ref{chap:docker}章） \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \subsection{udev でデバイスの設定を固定する}
 

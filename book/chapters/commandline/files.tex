@@ -58,7 +58,7 @@ boot  etc  lib   media  opt  root  sbin  srv   tmp  var
 
 \cmd{ls} には多くのオプションがありますが、まずは次の 3 つを覚えておきましょう。
 
-\begin{center}
+\begin{tablebox}[\cmd{ls} のよく使うオプション][tab:files-ls-options]
   \begin{tabular}{lp{0.75\linewidth}}
     \toprule
     オプション & 意味 \\
@@ -68,7 +68,7 @@ boot  etc  lib   media  opt  root  sbin  srv   tmp  var
     \cmd{-h} & \cmd{-l} と組み合わせ、サイズを K, M などの単位で表示する \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{terminal}[詳しい情報を表示する]
 $ ls -lh
@@ -123,7 +123,7 @@ $ pwd
 
 \cmd{cd} には、次のような便利な使い方があります。
 
-\begin{center}
+\begin{tablebox}[\cmd{cd} の便利な使い方][tab:files-cd]
   \begin{tabular}{ll}
     \toprule
     コマンド & 移動先 \\
@@ -134,7 +134,7 @@ $ pwd
     \cmd{cd -} & 直前にいたディレクトリ \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{terminal}[cd の便利な使い方]
 $ cd /usr/share
@@ -209,7 +209,7 @@ $ cat Documents/memo.txt               # 相対パス
 
 パスの中では、次の記号を使えます。
 
-\begin{center}
+\begin{tablebox}[パスの中で使える特別な記号][tab:files-path-symbols]
   \begin{tabular}{ll}
     \toprule
     記号 & 意味 \\
@@ -219,7 +219,7 @@ $ cat Documents/memo.txt               # 相対パス
     \cmd{..} & 1 つ上のディレクトリ（親ディレクトリ） \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \cmd{ls -a} で表示された \cmd{.} と \cmd{..} は、これらを表していたのです。
 \cmd{..} は重ねて使うこともできます。
@@ -492,7 +492,7 @@ $ gnome-text-editor memo.txt
 テキストエディターでは、ふつうのアプリケーションと同じように、マウスでカーソルを動かしてキーボードから文字を入力できます。
 よく使うキー操作は次のとおりです。
 
-\begin{center}
+\begin{tablebox}[テキストエディターのよく使うキー操作][tab:files-editor-keys]
   \begin{tabular}{ll}
     \toprule
     キー & 動作 \\
@@ -507,7 +507,7 @@ $ gnome-text-editor memo.txt
     \key{Ctrl}+\key{W} & 今のタブを閉じる \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 保存していない変更があるときは、ウィンドウの上部のファイル名の横に印が付きます。
 編集したら、こまめに \key{Ctrl}+\key{S} で保存する習慣をつけましょう。
@@ -575,7 +575,7 @@ $ find /opt/ros/jazzy -name "*.launch.py"
 
 \cmd{find} では、ほかにも次のような条件を指定できます。
 
-\begin{center}
+\begin{tablebox}[\cmd{find} で指定できる主な条件][tab:files-find-conditions]
   \begin{tabular}{ll}
     \toprule
     条件 & 意味 \\
@@ -586,7 +586,7 @@ $ find /opt/ros/jazzy -name "*.launch.py"
     \cmd{-type d} & ディレクトリだけを探す \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{terminal}[ディレクトリだけを探す]
 $ find ~/practice -type d
@@ -624,7 +624,7 @@ $ locate turtlesim_node
 
 \textbf{ワイルドカード}は、ファイル名のパターンを表す特別な記号です。
 
-\begin{center}
+\begin{tablebox}[ワイルドカード][tab:files-wildcard]
   \begin{tabular}{ll}
     \toprule
     記号 & 意味 \\
@@ -635,7 +635,7 @@ $ locate turtlesim_node
     \cmd{[0-9]} & \cmd{0} から \cmd{9} までのどれか 1 文字 \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 練習用のファイルを作って試してみましょう。
 
@@ -730,7 +730,7 @@ $ rm -r ~/practice
   \item ワイルドカードとブレース展開はシェルが展開するしくみで、複数のファイルをまとめて指定できます。
 \end{itemize}
 
-\begin{center}
+\begin{tablebox}[この章で学んだコマンド][tab:files-commands]
   \begin{tabular}{ll}
     \toprule
     コマンド & 働き \\
@@ -749,4 +749,4 @@ $ rm -r ~/practice
     \cmd{find} / \cmd{locate} & ファイルを探す \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}

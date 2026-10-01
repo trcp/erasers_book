@@ -114,7 +114,7 @@ $ sudo apt install python3-pip python3-venv
 
 pip のよく使うコマンドは、次のとおりです。
 
-\begin{center}
+\begin{tablebox}[pip のよく使うコマンド][tab:python-env-pip]
   \begin{tabular}{p{0.5\linewidth}p{0.42\linewidth}}
     \toprule
     コマンド & 動作 \\
@@ -126,7 +126,7 @@ pip のよく使うコマンドは、次のとおりです。
     \cmd{pip show パッケージ名} & パッケージの詳しい情報を表示する \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{caution}[Ubuntu 24.04 では仮想環境の中で使う]
   Ubuntu 24.04 では、仮想環境の外で \cmd{pip install} を実行すると、\cmd{externally-managed-environment} というエラーになり、パッケージをインストールできません。

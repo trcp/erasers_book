@@ -196,7 +196,7 @@ $ grep ERROR robot.log
 2026-09-30 10:00:12 [ERROR] motor: overcurrent
 \end{terminal}
 
-\begin{center}
+\begin{tablebox}[\cmd{grep} のよく使うオプション][tab:text-pipe-grep]
   \begin{tabular}{lp{0.6\linewidth}}
     \toprule
     オプション & 意味 \\
@@ -208,7 +208,7 @@ $ grep ERROR robot.log
     \cmd{-r} & ディレクトリの中のすべてのファイルを検索する \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{terminal}[grep のオプションを使う]
 $ grep -n lidar robot.log

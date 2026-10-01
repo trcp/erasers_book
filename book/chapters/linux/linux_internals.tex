@@ -105,7 +105,7 @@ Linux のディレクトリ構成は、FHS（Filesystem Hierarchy Standard）と
 そのため、ディストリビューションが違っても、どのディレクトリに何が置かれているかはほぼ共通しています。
 主なディレクトリの役割は次のとおりです。
 
-\begin{center}
+\begin{tablebox}[Linux の主なディレクトリ][tab:linux-internals-dirs]
   \begin{tabular}{lp{0.68\linewidth}}
     \toprule
     ディレクトリ & 役割 \\
@@ -125,7 +125,7 @@ Linux のディレクトリ構成は、FHS（Filesystem Hierarchy Standard）と
     \cmd{/media}, \cmd{/mnt} & USB メモリなどのストレージをマウントする場所 \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 最初からすべてを覚える必要はありません。
 ロボット開発では、まずは次のディレクトリを覚えておくとよいでしょう。
@@ -295,7 +295,7 @@ ROS 2 では、\cmd{ros2 run} などのコマンドでノードを起動する�
 
 ロボット開発でよく目にするデバイスファイルには、次のようなものがあります。
 
-\begin{center}
+\begin{tablebox}[ロボット開発でよく目にするデバイスファイル][tab:linux-internals-devices]
   \begin{tabular}{lp{0.52\linewidth}}
     \toprule
     デバイスファイル & 対応するデバイス \\
@@ -308,7 +308,7 @@ ROS 2 では、\cmd{ros2 run} などのコマンドでノードを起動する�
     \cmd{/dev/null} & 書き込んだデータをすべて捨てる特別なファイル \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 末尾の数字は、同じ種類のデバイスをつないだ順に 0, 1, 2, \ldots と付けられます。
 たとえば、USB シリアルの機器を 2 つつなぐと、\cmd{/dev/ttyUSB0} と \cmd{/dev/ttyUSB1} ができます。

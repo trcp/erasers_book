@@ -57,7 +57,7 @@ Python では、数値と演算子を組み合わせて計算ができます。
 
 ほかにも、次のような演算子があります。
 
-\begin{center}
+\begin{tablebox}[四則演算以外の演算子][tab:python-basics-operators]
   \begin{tabular}{lll}
     \toprule
     演算子 & 意味 & 例 \\
@@ -67,7 +67,7 @@ Python では、数値と演算子を組み合わせて計算ができます。
     \cmd{\%} & 割り算のあまり & \cmd{10 \% 3} は 1 \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \cmd{\%} は、ある数が偶数かどうか（2 で割ったあまりが 0 かどうか）を調べるときなどによく使います。
 
@@ -133,7 +133,7 @@ print(count)        # 2 と表示される
 よく使う型は次のとおりです。
 値の型は、\cmd{type( )} 関数で確かめられます。
 
-\begin{center}
+\begin{tablebox}[よく使うデータ型][tab:python-basics-types]
   \begin{tabular}{llp{0.45\linewidth}}
     \toprule
     型 & 意味 & 例 \\
@@ -144,7 +144,7 @@ print(count)        # 2 と表示される
     \cmd{bool} & 真偽値（\ref{sec:python-basics-if}節） & \cmd{True}, \cmd{False} \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{terminal}[値の型を調べる]
 >>> type(10)
@@ -320,7 +320,7 @@ print(len(distances))   # 要素の数
 
 リストの要素は、後から変更したり、追加・削除したりできます。
 
-\begin{center}
+\begin{tablebox}[リストの要素を変更・追加・削除する方法][tab:python-basics-list-methods]
   \begin{tabular}{lp{0.55\linewidth}}
     \toprule
     書き方 & 動作 \\
@@ -332,7 +332,7 @@ print(len(distances))   # 要素の数
     \cmd{リスト.remove(値)} & 指定した値の要素を削除する \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{terminal}[要素を変更・追加・削除する]
 >>> sensors = ["camera", "lidar"]
@@ -446,7 +446,7 @@ $ python3 obstacle.py
 条件は、主に次の\textbf{比較演算子}で書きます。
 比較の結果は、成り立つときは \cmd{True}（真）、成り立たないときは \cmd{False}（偽）になります。
 
-\begin{center}
+\begin{tablebox}[比較演算子][tab:python-basics-comparison]
   \begin{tabular}{ll}
     \toprule
     演算子 & 意味 \\
@@ -457,7 +457,7 @@ $ python3 obstacle.py
     \cmd{a <= b} / \cmd{a >= b} & a が b 以下 / 以上 \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 「等しい」は \cmd{=} ではなく \cmd{==} と書くことに注意しましょう（\cmd{=} は代入です）。
 
@@ -465,7 +465,7 @@ $ python3 obstacle.py
 
 複数の条件を組み合わせるときは、\textbf{論理演算子}を使います。
 
-\begin{center}
+\begin{tablebox}[論理演算子][tab:python-basics-logical]
   \begin{tabular}{ll}
     \toprule
     演算子 & 意味 \\
@@ -475,7 +475,7 @@ $ python3 obstacle.py
     \cmd{not a} & a が成り立たない \\
     \bottomrule
   \end{tabular}
-\end{center}
+\end{tablebox}
 
 \begin{terminal}[論理演算子]
 >>> battery = 11.5

@@ -110,6 +110,20 @@
   title={TIPS：#1}, fonttitle=\sffamily\bfseries,
 }
 
+% 本文中の表：前後に余白を空け、表の上にキャプション（表 5.1 など）を付ける
+%   \begin{tablebox}[キャプション][tab:ラベル] \begin{tabular}{ll} ... \end{tabular} \end{tablebox}
+%   キャプションを省略すると、番号なしの表になる
+\usepackage{capt-of}
+\NewDocumentEnvironment{tablebox}{o o}{%
+  \par\addvspace{\bigskipamount}%
+  \noindent\begin{minipage}{\linewidth}% キャプションと表を同じページに置く
+  \centering
+  \IfValueT{#1}{\captionof{table}{#1}\IfValueT{#2}{\label{#2}}}%
+}{%
+  \end{minipage}%
+  \par\addvspace{\bigskipamount}%
+}
+
 % 練習問題：\begin{exercise}[label={ex:...}] \begin{enumerate} \item ... \end{enumerate} \end{exercise}
 % 章ごとに「練習問題 18.1」のように番号が振られ、中の問題は (1), (2), ... になる。ページをまたげる。
 \newtcolorbox[auto counter, number within=chapter]{exercise}[1][]{
