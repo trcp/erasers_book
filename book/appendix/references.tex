@@ -1,4 +1,49 @@
 \chapter{参考文献・オンラインリソース}
 \label{app:references}
 
-TODO
+本書の内容をさらに深めたり、困ったときに調べたりするための情報源をまとめました。
+インターネットの情報は、古いバージョンのものも多いので、Ubuntu や ROS 2 のバージョン（本書では Ubuntu 24.04 と ROS 2 Jazzy）に合っているかを確かめながら読みましょう。
+URL は、本書の執筆時点のものです。
+
+\section{公式のドキュメント}
+\label{sec:references-official}
+
+ソフトウェアの使い方を調べるときは、まず公式のドキュメントを見るのが確実です。
+
+\begin{description}
+  \item[ROS 2 Documentation（Jazzy）] ROS 2 の公式のドキュメントです。インストールの方法から、本書で扱った内容を含むチュートリアル、各機能の詳しい説明まで載っています。本書を読み終えたら、まずはここのチュートリアルを順に進めるのがおすすめです。\\\url{https://docs.ros.org/en/jazzy/}
+  \item[Navigation2 Documentation] Navigation2 の使い方や設定の方法の説明です。\\\url{https://docs.nav2.org/}
+  \item[Gazebo Documentation] Gazebo の使い方の説明です。本書で使った Harmonic のドキュメントを選んで読みましょう。\\\url{https://gazebosim.org/docs}
+  \item[ROBOTIS e-Manual（TurtleBot3）] TurtleBot3 の使い方の説明です。ROS 2 のバージョンごとに、シミュレーションや実機の手順が載っています。\\\url{https://emanual.robotis.com/docs/en/platform/turtlebot3/overview/}
+  \item[Ubuntu のドキュメント] Ubuntu の使い方の公式の説明です。\\\url{https://help.ubuntu.com/}
+  \item[Python ドキュメント] Python の公式のドキュメントです。日本語のチュートリアルもあります。\\\url{https://docs.python.org/ja/3/}
+  \item[Pro Git] Git の使い方を詳しく説明した本で、Web で無料で読めます（日本語版もあります）。\\\url{https://git-scm.com/book/ja/v2}
+  \item[Visual Studio Code Documentation] VS Code の使い方の説明です。\\\url{https://code.visualstudio.com/docs}
+  \item[Docker Docs] Docker の使い方の説明です。\\\url{https://docs.docker.com/}
+\end{description}
+
+\section{質問と情報交換の場所}
+\label{sec:references-community}
+
+調べてもわからないときは、質問してみましょう。
+質問する前に、同じ質問がすでにないかを検索し、何をしたのか、何が起きたのか、エラーメッセージ、使っている環境を書くようにしましょう（\ref{sec:practice-next}節）。
+
+\begin{description}
+  \item[Robotics Stack Exchange] ROS を含むロボットの技術についての、英語の質問と回答のサイトです。\\\url{https://robotics.stackexchange.com/}
+  \item[ROS Discourse] ROS の開発者や利用者が、ニュースや情報を交換している英語のフォーラムです。\\\url{https://discourse.ros.org/}
+  \item[ROS Index] ROS のパッケージを検索できるサイトです。パッケージのリポジトリやドキュメントへのリンクが載っています。\\\url{https://index.ros.org/}
+  \item[ROS Japan Users Group] 日本の ROS の利用者のコミュニティです。勉強会などが開かれています。\\\url{https://rosjp.connpass.com/}
+\end{description}
+
+\section{書籍}
+\label{sec:references-books}
+
+本書の次に読む本の例です。
+ROS 2 や Python の本は、扱っているバージョンが本書と違うことがあるので、注意して読みましょう。
+
+\begin{itemize}
+  \item 近藤豊『ROS2ではじめよう 次世代ロボットプログラミング』技術評論社, 2019.
+  \item 出村公成・萩原良信・升谷保博・タン ジェフリー トゥ チュアン『ROS2とPythonで作って学ぶAIロボット入門』講談社, 2022.
+  \item Francisco Martín Rico, \textit{A Concise Introduction to Robot Programming with ROS2}, CRC Press, 2022.
+  \item Sebastian Thrun, Wolfram Burgard, Dieter Fox, \textit{Probabilistic Robotics}, MIT Press, 2005.（自己位置推定や SLAM の理論の定番の教科書。日本語訳『確率ロボティクス』もあります）
+\end{itemize}

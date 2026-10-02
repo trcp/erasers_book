@@ -1,4 +1,75 @@
 \chapter{トラブルシューティング集}
 \label{app:troubleshooting}
 
-TODO
+本書の内容を試していて、うまくいかなかったときに確かめてほしいことをまとめました。
+ここにない問題に出会ったときは、まずエラーメッセージをよく読み（\ref{sec:python-class-debug}節）、エラーメッセージをそのまま検索してみましょう。
+同じ問題に出会った人が、解決方法を書いていることがよくあります。
+
+\section{VirtualBox と Ubuntu}
+\label{sec:troubleshooting-vm}
+
+\begin{description}
+  \item[仮想マシンが起動しない] パソコンの BIOS（UEFI）の設定で、仮想化支援機能（Intel VT-x や AMD-V）が有効になっているかを確かめます（\ref{sec:linux-setup}節）。Windows では、Hyper-V などのほかの仮想化の機能と競合することもあります。
+  \item[画面が小さい・ウィンドウに合わせて大きさが変わらない] Guest Additions をインストールします（\ref{sec:linux-first-setup}節）。インストールした後は、仮想マシンを再起動します。
+  \item[ホストとの間でコピー・貼り付けができない] Guest Additions をインストールし、VirtualBox のメニューの「デバイス」→「クリップボードの共有」を「双方向」にします。
+  \item[動作がとても遅い] 仮想マシンに割り当てる CPU のコア数とメモリを増やします（ホストのパソコンの半分程度まで）。ほかのアプリを閉じるのも効果があります。
+  \item[USB の機器（センサやマイコン）が認識されない] VirtualBox のメニューの「デバイス」→「USB」で、使う機器にチェックを入れて、仮想マシンにつなぎます。認識されたら、\cmd{ls /dev/tty*} でデバイスファイルを確かめ、権限も確認します（\ref{sec:permission-device}節）。
+  \item[日本語を入力できない] 画面右上の入力メソッドで「日本語（Mozc）」が選ばれているかを確かめ、\key{半角/全角} キーで切り替えます。
+\end{description}
+
+\section{コマンドとシェル}
+\label{sec:troubleshooting-shell}
+
+\begin{description}
+  \item[\cmd{command not found} と表示される] コマンド名の打ち間違いがないかを確かめます。正しければ、そのコマンドのパッケージがインストールされていないか、\cmd{PATH}（\ref{sec:env-variable}節）が通っていません。Ubuntu では、インストールすべきパッケージの名前が一緒に表示されることがあります。
+  \item[\cmd{Permission denied} と表示される] ファイルの権限が足りません。\cmd{ls -l} で権限を確かめます（\ref{sec:permission-read}節）。スクリプトなら \cmd{chmod +x} で実行の権限を付け、システムのファイルなら \cmd{sudo} を使います。ただし、何でも \cmd{sudo} で済ませるのはやめましょう。
+  \item[\cmd{.bashrc} を書き換えたのに反映されない] \cmd{source \textasciitilde/.bashrc} を実行するか、ターミナルを開き直します（\ref{sec:env-bashrc}節）。
+  \item[\cmd{.bashrc} を書き換えたら、ターミナルでエラーが出るようになった] 書き加えた行を見直します。ターミナルがうまく開かないときは、テキストエディターで \cmd{\textasciitilde/.bashrc} を開いて直します（隠しファイルは \key{Ctrl}+\key{H} で表示できます）。
+  \item[コマンドが終わらず、入力を受け付けない] \key{Ctrl}+\key{C} で止めます。\cmd{>} が表示されているときは、クォートやかっこが閉じていない可能性があります。
+\end{description}
+
+\section{パッケージのインストール}
+\label{sec:troubleshooting-apt}
+
+\begin{description}
+  \item[\cmd{Could not get lock /var/lib/dpkg/lock} と表示される] ほかの apt や、Ubuntu の自動更新が動いています。しばらく待ってから、やり直します（\ref{sec:package-apt}節）。
+  \item[\cmd{Unable to locate package} と表示される] \cmd{sudo apt update} を忘れていないか、パッケージ名の打ち間違いがないかを確かめます。ROS 2 のパッケージなら、ROS 2 のリポジトリが追加されているかを確かめます（\ref{sec:ros2-install-install}節）。
+  \item[\cmd{GPG error} や \cmd{NO\_PUBKEY} と表示される] リポジトリの鍵が登録されていないか、古くなっています。そのリポジトリのインストール手順に従って、鍵を登録し直します（\ref{sec:package-repository}節）。
+  \item[\cmd{pip install} で \cmd{externally-managed-environment} と表示される] Ubuntu 24.04 では、システムの Python に pip で直接インストールできません。apt・pipx・仮想環境のどれかを使います（\ref{sec:python-pep668}節）。
+\end{description}
+
+\section{Git と GitHub}
+\label{sec:troubleshooting-git}
+
+\begin{description}
+  \item[\cmd{Permission denied (publickey)} と表示される] SSH の鍵が GitHub に登録されていないか、使われていません。\cmd{ssh -T git@github.com} で接続を確かめます（\ref{sec:git-github}節）。
+  \item[\cmd{CONFLICT} と表示されてマージが止まった] 同じ場所を別々に変更したため、コンフリクトが起きています。\cmd{git status} で対象のファイルを確かめ、\cmd{<<<<<<<} から \cmd{>>>>>>>} の部分を直して、\cmd{git add} と \cmd{git commit} をします（\ref{sec:git-branch}節）。
+  \item[\cmd{git push} が \cmd{rejected} になる] リモートに、手元にない新しいコミットがあります。先に \cmd{git pull} で取り込んでから、もう一度 push します。
+  \item[コミットしてはいけないファイル（パスワードなど）をコミットしてしまった] push する前なら \cmd{git reset} などで取り消せます。push してしまった場合は、そのパスワードや鍵を無効にして作り直すことを優先しましょう。履歴から消しても、すでに誰かに見られている可能性があります。
+\end{description}
+
+\section{Python}
+\label{sec:troubleshooting-python}
+
+\begin{description}
+  \item[\cmd{IndentationError} と表示される] インデントがそろっていません。スペースとタブが混ざっていないかも確かめます。VS Code では、空白を表示する設定にすると見つけやすくなります（\ref{sec:python-class-style}節）。
+  \item[\cmd{ModuleNotFoundError} と表示される] モジュールの名前の打ち間違いか、パッケージがインストールされていません。仮想環境を使っているなら、有効になっているかを確かめます（\ref{sec:python-venv}節）。ROS 2 のメッセージ型なら、\cmd{source} を忘れていないかを確かめます。
+  \item[\cmd{NameError} や \cmd{AttributeError} と表示される] 変数・関数・メソッドの名前の打ち間違いが多い原因です。クラスの中では、\cmd{self.} を付け忘れていないかも確かめます（\ref{sec:python-class-class}節）。
+\end{description}
+
+\section{ROS 2}
+\label{sec:troubleshooting-ros2}
+
+ROS 2 のトラブルの調べ方は、\ref{sec:debug-trouble}節にもまとめています。
+
+\begin{description}
+  \item[\cmd{ros2: command not found} と表示される] \cmd{source /opt/ros/jazzy/setup.bash} を実行します。毎回必要なら、\cmd{.bashrc} に書いておきます（\ref{sec:ros2-install-setup}節）。
+  \item[\cmd{Package '〇〇' not found} と表示される] ワークスペースのパッケージなら、ビルドした後に \cmd{source install/local\_setup.bash} を実行します（\ref{sec:workspace-overlay}節）。apt のパッケージなら、インストールされているかを確かめます。
+  \item[自分のノードを追加したのに \cmd{ros2 run} で見つからない] \cmd{setup.py} の \cmd{entry\_points} に登録して、ビルドし直します（\ref{sec:rclpy-first}節）。
+  \item[\cmd{colcon build} でエラーになる] 最初に出たエラーを読みます。依存パッケージが足りないときは、\cmd{rosdep install} を実行します（\ref{sec:workspace-rosdep}節）。それでも直らないときは、\cmd{build}・\cmd{install}・\cmd{log} を削除して、ビルドし直してみます。
+  \item[別のパソコンや仮想マシンとの間で、ノードが見えない] \cmd{ROS\_DOMAIN\_ID} と \cmd{ROS\_AUTOMATIC\_}\allowbreak\cmd{DISCOVERY\_RANGE} をそろえ、VirtualBox のネットワークをブリッジアダプターにします。ファイアウォールが通信を止めていないかも確かめます（\ref{sec:ros2-install-network}節）。
+  \item[トピックがあるのに、データが届かない] \cmd{ros2 topic info -v} で、型と QoS がパブリッシャとサブスクライバで合っているかを確かめます（\ref{sec:debug-qos}節）。
+  \item[RViz2 や Gazebo の画面が真っ黒・すぐに終了する] 仮想マシンの 3D の表示が原因のことが多いです。\cmd{export LIBGL\_ALWAYS\_SOFTWARE=1} を試します（\ref{sec:tf-viz-rviz}節）。
+  \item[RViz2 に何も表示されない] 「Fixed Frame」が正しいか、表示のトピック名が合っているかを確かめます。シミュレーションでは、RViz2 も \cmd{use\_sim\_time:=true} で起動します（\ref{sec:simulation-sensor}節）。
+  \item[TurtleBot3 のシミュレーションで、ロボットが動かない] \cmd{ros2 topic info /cmd\_vel} で型を確かめます。Jazzy の TurtleBot3 は \cmd{TwistStamped} を使います（\ref{sec:simulation-turtlebot3}節）。
+\end{description}

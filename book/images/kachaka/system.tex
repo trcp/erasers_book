@@ -1,0 +1,13 @@
+% 図：カチャカと ROS 2 のつながり（chapters/ros2/kachaka.tex）
+\begin{tikzpicture}[blk/.style={draw, rounded corners=3pt, align=center, font=\small, minimum height=12mm, inner sep=4pt},
+    msg/.style={font=\scriptsize\ttfamily, align=center}]
+  \node[blk, fill=orange!10, minimum width=26mm] (k) at (0,0) {カチャカ\\{\scriptsize LiDAR・カメラ・}\\{\scriptsize スピーカ・車輪}};
+  \node[blk, fill=green!10, minimum width=30mm] (e) at (4.6,0) {erasers\_kachaka\\{\scriptsize gRPC と ROS 2 の}\\{\scriptsize 変換・便利な機能}};
+  \node[blk, fill=blue!8, minimum width=26mm] (n) at (9.2,0) {自分のノード\\{\scriptsize RViz2 など}};
+  \draw[figarrow, <->] (k) -- node[above, font=\scriptsize]{kachaka API} node[below, font=\scriptsize]{（gRPC）} (e);
+  \draw[figarrow, <->] (e) -- node[above, font=\scriptsize]{ROS 2 の} node[below, font=\scriptsize]{トピック} (n);
+  \node[msg, below=2mm of n, xshift=-2mm] {/er\_kachaka/lidar/scan\\/er\_kachaka/kachaka\_speak\\…};
+  \node[font=\scriptsize, text=black!60] at (0,1.05) {ロボットの中のコンピュータ};
+  \node[font=\scriptsize, text=black!60] at (6.95,1.05) {自分のパソコン（LAN でつなぐ）};
+  \draw[dashed, black!40, rounded corners=4pt] (2.85,-1.75) rectangle (11.1,1.35);
+\end{tikzpicture}

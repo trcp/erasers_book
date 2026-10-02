@@ -1,0 +1,17 @@
+% 図：Gazebo と ROS 2 のつながり（chapters/ros2/simulation.tex）
+\begin{tikzpicture}[blk/.style={draw, rounded corners=3pt, align=center, font=\small, minimum height=10mm, inner sep=4pt},
+    msg/.style={font=\scriptsize\ttfamily, midway, fill=white, inner sep=1pt}]
+  \node[blk, fill=orange!10, minimum width=34mm, minimum height=34mm] (gz) at (0,0) {};
+  \node[font=\small\bfseries, anchor=north] at (gz.north) {Gazebo};
+  \node[blk, fill=white, font=\scriptsize, minimum width=28mm] at (0,0.15) {ロボットのモデル\\（車輪・LiDAR・\\カメラ・IMU）};
+  \node[font=\scriptsize, anchor=south] at (gz.south) {物理法則で動きを計算};
+  \node[blk, fill=green!10, minimum width=24mm, minimum height=34mm] (br) at (4.4,0) {ros\_gz\_bridge\\[2pt]{\scriptsize メッセージを}\\{\scriptsize 変換して中継}};
+  \node[blk, fill=blue!8, minimum width=30mm, minimum height=34mm] (ros) at (9.6,0) {};
+  \node[font=\small\bfseries, anchor=north] at (ros.north) {ROS 2 のノード};
+  \node[font=\scriptsize, align=center] at (9.6,-0.1) {teleop\\自作のノード\\SLAM、Nav2\\RViz2};
+  \draw[figarrow] ([yshift=11mm]br.east) -- node[msg, above=1pt]{/scan, /odom} ([yshift=11mm]ros.west);
+  \draw[figarrow] ([yshift=4mm]br.east) -- node[msg, above=1pt]{/imu, /clock} ([yshift=4mm]ros.west);
+  \draw[figarrow] ([yshift=-11mm]ros.west) -- node[msg, below=1pt]{/cmd\_vel} ([yshift=-11mm]br.east);
+  \draw[figarrow] ([yshift=8mm]gz.east) -- node[font=\scriptsize, above=1pt, midway]{センサ} ([yshift=8mm]br.west);
+  \draw[figarrow] ([yshift=-11mm]br.west) -- node[font=\scriptsize, below=1pt, midway]{速度の指令} ([yshift=-11mm]gz.east);
+\end{tikzpicture}

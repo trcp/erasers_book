@@ -1,0 +1,454 @@
+\chapter{実践：カチャカを動かす}
+\label{chap:kachaka}
+
+% この章で学ぶこと
+\begin{goalbox}
+  \begin{itemize}
+    \item 家庭用ロボット「カチャカ」と、それを ROS 2 で動かすしくみ
+    \item カチャカとパソコンをネットワークでつなぐ方法
+    \item erasers\_kachaka を使って、カチャカを ROS 2 のロボットとして起動する方法
+    \item 実際のロボットを動かし、話させ、カメラと LiDAR のデータを読む方法
+    \item シミュレーションで作ったノードを、実際のロボットで動かす方法
+  \end{itemize}
+\end{goalbox}
+
+\ref{chap:practice}章では、シミュレーションの中で移動ロボットを動かしました。
+この章では、いよいよ\textbf{本物のロボット}を動かします。
+使うのは、Preferred Robotics 社の家庭用ロボット\textbf{カチャカ}です。
+ここまでに学んだトピック・メッセージ型・QoS・名前空間・パラメータなどの知識が、実際のロボットでもそのまま使えることを確かめていきましょう。
+
+\begin{caution}[実際のロボットを動かすときの注意]
+  実際のロボットは、プログラムの誤りで思わぬ動きをすることがあります。
+  \begin{itemize}
+    \item ロボットの周りに、十分な広さの空間を確保する
+    \item 段差や階段の近く、人や物の多い場所では動かさない
+    \item いつでもロボットを止められるように、止め方（\ref{sec:kachaka-move}節）を先に確かめておく
+    \item 研究室や授業で使うときは、決められたルールに従う
+  \end{itemize}
+\end{caution}
+
+\section{カチャカとは}
+\label{sec:kachaka-intro}
+
+\subsection{カチャカ}
+
+\textbf{カチャカ}（kachaka）は、Preferred Robotics 社が開発した、家庭用の移動ロボットです。
+専用の棚（シェルフ）の下にもぐり込んで持ち上げ、指示した場所まで運ぶことができます。
+スマートフォンのアプリや、「ねえカチャカ、〇〇に行って」のような声で指示して使います（図\ref{fig:kachaka-robot}）。
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：カチャカの本体の写真（LiDAR が入っている前面上部のリングと、前のカメラの位置がわかるもの）
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.6\linewidth]{kachaka/kachaka.png}
+  \caption{カチャカ}
+  \label{fig:kachaka-robot}
+\end{figure}
+
+カチャカは家庭用の製品ですが、中身は本格的な自律移動ロボットです。
+\ref{chap:simulation}章の TurtleBot3 と同じように、LiDAR・カメラ・車輪などを持ち、地図を作って自分の位置を推定しながら移動します。
+
+\begin{tablebox}[カチャカの主な部品][tab:kachaka-parts]
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    部品 & 役割 \\
+    \midrule
+    LiDAR & 周りの物までの距離を測る。本体の前面上部の、丸いリングの中に入っている \\
+    カメラ & 前と後ろにあり、周りの様子や物を見る \\
+    ToF カメラ & 前方の物までの距離を、面で測る \\
+    スピーカ & 声で話す \\
+    車輪 & 左右 2 つの車輪で、前後に進んだり、その場で回ったりする \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\subsection{カチャカを ROS 2 で動かすしくみ}
+
+カチャカには、開発者がプログラムからカチャカを操作するための \textbf{kachaka API} が用意されています。
+kachaka API は、gRPC という通信のしくみを使っていて、そのままでは ROS 2 のトピックとしては扱えません。
+そこで、kachaka API と ROS 2 の間を中継するソフトウェアを使います（図\ref{fig:kachaka-system}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/kachaka/system}
+  \caption{カチャカと ROS 2 のつながり}
+  \label{fig:kachaka-system}
+\end{figure}
+
+この本では、玉川大学のロボットチーム eR@sers が開発している \textbf{erasers\_kachaka} を使います。
+erasers\_kachaka は、Preferred Robotics 社が公開している ROS 2 のブリッジ（kachaka-api）をもとに、発話のトピックや、LiDAR のデータを扱いやすくする処理、地図作り・自律移動のための設定などを加えたパッケージの集まりです。
+erasers\_kachaka を起動すると、カチャカのセンサのデータや操作のためのトピックが、\cmd{/er\_kachaka} という名前空間（\ref{sec:launch-namespace}節）の下に用意されます。
+
+\ref{sec:simulation-bridge}節で、ros\_gz\_bridge が Gazebo と ROS 2 をつないでいたのと同じ考え方です。
+自分のノードから見れば、シミュレーションのロボットも、カチャカも、トピックを持ったノードの集まりに見えます。
+
+\section{パソコンとつなぐ}
+\label{sec:kachaka-connect}
+
+\subsection{同じネットワークにつなぐ}
+
+パソコンとカチャカは、ネットワークでつながっている必要があります（\ref{chap:network}章）。
+カチャカと同じネットワークに、パソコンを Wi-Fi か有線 LAN でつなぎます。
+研究室などでは、カチャカに小さなルータを載せておき、パソコンと LAN ケーブルでつなぐ方法もよく使われます。
+無線より通信が安定するので、カメラの画像のような大きなデータも遅れにくくなります。
+
+VirtualBox を使っている場合は、仮想マシンのネットワークの設定を\textbf{ブリッジアダプター}にして、カチャカとつながっているほうのネットワークの機器（有線 LAN なら Ethernet のアダプター）を選びます（\ref{sec:ros2-install-network}節）。
+
+\subsection{カチャカの IP アドレスを調べる}
+
+カチャカの IP アドレスは、カチャカに「ねえカチャカ、IP アドレスを教えて」と話しかけると、声で教えてくれます。
+研究室や授業で使う場合は、カチャカごとに決められた IP アドレスを、担当者に確かめてください。
+
+調べた IP アドレスに、\cmd{ping}（\ref{sec:network-check}節）で通信できるかを確かめましょう。
+
+\begin{terminal}[カチャカと通信できるかを確かめる]
+$ ping 192.168.0.10
+PING 192.168.0.10 (192.168.0.10) 56(84) bytes of data.
+64 bytes from 192.168.0.10: icmp_seq=1 ttl=64 time=1.52 ms
+64 bytes from 192.168.0.10: icmp_seq=2 ttl=64 time=1.31 ms
+...
+\end{terminal}
+
+\cmd{192.168.0.10} の部分は、自分のカチャカの IP アドレスに置き換えてください。
+\cmd{time=} の応答が返ってくれば、通信できています。
+\key{Ctrl}+\key{C} で止めます。
+応答がないときは、IP アドレスと、パソコンや VirtualBox のネットワークの設定を確かめます。
+
+\section{erasers\_kachaka を用意する}
+\label{sec:kachaka-setup}
+
+\subsection{インストールする}
+
+erasers\_kachaka は、\ref{sec:workspace-colcon}節と同じように、ソースコードからワークスペースでビルドします。
+erasers\_kachaka が使うほかのリポジトリ（kachaka-api など）は、\textbf{vcstool} の \cmd{vcs import} で、リストに書かれたものをまとめてダウンロードします。
+vcstool は、\ref{sec:ros2-install-install}節でインストールした \cmd{ros-dev-tools} に含まれています。
+
+\begin{terminal}[erasers\_kachaka をダウンロードしてビルドする]
+$ cd ~/ros2_ws/src
+$ git clone https://github.com/trcp/erasers_kachaka.git
+$ vcs import . < erasers_kachaka/depends.repos
+$ cd ~/ros2_ws
+$ rosdep install -i --from-path src --rosdistro jazzy -y
+$ colcon build --symlink-install --packages-up-to erasers_kachaka_bringup
+$ source install/local_setup.bash
+\end{terminal}
+
+\cmd{--packages-up-to}（\ref{sec:workspace-colcon}節）で、起動に必要なパッケージだけをビルドしています。
+パッケージが多いので、ビルドには時間がかかります。
+
+\begin{caution}[最新の手順を確かめる]
+  erasers\_kachaka は、今も開発が続いているソフトウェアです。
+  必要な Python のパッケージ（kachaka API のライブラリなど）や、インストールの手順が変わることがあります。
+  インストールする前に、リポジトリの README を確認し、そちらの手順を優先してください。
+  Python のパッケージを pip でインストールするように書かれている場合は、\ref{sec:python-pep668}節を参考に、方法を選びましょう。
+\end{caution}
+
+\subsection{環境変数を設定する}
+
+erasers\_kachaka は、接続するカチャカの IP アドレスなどを、環境変数（\ref{chap:env}章）から読み取ります。
+\cmd{.bashrc} の最後に、次の行を追加します（\ref{sec:env-bashrc}節）。
+
+\begin{lstlisting}[style=bash, caption={.bashrc に追加する設定}, label={lst:kachaka-bashrc}]
+# カチャカ
+export KACHAKA_NAME=er_kachaka                  # 名前空間の名前
+export KACHAKA_IP=192.168.0.10                  # 自分のカチャカの IP アドレス
+export GRPC_PORT=26400                          # 変えない
+export API_GRPC_BRIDGE_SERVER_URI="${KACHAKA_IP}:${GRPC_PORT}"
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp    # 通信に使う DDS
+\end{lstlisting}
+
+\begin{description}
+  \item[\cmd{KACHAKA\_NAME}] トピックの名前空間になります。\cmd{er\_kachaka} なら、トピックは \cmd{/er\_kachaka/...} になります。
+  \item[\cmd{KACHAKA\_IP}] 前の節で調べた、カチャカの IP アドレスです。
+  \item[\cmd{RMW\_IMPLEMENTATION}] ROS 2 の通信に使う DDS（\ref{sec:what-is-ros-architecture}節）の種類です。erasers\_kachaka では Cyclone DDS を使います。使う前に、\cmd{sudo apt install ros-jazzy-rmw-cyclonedds-cpp} でインストールしておきます。
+\end{description}
+
+\cmd{\$\{KACHAKA\_IP\}} のように書くと、ほかの変数の値を使えます（\ref{sec:shellscript-variable}節）。
+保存したら、\cmd{source \textasciitilde/.bashrc} で読み込み直します。
+
+\begin{point}[複数のカチャカを同じネットワークで使うとき]
+  授業などで、何台ものカチャカを同じネットワークで動かすときは、パソコンとカチャカの組ごとに、\cmd{ROS\_DOMAIN\_ID}（\ref{sec:ros2-install-network}節）を別の値にしておきましょう。
+  そうしないと、隣の人のカチャカのトピックが見えたり、自分の指令で隣のカチャカが動いたりしてしまいます。
+\end{point}
+
+\section{起動して RViz2 で見る}
+\label{sec:kachaka-bringup}
+
+\subsection{erasers\_kachaka を起動する}
+
+カチャカと通信できることを確かめたら、erasers\_kachaka を起動します。
+\cmd{use\_rviz:=True} は、RViz2 も一緒に起動するための launch 引数（\ref{sec:launch-bringup}節）です。
+
+\begin{terminal}[erasers\_kachaka を起動する]
+$ ros2 launch erasers_kachaka_bringup bringup.launch.py use_rviz:=True
+\end{terminal}
+
+しばらく待つと、カチャカが「スタート」と話し、RViz2 にカチャカのモデルと、LiDAR の点、カメラの画像などが表示されます（図\ref{fig:kachaka-rviz}）。
+RViz2 の表示が重くて作業しにくいときは、\cmd{use\_rviz:=False} にして起動し、必要なときだけ RViz2 を別に起動しましょう。
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：bringup.launch.py use_rviz:=True で起動したときの RViz2 の画面（カチャカのモデル、LiDAR の点、カメラの画像）のスクリーンショット
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{kachaka/rviz.png}
+  \caption{erasers\_kachaka を起動したときの RViz2 の画面}
+  \label{fig:kachaka-rviz}
+\end{figure}
+
+\subsection{トピックを調べる}
+
+別のターミナルで、どのようなトピックがあるかを調べてみましょう（\ref{sec:ros2-concepts-topic}節）。
+
+\begin{terminal}[カチャカのトピックを調べる]
+$ ros2 topic list | grep er_kachaka
+/er_kachaka/front_camera/image_raw
+/er_kachaka/kachaka_speak
+/er_kachaka/lidar/scan
+/er_kachaka/manual_control/cmd_vel
+...
+\end{terminal}
+
+たくさんのトピックがありますが、この章では、次の 4 つを使います。
+
+\begin{tablebox}[この章で使うカチャカのトピック][tab:kachaka-topics]
+  \begin{tabular}{p{0.32\linewidth}p{0.34\linewidth}p{0.22\linewidth}}
+    \toprule
+    トピック（\cmd{/er\_kachaka/} の後ろ） & メッセージ型 & 内容 \\
+    \midrule
+    \cmd{manual\_control/cmd\_vel} & \cmd{geometry\_msgs/msg/Twist} & 速度の指令 \\
+    \cmd{kachaka\_speak} & \cmd{std\_msgs/msg/String} & 話す文章 \\
+    \cmd{front\_camera/image\_raw} & \cmd{sensor\_msgs/msg/Image} & 前のカメラの画像 \\
+    \cmd{lidar/scan} & \cmd{sensor\_msgs/msg/LaserScan} & LiDAR のデータ \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+速度の指令は、TurtleBot3（\cmd{TwistStamped}）と違い、\cmd{Twist}（\ref{sec:ros2-concepts-topic}節）で送ります。
+型は \cmd{ros2 topic info} で確かめる習慣をつけておきましょう。
+
+\section{カチャカを動かす}
+\label{sec:kachaka-move}
+
+\subsection{コマンドから動かす}
+
+まずは、\cmd{ros2 topic pub}（\ref{sec:ros2-concepts-topic}節）で速度の指令を送って、カチャカを少しだけ動かしてみましょう。
+カチャカが 1 m ほど動くので、周りに十分な空間があることを確かめてから実行してください。
+
+\begin{terminal}[コマンドからカチャカを動かす]
+$ ros2 topic pub --rate 5 --times 10 /er_kachaka/manual_control/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}, angular: {z: 0.1}}"
+\end{terminal}
+
+\cmd{--rate 5 --times 10} は、「1 秒に 5 回、合計 10 回送る」という意味です。
+2 秒間だけ指令が送られ、カチャカは前に進みながら、少し左に曲がります。
+指令が届かなくなると、カチャカは止まります。
+
+\subsection{キーボードで動かす}
+
+\ref{sec:practice-teleop}節の teleop\_twist\_keyboard も、リマップ（\ref{sec:launch-namespace}節）でトピック名を付け替えれば、そのままカチャカで使えます。
+カチャカは \cmd{Twist} を使うので、\cmd{stamped} の設定は不要です。
+
+\begin{terminal}[キーボードでカチャカを動かす]
+$ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=/er_kachaka/manual_control/cmd_vel
+\end{terminal}
+
+はじめは \key{Z} を何回か押して、速度を下げてから動かしましょう。
+\key{K} で止まります。
+シミュレーションのロボットと同じ操作で、本物のロボットが動くことを確かめてください。
+
+\section{カチャカに話させる}
+\label{sec:kachaka-speak}
+
+\subsection{発話のトピック}
+
+erasers\_kachaka は、\cmd{/er\_kachaka/kachaka\_speak} トピックに \cmd{std\_msgs/msg/String} 型のメッセージが届くと、その文章をカチャカに話させます。
+まずはコマンドから試してみましょう。
+
+\begin{terminal}[コマンドからカチャカに話させる]
+$ ros2 topic pub --once /er_kachaka/kachaka_speak std_msgs/msg/String "{data: 'こんにちは'}"
+\end{terminal}
+
+\subsection{話させるノード}
+
+決まった間隔で話させるノードを書いてみましょう。
+\ref{sec:rclpy-pubsub}節の talker とほとんど同じです。
+
+\lstinputlisting[style=python, lastline=21, caption={カチャカに話させるノード（my\_package/kachaka\_speaker.py）}, label={lst:kachaka-speaker}]{samples/rclpy/my_package/my_package/kachaka_speaker.py}
+
+トピック名を、\cmd{/er\_kachaka/kachaka\_speak} ではなく、\cmd{kachaka\_speak} という相対名（\ref{sec:launch-namespace}節）で書いているのがポイントです。
+起動するときに名前空間 \cmd{/er\_kachaka} を指定すれば、\cmd{/er\_kachaka/kachaka\_speak} になります。
+こうしておけば、\cmd{KACHAKA\_NAME} を変えた別のカチャカでも、プログラムを書き換えずに使えます。
+
+\cmd{setup.py} に \cmd{'kachaka\_speaker = my\_package.kachaka\_speaker:main',} を追加してビルドし、名前空間とパラメータを指定して起動します。
+
+\begin{terminal}[カチャカに話させるノードを起動する]
+$ ros2 run my_package kachaka_speaker --ros-args -r __ns:=/er_kachaka -p text:="ROS 2 を勉強しています" -p interval:=15.0
+[INFO] [...] [er_kachaka.kachaka_speaker]: 話す内容: ROS 2 を勉強しています
+...
+\end{terminal}
+
+15 秒ごとに、カチャカが指定した文章を話します。
+
+\section{カメラの画像を見る}
+\label{sec:kachaka-camera}
+
+\subsection{cv\_bridge と OpenCV}
+
+カチャカの前のカメラの画像は、\cmd{/er\_kachaka/front\_camera/image\_raw} トピックに \cmd{sensor\_msgs/msg/Image} 型でパブリッシュされます。
+画像を見るだけなら、\ref{sec:simulation-sensor}節の \cmd{rqt\_image\_view} で十分です。
+ここでは、画像を自分のノードで受け取って、加工してみましょう。
+
+画像の処理には、\textbf{OpenCV} というライブラリがよく使われます。
+ROS 2 の画像のメッセージと、OpenCV で扱う画像は形が違うので、\textbf{cv\_bridge} を使って変換します。
+どちらも apt でインストールします（\ref{sec:python-pep668}節）。
+
+\begin{terminal}[cv\_bridge と OpenCV をインストールする]
+$ sudo apt install ros-jazzy-cv-bridge python3-opencv
+\end{terminal}
+
+\subsection{画像を表示するノード}
+
+\lstinputlisting[style=python, lastline=28, caption={カメラの画像を表示するノード（my\_package/camera\_viewer.py）}, label={lst:kachaka-camera}]{samples/rclpy/my_package/my_package/camera_viewer.py}
+
+\begin{description}
+  \item[QoS] カメラの画像は、大量のデータを次々と送るので、\cmd{BEST\_EFFORT} でパブリッシュされています。サブスクライバも \cmd{qos\_profile\_sensor\_data} を使わないと、データが届きません（\ref{sec:debug-qos}節）。
+  \item[\cmd{imgmsg\_to\_cv2}] ROS 2 のメッセージを、OpenCV の画像に変換します。\cmd{bgr8} は、各画素を青・緑・赤の順に 8 ビットずつで表す形式で、OpenCV の標準の色の並びです。
+  \item[\cmd{cv2.imshow} と \cmd{cv2.waitKey(1)}] 画像をウィンドウに表示します。\cmd{waitKey} を呼ばないと、画面が更新されません。
+  \item[エッジの検出] パラメータ \cmd{edge} を \cmd{True} にすると、画像を白黒にしてから、\cmd{cv2.Canny} で物の輪郭（エッジ）を取り出して表示します。
+\end{description}
+
+\begin{terminal}[カメラの画像を表示する]
+$ ros2 run my_package camera_viewer --ros-args -r __ns:=/er_kachaka
+$ ros2 run my_package camera_viewer --ros-args -r __ns:=/er_kachaka -p edge:=true
+\end{terminal}
+
+ウィンドウに、カチャカから見た景色が表示されます。
+コールバックの中の処理を書き換えれば、色で物を見つける、顔を見つける、深層学習で物体を認識する、といった画像処理に発展させられます。
+
+\section{LiDAR のデータを読む}
+\label{sec:kachaka-lidar}
+
+\subsection{カチャカの LiDAR の向き}
+
+カチャカの LiDAR のデータは、\cmd{/er\_kachaka/lidar/scan} トピックに \cmd{sensor\_msgs/msg/}\allowbreak\cmd{LaserScan} 型（\ref{sec:simulation-sensor}節）でパブリッシュされます。
+ただし、カチャカの LiDAR は、ロボットの前ではなく、\textbf{左を向いて}取り付けられています（図\ref{fig:kachaka-lidar}）。
+LiDAR の角度 0（x 軸の向き）がロボットの左なので、ロボットの正面は、LiDAR から見ると $-90^\circ$（$-\pi/2$ rad）の向きになります。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/kachaka/lidar}
+  \caption{カチャカの LiDAR の向き}
+  \label{fig:kachaka-lidar}
+\end{figure}
+
+また、カチャカの LiDAR は、状況によって、1 回に測る点の数が変わります。
+そのため、「\cmd{ranges} の何番目が正面」と、番号を決め打ちしてはいけません。
+毎回、\cmd{angle\_min} と \cmd{angle\_increment} から計算する必要があります。
+
+\subsection{正面の距離を求める}
+
+\cmd{ranges} の $i$ 番目の値の向き $\theta_i$ は、次の式で表されます（\ref{sec:practice-avoid}節）。
+\[
+  \theta_i = \mathrm{angle\_min} + i \times \mathrm{angle\_increment}
+\]
+これを $i$ について解くと、向き $\theta$ の距離が入っている番号がわかります。
+\[
+  i = \frac{\theta - \mathrm{angle\_min}}{\mathrm{angle\_increment}}
+\]
+この $\theta$ に、ロボットの正面の向き（$-\pi/2$）を入れれば、正面の障害物までの距離が求められます。
+これを使って、正面の距離を表示するノードを書いてみましょう。
+
+\lstinputlisting[style=python, lastline=36, caption={正面の障害物までの距離を表示するノード（my\_package/front\_distance.py）}, label={lst:kachaka-front}]{samples/rclpy/my_package/my_package/front_distance.py}
+
+計算した番号は小数になるので、\cmd{round()} で一番近い整数にしています。
+距離の値が \cmd{inf}（無限大）のときは測れる範囲に障害物がない、\cmd{nan}（数ではない）のときは正しく測れなかった、という意味です。
+\cmd{math.isinf()} と \cmd{math.isnan()} で調べています。
+ログは、\cmd{throttle\_duration\_sec}（\ref{sec:debug-log}節）で 1 秒に 1 回だけ表示するようにしています。
+
+\begin{terminal}[正面の距離を表示する]
+$ ros2 run my_package front_distance --ros-args -r __ns:=/er_kachaka
+[INFO] [...] [er_kachaka.front_distance]: 正面の障害物までの距離: 1.23 m
+...
+\end{terminal}
+
+カチャカの前に手や箱を置いて、距離が変わることを確かめてみましょう。
+パラメータ \cmd{front\_angle} を変えれば、ほかの向きの距離も調べられます。
+たとえば、\cmd{-p front\_angle:=0.0} にすると、ロボットの左の距離になります。
+
+\section{障害物を避けて走らせる}
+\label{sec:kachaka-avoid}
+
+\subsection{シミュレーションのノードを実機で動かす}
+
+最後に、\ref{sec:practice-avoid}節でシミュレーションの TurtleBot3 のために作った、障害物を避けるノードを、カチャカで動かしてみましょう。
+カチャカと TurtleBot3 の違いは、次の 3 つです。
+
+\begin{itemize}
+  \item トピックが \cmd{/er\_kachaka} の名前空間の下にあり、速度の指令は \cmd{manual\_control/cmd\_vel}
+  \item 速度の指令は \cmd{TwistStamped} ではなく \cmd{Twist}
+  \item LiDAR から見たロボットの正面は $-\pi/2$
+\end{itemize}
+
+\ref{sec:practice-avoid}節のノードは、これらの違いを、名前空間・リマップ・パラメータで吸収できるように作ってあります。
+プログラムは 1 行も書き換えずに、起動するときの指定だけで、カチャカに対応させられます。
+
+\begin{terminal}[障害物を避けるノードをカチャカで動かす]
+$ ros2 run my_package obstacle_avoider --ros-args -r __ns:=/er_kachaka -r cmd_vel:=manual_control/cmd_vel -r scan:=lidar/scan -p stamped:=false -p front_angle:=-1.5708 -p linear_speed:=0.1
+\end{terminal}
+
+\begin{description}
+  \item[\cmd{-r \_\_ns:=/er\_kachaka}] ノードを \cmd{/er\_kachaka} の名前空間で起動します。
+  \item[\cmd{-r cmd\_vel:=manual\_control/cmd\_vel}、\cmd{-r scan:=lidar/scan}] トピック名を、カチャカのトピック名に付け替えます。どちらも相対名なので、名前空間が前に付いて、\cmd{/er\_kachaka/manual\_control/cmd\_vel} などになります。
+  \item[\cmd{-p stamped:=false}] 速度の指令を \cmd{Twist} で送ります。
+  \item[\cmd{-p front\_angle:=-1.5708}] LiDAR から見た正面を $-\pi/2$ にします。
+  \item[\cmd{-p linear\_speed:=0.1}] 初めて動かすので、速度を遅めにしておきます。
+\end{description}
+
+カチャカがまっすぐ進み、障害物に近づくと、その場で回って向きを変えます。
+止めるときは、\key{Ctrl}+\key{C} でノードを止めます。
+カチャカは、指令が届かなくなると止まります。
+
+起動のたびにこれだけの指定を入力するのは大変なので、launch ファイル（\ref{chap:launch}章）にまとめておくとよいでしょう。
+ノードのプログラムを、特定のロボットに依存しないように書き、ロボットごとの違いは launch ファイルや設定ファイルで吸収する、というのは、実際のロボット開発でもよく使われる考え方です。
+
+\begin{point}[シミュレーションと実機の違い]
+  同じノードでも、シミュレーションと実機では、動きが違うことに気づいたかもしれません。
+  実機では、LiDAR が黒い物や鏡のような物をうまく測れなかったり、床の状態で車輪がすべったり、ネットワークの遅れで指令が遅れて届いたりします。
+  シミュレーションでうまくいったら終わりではなく、実機で試し、調整していくことが大切です。
+  bag ファイル（\ref{sec:debug-rosbag}節）に実機のデータを記録しておけば、ロボットがない場所でも、そのデータでノードを改良できます。
+\end{point}
+
+\subsection{さらに進む}
+
+erasers\_kachaka には、この章で使った機能のほかに、地図作り（SLAM）や自律移動（Navigation2）のためのパッケージも含まれています。
+\ref{chap:practice}章でシミュレーションの TurtleBot3 で体験した地図作りと自律移動を、今度はカチャカで試してみましょう。
+使い方は、erasers\_kachaka のリポジトリの各パッケージの README に書かれています。
+
+\section*{この章のまとめ}
+
+\begin{itemize}
+  \item カチャカは、LiDAR・カメラ・スピーカなどを持つ家庭用の移動ロボットです。erasers\_kachaka を使うと、カチャカを ROS 2 のロボットとして扱えます。
+  \item パソコンとカチャカを同じネットワークにつなぎ、IP アドレスなどを環境変数に設定して、erasers\_kachaka を起動します。
+  \item \cmd{/er\_kachaka/manual\_control/cmd\_vel} で動かし、\cmd{/er\_kachaka/kachaka\_speak} で話させ、カメラの画像と LiDAR のデータをトピックで受け取れます。
+  \item カチャカの LiDAR は左を向いていて、ロボットの正面は $-\pi/2$ の向きです。正面の距離は、\cmd{angle\_min} と \cmd{angle\_increment} から計算します。
+  \item ノードを相対名とパラメータで書いておけば、名前空間・リマップ・パラメータの指定だけで、シミュレーションのノードを実際のロボットで動かせます。
+\end{itemize}

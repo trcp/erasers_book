@@ -1,4 +1,198 @@
 \chapter{用語集}
 \label{app:glossary}
 
-TODO
+本書に出てきた主な用語を、英数字、五十音の順に並べました。
+かっこの中は、その用語を詳しく説明している章です。
+
+% 用語集の項目：\gterm{用語}{説明}{参照}
+\newcommand{\gterm}[3]{\item[#1] #2（#3）}
+
+\section*{英数字}
+
+\begin{description}
+  \gterm{ament\_cmake / ament\_python}{ROS 2 のパッケージのビルドの種類。C++ やインタフェースのパッケージは ament\_cmake、Python のパッケージは ament\_python を使う}{\ref{chap:workspace}章}
+  \gterm{apt}{Ubuntu のパッケージ管理システム。\cmd{sudo apt install} でソフトウェアをインストールする}{\ref{chap:package}章}
+  \gterm{bag ファイル}{rosbag2 でトピックのデータを記録したファイル}{\ref{chap:debug}章}
+  \gterm{bash}{Ubuntu の標準のシェル}{\ref{chap:terminal_shell}章}
+  \gterm{CLI}{コマンドを文字で入力してコンピュータを操作する方法（Command Line Interface）}{\ref{chap:terminal_shell}章}
+  \gterm{CMake}{C や C++ のプログラムのビルドの方法を書くためのツール。設定は \cmd{CMakeLists.txt} に書く}{\ref{chap:package}章}
+  \gterm{colcon}{ROS 2 のワークスペースのパッケージをまとめてビルドするツール}{\ref{chap:workspace}章}
+  \gterm{CPU}{コンピュータの中で計算や命令の実行を行う部品}{\ref{chap:computer}章}
+  \gterm{CSV}{値をカンマで区切って並べた、表のデータのテキストファイルの形式}{\ref{chap:text_pipe}章}
+  \gterm{CUI}{文字だけで操作する画面（Character User Interface）}{\ref{chap:terminal_shell}章}
+  \gterm{DDS}{ROS 2 が通信の土台に使っている、データをやり取りするための規格}{\ref{chap:what_is_ros}章}
+  \gterm{Docker}{コンテナを作って動かすためのソフトウェア}{\ref{chap:docker}章}
+  \gterm{Dockerfile}{Docker のイメージの作り方を書いたファイル}{\ref{chap:docker}章}
+  \gterm{f 文字列}{\cmd{f"..."} の形で、文字列の中に変数の値を埋め込む Python の書き方}{\ref{chap:python_basics}章}
+  \gterm{Gazebo}{ロボットのためのオープンソースのシミュレータ。ROS 2 Jazzy では Harmonic を使う}{\ref{chap:simulation}章}
+  \gterm{Git}{ファイルの変更の履歴を管理するバージョン管理システム}{\ref{chap:git}章}
+  \gterm{GitHub}{Git のリポジトリをインターネット上で共有するためのサービス}{\ref{chap:git}章}
+  \gterm{GNU}{UNIX に似た OS を自由なソフトウェアで作るプロジェクト。Linux で使われる多くのコマンドを開発している}{\ref{chap:what_is_linux}章}
+  \gterm{GPU}{画像の処理などの、たくさんの単純な計算を同時に行うのが得意な部品}{\ref{chap:computer}章}
+  \gterm{GUI}{ウィンドウやボタンをマウスで操作する画面（Graphical User Interface）}{\ref{chap:terminal_shell}章}
+  \gterm{IMU}{加速度と角速度を測るセンサ}{\ref{chap:simulation}章}
+  \gterm{IP アドレス}{ネットワークにつながったコンピュータを区別するための番号}{\ref{chap:network}章}
+  \gterm{launch ファイル}{複数のノードを、決まった名前と設定でまとめて起動するためのファイル}{\ref{chap:launch}章}
+  \gterm{LiDAR}{レーザを使って、周りの物までの距離を測るセンサ}{\ref{chap:simulation}章}
+  \gterm{Linux}{オープンソースの OS のカーネル。また、それを使った OS 全体}{\ref{chap:what_is_linux}章}
+  \gterm{LTS}{長い期間サポートされる版（Long Term Support）。Ubuntu や ROS 2 にある}{\ref{chap:what_is_linux}章、\ref{chap:what_is_ros}章}
+  \gterm{Markdown}{\cmd{\#} や \cmd{-} などの記号で見出しや箇条書きを表す、文章の書き方。README などに使う}{\ref{chap:git}章}
+  \gterm{Navigation2（Nav2）}{移動ロボットを、地図の上の目的地まで自律移動させるためのパッケージの集まり}{\ref{chap:practice}章}
+  \gterm{None}{Python で「値がない」ことを表す特別な値}{\ref{chap:python_basics}章}
+  \gterm{OS}{コンピュータの部品を管理し、アプリが動くための土台になるソフトウェア}{\ref{chap:computer}章}
+  \gterm{OSS}{ソースコードが公開され、自由に使ったり改良したりできるソフトウェア（オープンソースソフトウェア）}{\ref{chap:what_is_linux}章}
+  \gterm{package.xml}{ROS 2 のパッケージの情報と依存関係を書くファイル}{\ref{chap:workspace}章}
+  \gterm{PATH}{コマンドの実行ファイルを探すディレクトリを並べた環境変数}{\ref{chap:env}章}
+  \gterm{PEP 8}{Python のコードの書き方の決まり（スタイルガイド）}{\ref{chap:python_class}章}
+  \gterm{PID}{プロセスを区別するための番号}{\ref{chap:linux_internals}章}
+  \gterm{pip}{Python のパッケージをインストールするためのツール}{\ref{chap:python_env}章}
+  \gterm{Pull Request}{自分の変更を取り込んでもらうように依頼する、GitHub の機能}{\ref{chap:git}章}
+  \gterm{QoS}{トピックの通信の品質の設定（信頼性・永続性・履歴など）}{\ref{chap:debug}章}
+  \gterm{rclcpp}{ROS 2 のノードを C++ で書くためのライブラリ}{補章\ref{sup:rclcpp}}
+  \gterm{rclpy}{ROS 2 のノードを Python で書くためのライブラリ}{\ref{chap:rclpy}章}
+  \gterm{README}{リポジトリやソフトウェアの説明を書いたファイル}{\ref{chap:git}章}
+  \gterm{robot\_state\_publisher}{URDF と関節の角度から、各リンクの座標変換を計算して tf2 に流すノード}{\ref{chap:tf_viz}章}
+  \gterm{root}{Linux の管理者のユーザ}{\ref{chap:linux_internals}章}
+  \gterm{ROS / ROS 2}{ロボットのソフトウェアを作るためのミドルウェアと、ツールやライブラリの集まり（Robot Operating System）}{\ref{chap:what_is_ros}章}
+  \gterm{ROS\_DOMAIN\_ID}{同じネットワークの ROS 2 のグループを分けるための環境変数}{\ref{chap:ros2_install}章}
+  \gterm{rosbag2}{トピックのデータを記録・再生するツール}{\ref{chap:debug}章}
+  \gterm{rosdep}{\cmd{package.xml} に書かれた依存パッケージを、まとめてインストールするツール}{\ref{chap:workspace}章}
+  \gterm{rqt / rqt\_graph}{ROS 2 の GUI のツール。rqt\_graph はノードとトピックのつながりを表示する}{\ref{chap:ros2_concepts}章}
+  \gterm{RViz2}{ROS 2 のデータを 3D の画面に表示するツール}{\ref{chap:tf_viz}章}
+  \gterm{SDF}{Gazebo でシミュレーションする世界やロボットを書くための、XML の形式のファイル}{\ref{chap:simulation}章}
+  \gterm{setup.py}{Python のパッケージのインストールの方法を書くファイル。ROS 2 ではノードを \cmd{entry\_points} に登録する}{\ref{chap:workspace}章}
+  \gterm{SLAM}{ロボットを動かしながら、地図作りと自分の位置の推定を同時に行う技術}{\ref{chap:practice}章}
+  \gterm{source}{ファイルに書かれたコマンドを、今のシェルで実行するコマンド}{\ref{chap:env}章}
+  \gterm{SSH}{ネットワークを通じて、別のコンピュータに安全にログインするしくみ}{\ref{chap:network}章}
+  \gterm{sudo}{管理者の権限でコマンドを実行するためのコマンド}{\ref{chap:permission}章}
+  \gterm{systemd}{Linux で最初に起動され、サービスの起動や管理を行うしくみ}{\ref{chap:linux_internals}章}
+  \gterm{tf2}{座標系どうしの位置関係を管理し、座標変換を計算する ROS 2 のしくみ}{\ref{chap:tf_viz}章}
+  \gterm{tmux}{1 つのターミナルで、複数の画面やセッションを扱うためのツール（ターミナルマルチプレクサ）}{\ref{chap:network}章}
+  \gterm{turtlesim}{カメを動かす、ROS 2 の学習用の簡単なシミュレータ}{\ref{chap:ros2_install}章}
+  \gterm{TurtleBot3}{ROS の学習や研究のための小型の移動ロボット}{\ref{chap:simulation}章}
+  \gterm{Twist}{並進の速度と回転の速度を表すメッセージ型。時刻などを加えたものが TwistStamped}{\ref{chap:ros2_concepts}章、\ref{chap:simulation}章}
+  \gterm{Ubuntu}{Linux のディストリビューションの 1 つ。ROS 2 の開発で標準的に使われる}{\ref{chap:what_is_linux}章}
+  \gterm{UNIX}{1970 年ごろに作られた OS。Linux などの多くの OS の元になった}{\ref{chap:what_is_linux}章}
+  \gterm{URDF}{ロボットの形や部品のつながりを書くための、XML の形式のファイル}{\ref{chap:tf_viz}章}
+  \gterm{use\_sim\_time}{ノードがシミュレーションの時刻（\cmd{/clock}）を使うかどうかを決めるパラメータ}{\ref{chap:simulation}章}
+  \gterm{venv}{Python の仮想環境を作るための標準の機能}{\ref{chap:python_env}章}
+  \gterm{VirtualBox}{パソコンの中に仮想マシンを作るためのソフトウェア}{\ref{chap:what_is_linux}章}
+  \gterm{VS Code}{Microsoft が開発している、拡張機能で機能を追加できるエディタ}{\ref{chap:editor}章}
+  \gterm{xacro}{URDF に変数やマクロを使えるようにした形式}{\ref{chap:tf_viz}章}
+  \gterm{YAML}{「キー: 値」をインデントで階層にして書く、設定ファイルなどの形式}{\ref{chap:launch}章}
+\end{description}
+
+\section*{あ行}
+
+\begin{description}
+  \gterm{アクション}{時間のかかる処理を頼み、途中経過（フィードバック）と結果（リザルト）を受け取る ROS 2 の通信の方法。キャンセルもできる}{\ref{chap:ros2_concepts}章}
+  \gterm{アルゴリズム}{問題を解くための手順}{\ref{chap:computer}章}
+  \gterm{アンダーレイ / オーバーレイ}{ワークスペースを重ねて使うときの、下の環境（apt でインストールした ROS 2 など）と上の環境（自分のワークスペース）。同じ名前のパッケージはオーバーレイが優先される}{\ref{chap:workspace}章}
+  \gterm{イメージ（Docker）}{コンテナの元になる、OS やソフトウェアをまとめたもの}{\ref{chap:docker}章}
+  \gterm{インスタンス}{クラスから作った、具体的な 1 つのオブジェクト}{\ref{chap:python_class}章}
+  \gterm{インタフェース（ROS 2）}{メッセージ型・サービスの型・アクションの型をまとめた呼び方}{\ref{chap:rclpy}章}
+  \gterm{インタプリタ}{ソースコードを 1 行ずつ読みながら実行するしくみ}{\ref{chap:what_is_python}章}
+  \gterm{インデント}{行の先頭に空白を入れて、字下げすること。Python ではブロックを表す}{\ref{chap:python_basics}章}
+  \gterm{エイリアス}{長いコマンドに付けた短い別名}{\ref{chap:env}章}
+  \gterm{エントリポイント}{\cmd{ros2 run} で実行したときに呼び出される関数。\cmd{setup.py} の \cmd{entry\_points} に書く}{\ref{chap:rclpy}章}
+  \gterm{オドメトリ}{車輪の回転などから計算した、ロボットの移動量}{\ref{chap:tf_viz}章}
+  \gterm{オブジェクト}{データ（属性）と、それを扱う処理（メソッド）をまとめたもの}{\ref{chap:python_class}章}
+\end{description}
+
+\section*{か行}
+
+\begin{description}
+  \gterm{カーネル}{OS の中心となる部分。CPU やメモリ、デバイスを管理する}{\ref{chap:linux_internals}章}
+  \gterm{仮想環境（Python）}{プロジェクトごとに、Python のパッケージを分けてインストールするための環境}{\ref{chap:python_env}章}
+  \gterm{仮想マシン}{ソフトウェアで作った、仮想的なコンピュータ}{\ref{chap:what_is_linux}章}
+  \gterm{環境変数}{そのシェルから起動したプログラムにも引き継がれる変数}{\ref{chap:env}章}
+  \gterm{関数}{ひとまとまりの処理に名前を付けたもの}{\ref{chap:python_basics}章}
+  \gterm{クォータニオン}{回転（向き）を 4 つの数で表す方法。ROS 2 のメッセージでは向きをこれで表す}{\ref{chap:tf_viz}章}
+  \gterm{クラス}{オブジェクトの設計図}{\ref{chap:python_class}章}
+  \gterm{継承}{あるクラスの機能を引き継いで、新しいクラスを作ること。ROS 2 のノードは \cmd{Node} を継承して作る}{\ref{chap:python_class}章}
+  \gterm{権限（パーミッション）}{ファイルを読む・書く・実行することを、誰に許すかの設定}{\ref{chap:permission}章}
+  \gterm{コールバック}{「〇〇が起きたら呼び出す」と、あらかじめ渡しておく関数。ROS 2 のノードはコールバックの集まりとして動く}{\ref{chap:python_class}章、\ref{chap:rclpy}章}
+  \gterm{コストマップ}{障害物の周りの「近づかないほうがよい範囲」を表した地図}{\ref{chap:practice}章}
+  \gterm{コミット}{Git で、ファイルの変更を履歴として記録すること}{\ref{chap:git}章}
+  \gterm{コンテナ}{アプリと、それが動くのに必要なものをまとめて、ほかから切り離して動かすしくみ}{\ref{chap:docker}章}
+  \gterm{コンパイル}{ソースコードを、コンピュータが実行できる形（機械語）に変換すること}{\ref{chap:what_is_python}章}
+  \gterm{コンフリクト}{Git で、同じ場所を別々に変更したために、自動でマージできない状態}{\ref{chap:git}章}
+\end{description}
+
+\section*{さ行}
+
+\begin{description}
+  \gterm{サービス}{要求（リクエスト）を送ると、応答（レスポンス）が 1 回返ってくる ROS 2 の通信の方法}{\ref{chap:ros2_concepts}章}
+  \gterm{座標系（フレーム）}{位置や向きを表すための、原点と軸の向きの決まり}{\ref{chap:tf_viz}章}
+  \gterm{座標変換}{ある座標系で表した位置を、別の座標系での位置に直すこと}{\ref{chap:tf_viz}章}
+  \gterm{サブスクライバ / パブリッシャ}{トピックのデータを受け取るもの / 送るもの}{\ref{chap:ros2_concepts}章}
+  \gterm{シェル}{ユーザが入力したコマンドを解釈して、実行するプログラム}{\ref{chap:terminal_shell}章}
+  \gterm{シェルスクリプト}{シェルのコマンドを並べて書いたファイル}{\ref{chap:shellscript}章}
+  \gterm{シグナル}{プロセスに送る合図。\key{Ctrl}+\key{C} は SIGINT を送る}{\ref{chap:process}章}
+  \gterm{システムコール}{プログラムがカーネルに処理を頼むためのしくみ}{\ref{chap:linux_internals}章}
+  \gterm{ジョイント / リンク}{URDF で、部品どうしのつなぎ目（関節） / 部品}{\ref{chap:tf_viz}章}
+  \gterm{シミュレーション}{コンピュータの中に仮想の世界を作り、その中でロボットを動かすこと}{\ref{chap:simulation}章}
+  \gterm{絶対パス / 相対パス}{ルートディレクトリから書いたパス / 今いるディレクトリから書いたパス}{\ref{chap:files}章}
+  \gterm{絶対名 / 相対名（ROS 2）}{\cmd{/} で始まり、名前空間が付かない名前 / \cmd{/} で始まらず、名前空間が前に付く名前}{\ref{chap:launch}章}
+  \gterm{占有格子地図}{空間をマス目に分け、通れる場所・障害物・わからない場所を表した地図}{\ref{chap:practice}章}
+  \gterm{ソースコード}{人間が読み書きできる形で書いたプログラム}{\ref{chap:what_is_python}章}
+\end{description}
+
+\section*{た行}
+
+\begin{description}
+  \gterm{ターミナル}{CUI でコマンドを入力するための画面（アプリ）}{\ref{chap:terminal_shell}章}
+  \gterm{タイマ}{決まった時間ごとにコールバックを呼び出すしくみ}{\ref{chap:rclpy}章}
+  \gterm{ディストリビューション}{Linux のカーネルに、ソフトウェアをまとめて使いやすくしたもの。ROS 2 の版（Jazzy など）のこともこう呼ぶ}{\ref{chap:what_is_linux}章、\ref{chap:what_is_ros}章}
+  \gterm{データ型}{値の種類（整数・小数・文字列など）}{\ref{chap:python_basics}章}
+  \gterm{デバイスドライバ}{OS が特定の機器を動かすためのソフトウェア}{\ref{chap:computer}章}
+  \gterm{デバイスファイル}{\cmd{/dev} にある、機器を表すファイル}{\ref{chap:linux_internals}章}
+  \gterm{デバッグ}{プログラムの誤り（バグ）を見つけて直すこと}{\ref{chap:python_class}章、\ref{chap:debug}章}
+  \gterm{トピック}{パブリッシャからサブスクライバへ、データを流し続けるための名前の付いた通り道}{\ref{chap:ros2_concepts}章}
+\end{description}
+
+\section*{な行}
+
+\begin{description}
+  \gterm{名前空間}{ノードやトピックの名前の前に付ける、ディレクトリのようなもの。同じノードを区別して複数起動できる}{\ref{chap:launch}章}
+  \gterm{ノード}{ROS 2 のプログラムの単位}{\ref{chap:ros2_concepts}章}
+\end{description}
+
+\section*{は行}
+
+\begin{description}
+  \gterm{パイプ}{\cmd{|} で、あるコマンドの出力を、次のコマンドの入力に渡すこと}{\ref{chap:text_pipe}章}
+  \gterm{バグ}{プログラムの誤り}{\ref{chap:computer}章}
+  \gterm{パス}{ファイルやディレクトリの場所を表す文字列}{\ref{chap:files}章}
+  \gterm{パッケージ}{ソフトウェアを配布・管理するための単位。ROS 2 では、ノードや設定ファイルをまとめる単位}{\ref{chap:package}章、\ref{chap:workspace}章}
+  \gterm{パラメータ}{ノードが持っている設定値}{\ref{chap:ros2_concepts}章}
+  \gterm{ブランチ}{Git で、履歴を枝分かれさせて、別々に作業するためのしくみ}{\ref{chap:git}章}
+  \gterm{プロセス}{実行中のプログラム}{\ref{chap:linux_internals}章}
+  \gterm{プロンプト}{ターミナルで、コマンドの入力を待っていることを示す表示}{\ref{chap:terminal_shell}章}
+  \gterm{ホームディレクトリ}{ユーザごとに用意される、自分のファイルを置くディレクトリ（\cmd{\textasciitilde}）}{\ref{chap:files}章}
+\end{description}
+
+\section*{ま行}
+
+\begin{description}
+  \gterm{マージ}{Git で、別のブランチの変更を取り込むこと}{\ref{chap:git}章}
+  \gterm{マイコン}{1 つのチップに CPU やメモリなどをまとめた、小さなコンピュータ}{\ref{chap:computer}章}
+  \gterm{ミドルウェア}{OS とアプリの間で、アプリを作りやすくするためのソフトウェア}{\ref{chap:what_is_ros}章}
+  \gterm{メッセージ型}{トピックで流すデータの形}{\ref{chap:ros2_concepts}章}
+  \gterm{メモリ}{CPU が計算に使うデータを、一時的に置いておく部品}{\ref{chap:computer}章}
+  \gterm{モジュール}{関数やクラスをまとめた Python のファイル。\cmd{import} で読み込む}{\ref{chap:python_class}章}
+\end{description}
+
+\section*{や行・ら行・わ行}
+
+\begin{description}
+  \gterm{ライセンス}{ソフトウェアを使ったり、改良したり、配布したりするときの条件}{\ref{chap:what_is_linux}章}
+  \gterm{リスト}{複数の値を順番に並べた Python のデータ}{\ref{chap:python_basics}章}
+  \gterm{リダイレクト}{\cmd{>} などで、コマンドの出力をファイルに書き込むこと}{\ref{chap:text_pipe}章}
+  \gterm{リポジトリ}{Git で、ファイルと変更の履歴を保存しておく場所。apt では、パッケージを配布している場所}{\ref{chap:git}章、\ref{chap:package}章}
+  \gterm{リマップ}{ノードが使うトピックなどの名前を、起動するときに付け替えること}{\ref{chap:launch}章}
+  \gterm{例外}{プログラムの実行中に起きたエラー。\cmd{try} と \cmd{except} で受け止められる}{\ref{chap:python_class}章}
+  \gterm{ログ}{プログラムが動作の記録として出力するメッセージ。DEBUG・INFO・WARN・ERROR・FATAL のレベルがある}{\ref{chap:debug}章}
+  \gterm{ワークスペース（ROS 2）}{パッケージのソースコードを置いてビルドするためのディレクトリ}{\ref{chap:workspace}章}
+  \gterm{ワイルドカード}{\cmd{*} や \cmd{?} を使って、複数のファイル名をまとめて表す書き方}{\ref{chap:files}章}
+\end{description}

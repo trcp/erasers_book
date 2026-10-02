@@ -1,4 +1,289 @@
 \chapter{コマンド早見表}
 \label{app:cheatsheet}
 
-TODO
+本書で使った主なコマンドを、目的ごとにまとめました。
+詳しい使い方は、各章の本文か、\cmd{man コマンド名} や \cmd{コマンド名 --help}（\ref{sec:terminal-help}節）で調べてください。
+「〇〇」の部分は、ファイル名やパッケージ名などに置き換えて使います。
+
+\section{Linux の基本}
+\label{sec:cheatsheet-linux}
+
+Linux の基本的な操作のコマンドです。
+
+\begin{tablebox}[ヘルプと履歴（第4章）][tab:cheatsheet-help]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{man 〇〇} & コマンドのマニュアルを表示する（\key{q} で終了） \\
+    \cmd{〇〇 --help} & コマンドの簡単な使い方を表示する \\
+    \cmd{history} & 入力したコマンドの履歴を表示する \\
+    \cmd{clear} & 画面をきれいにする \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[ファイルとディレクトリ（第5章）][tab:cheatsheet-files]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{pwd} & 今いるディレクトリを表示する \\
+    \cmd{ls -la} & 隠しファイルも含めて、詳しく一覧を表示する \\
+    \cmd{cd 〇〇} / \cmd{cd \textasciitilde} / \cmd{cd ..} & 移動する / ホームへ / 1 つ上へ \\
+    \cmd{mkdir -p 〇〇/〇〇} & ディレクトリを（途中のものも）作る \\
+    \cmd{touch 〇〇} & 空のファイルを作る \\
+    \cmd{cp 元 先} / \cmd{cp -r 元 先} & ファイルを / ディレクトリごとコピーする \\
+    \cmd{mv 元 先} & 移動する・名前を変える \\
+    \cmd{rm 〇〇} / \cmd{rm -r 〇〇} & ファイルを / ディレクトリごと削除する（元に戻せない） \\
+    \cmd{cat 〇〇} & ファイルの中身を表示する \\
+    \cmd{less 〇〇} & ファイルを 1 画面ずつ表示する（\key{q} で終了） \\
+    \cmd{head -n 5 〇〇} / \cmd{tail -n 5 〇〇} & 先頭 / 末尾の 5 行を表示する \\
+    \cmd{tail -f 〇〇} & ファイルに追加される内容を表示し続ける \\
+    \cmd{find . -name "*.py"} & 名前でファイルを探す \\
+    \cmd{tree} & ディレクトリの構造を木の形で表示する \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[権限とユーザ（第6章）][tab:cheatsheet-permission]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{sudo 〇〇} & 管理者の権限でコマンドを実行する \\
+    \cmd{chmod +x 〇〇} & 実行の権限を付ける \\
+    \cmd{chmod 644 〇〇} & 権限を数字で設定する \\
+    \cmd{chown ユーザ:グループ 〇〇} & 所有者を変える \\
+    \cmd{groups} & 自分が入っているグループを表示する \\
+    \cmd{sudo usermod -aG dialout \$USER} & グループに自分を追加する（再ログインで有効） \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[テキスト処理（第7章）][tab:cheatsheet-text]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド・記号 & 意味 \\
+    \midrule
+    \cmd{コマンド > 〇〇} / \cmd{>> 〇〇} & 出力をファイルに書き込む / 追記する \\
+    \cmd{コマンド 2> 〇〇} & エラー出力をファイルに書き込む \\
+    \cmd{コマンド1 | コマンド2} & 出力を次のコマンドに渡す（パイプ） \\
+    \cmd{grep 文字列 〇〇} & 文字列を含む行を探す（\cmd{-i} で大文字・小文字を区別しない） \\
+    \cmd{wc -l 〇〇} & 行数を数える \\
+    \cmd{cut -d, -f2 〇〇} & カンマで区切った 2 列目を取り出す \\
+    \cmd{sort} / \cmd{uniq -c} & 並べ替える / 重複を数える \\
+    \cmd{sed 's/元/新/g' 〇〇} & 文字列を置き換える \\
+    \cmd{awk -F, '\{print \$2\}' 〇〇} & 列を取り出して処理する \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[プロセスとシステム（第8章）][tab:cheatsheet-process]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{ps aux} & 動いているプロセスの一覧を表示する \\
+    \cmd{top} / \cmd{htop} & プロセスと CPU・メモリの使用状況を表示し続ける \\
+    \cmd{コマンド \&} & バックグラウンドで実行する \\
+    \cmd{jobs} / \cmd{fg} / \cmd{bg} & ジョブの一覧 / フォアグラウンドへ / バックグラウンドへ \\
+    \cmd{kill PID} / \cmd{pkill 名前} & プロセスを終了させる \\
+    \cmd{df -h} / \cmd{du -sh 〇〇} / \cmd{free -h} & ディスク / ディレクトリの大きさ / メモリ \\
+    \cmd{systemctl status 〇〇} & サービスの状態を表示する \\
+    \cmd{journalctl -u 〇〇} / \cmd{sudo dmesg} & サービスのログ / カーネルのログを表示する \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[環境変数（第9章）][tab:cheatsheet-env]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{echo \$〇〇} & 変数の値を表示する \\
+    \cmd{export 〇〇=値} & 環境変数を設定する \\
+    \cmd{source \textasciitilde/.bashrc} & 設定ファイルを読み込み直す \\
+    \cmd{alias 名前='コマンド'} & エイリアスを作る \\
+    \cmd{which 〇〇} & コマンドの実行ファイルの場所を表示する \\
+    \cmd{env} / \cmd{printenv} & 環境変数の一覧を表示する \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\section{開発のための周辺ツール}
+\label{sec:cheatsheet-tools}
+
+開発で使う周辺ツールのコマンドです。
+
+\begin{tablebox}[パッケージ管理（第11章）][tab:cheatsheet-apt]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{sudo apt update} & パッケージの一覧を最新にする \\
+    \cmd{sudo apt upgrade} & インストール済みのパッケージを更新する \\
+    \cmd{sudo apt install 〇〇} & パッケージをインストールする \\
+    \cmd{sudo apt remove 〇〇} & パッケージを削除する \\
+    \cmd{apt search 〇〇} & パッケージを探す \\
+    \cmd{apt list --installed} & インストール済みのパッケージの一覧 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[Git（第13章）][tab:cheatsheet-git]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{git init} / \cmd{git clone URL} & リポジトリを作る / 複製する \\
+    \cmd{git status} & 変更の状態を表示する \\
+    \cmd{git add 〇〇} & 変更をステージする \\
+    \cmd{git commit -m "説明"} & コミットする \\
+    \cmd{git log --oneline} & コミットの履歴を表示する \\
+    \cmd{git diff} & 変更の差分を表示する \\
+    \cmd{git switch -c 〇〇} & ブランチを作って切り替える \\
+    \cmd{git merge 〇〇} & ブランチを取り込む \\
+    \cmd{git push} / \cmd{git pull} & リモートに送る / リモートから取り込む \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[ネットワークとリモート操作（第14章）][tab:cheatsheet-network]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{ip a} / \cmd{hostname -I} & IP アドレスを表示する \\
+    \cmd{ping 〇〇} & 相手とつながるかを確かめる \\
+    \cmd{ssh ユーザ@ホスト} & 別のコンピュータにログインする \\
+    \cmd{ssh-keygen -t ed25519} & SSH の鍵を作る \\
+    \cmd{scp 元 ユーザ@ホスト:先} & ファイルを送る \\
+    \cmd{rsync -av 元/ 先/} & ディレクトリを同期する \\
+    \cmd{tmux} / \cmd{tmux attach} & tmux を始める / セッションに戻る \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[Docker（第15章）][tab:cheatsheet-docker]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{docker run -it --rm イメージ} & コンテナを起動する（終了したら削除） \\
+    \cmd{docker ps -a} & コンテナの一覧を表示する \\
+    \cmd{docker images} & イメージの一覧を表示する \\
+    \cmd{docker exec -it コンテナ bash} & 動いているコンテナでシェルを開く \\
+    \cmd{docker build -t 名前 .} & Dockerfile からイメージを作る \\
+    \cmd{docker compose up -d} / \cmd{down} & compose.yaml のコンテナを起動 / 停止する \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\section{Python}
+\label{sec:cheatsheet-python}
+
+Python のプログラムを実行するためのコマンドです。
+
+\begin{tablebox}[Python の実行と環境（第17章）][tab:cheatsheet-python]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{python3} & 対話モードで起動する（\cmd{exit()} で終了） \\
+    \cmd{python3 〇〇.py} & スクリプトを実行する \\
+    \cmd{python3 -m venv .venv} & 仮想環境を作る \\
+    \cmd{source .venv/bin/activate} & 仮想環境を有効にする（\cmd{deactivate} で終了） \\
+    \cmd{pip install 〇〇} & （仮想環境の中で）パッケージをインストールする \\
+    \cmd{pipx install 〇〇} & コマンドとして使うツールをインストールする \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\section{ROS 2}
+\label{sec:cheatsheet-ros2}
+
+ROS 2 の \cmd{ros2} コマンドなどです。
+
+\begin{tablebox}[ノードの起動と環境（第21章・第23章・第25章）][tab:cheatsheet-ros2-run]
+  \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{source /opt/ros/jazzy/setup.bash} & ROS 2 の設定を読み込む \\
+    \cmd{ros2 run パッケージ 実行ファイル} & ノードを起動する \\
+    \cmd{ros2 launch パッケージ 〇〇.launch.py} & launch ファイルを実行する \\
+    \cmd{ros2 launch ... -s} & launch 引数の一覧を表示する \\
+    \cmd{--ros-args -p 名前:=値} & 起動時にパラメータを設定する \\
+    \cmd{--ros-args -r 元:=新} & 起動時に名前を付け替える（リマップ） \\
+    \cmd{--ros-args --params-file 〇〇.yaml} & YAML ファイルのパラメータを読み込む \\
+    \cmd{--ros-args --log-level debug} & ログレベルを変える \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[ノードとトピックを調べる（第22章）][tab:cheatsheet-ros2-topic]
+  \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{ros2 node list} / \cmd{info 〇〇} & ノードの一覧 / 詳しい情報 \\
+    \cmd{ros2 topic list -t} & トピックの一覧（型も表示） \\
+    \cmd{ros2 topic echo 〇〇} & トピックのデータを表示する \\
+    \cmd{ros2 topic info -v 〇〇} & パブリッシャ・サブスクライバ・QoS を表示する \\
+    \cmd{ros2 topic hz 〇〇} & データが届く頻度を表示する \\
+    \cmd{ros2 topic pub --once 〇〇 型 "\{...\}"} & トピックにデータを 1 回送る \\
+    \cmd{ros2 interface show 型} & メッセージ型などの中身を表示する \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[サービス・アクション・パラメータ（第22章）][tab:cheatsheet-ros2-srv]
+  \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{ros2 service list -t} & サービスの一覧 \\
+    \cmd{ros2 service call 〇〇 型 "\{...\}"} & サービスを呼び出す \\
+    \cmd{ros2 action list -t} & アクションの一覧 \\
+    \cmd{ros2 action send\_goal 〇〇 型 "\{...\}" --feedback} & アクションのゴールを送る \\
+    \cmd{ros2 param list} & パラメータの一覧 \\
+    \cmd{ros2 param get ノード 名前} & パラメータの値を表示する \\
+    \cmd{ros2 param set ノード 名前 値} & パラメータの値を変える \\
+    \cmd{ros2 param dump ノード} & パラメータを YAML で表示する \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[ワークスペースとパッケージ（第23章）][tab:cheatsheet-ros2-ws]
+  \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{ros2 pkg create --build-type ament\_python 〇〇} & Python のパッケージを作る \\
+    \cmd{rosdep install -i --from-path src --rosdistro jazzy -y} & 依存パッケージをインストールする \\
+    \cmd{colcon build --symlink-install} & ワークスペースをビルドする \\
+    \cmd{colcon build --packages-select 〇〇} & 指定したパッケージだけビルドする \\
+    \cmd{source install/local\_setup.bash} & ビルドしたパッケージを読み込む \\
+    \cmd{ros2 pkg list} & 使えるパッケージの一覧 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[可視化・記録・デバッグ（第22章・第26章・第28章）][tab:cheatsheet-ros2-debug]
+  \begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+    \toprule
+    コマンド & 意味 \\
+    \midrule
+    \cmd{rqt\_graph} & ノードとトピックのつながりを表示する \\
+    \cmd{rqt} & GUI のツールをまとめて使う \\
+    \cmd{rviz2} & 3D でデータを表示する \\
+    \cmd{ros2 run tf2\_ros tf2\_echo 親 子} & 座標変換を表示する \\
+    \cmd{ros2 run tf2\_tools view\_frames} & 座標系のつながりを PDF にする \\
+    \cmd{ros2 bag record -o 名前 トピック ...} & トピックを記録する \\
+    \cmd{ros2 bag info 〇〇} / \cmd{play 〇〇} & 記録の情報を表示する / 再生する \\
+    \cmd{ros2 doctor} & ROS 2 の環境を調べる \\
+    \cmd{ros2 daemon stop} & ros2 コマンドの古い情報を消す \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}

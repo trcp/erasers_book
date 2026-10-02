@@ -1,0 +1,16 @@
+% 図：カチャカの LiDAR の向き（chapters/ros2/kachaka.tex）
+\begin{tikzpicture}[ax/.style={-{Stealth[length=2.2mm]}, very thick}]
+  % ロボット（上から見た図、上が前）
+  \draw[rounded corners=4pt, fill=blue!8] (-1.0,-1.0) rectangle (1.0,1.0);
+  \node[font=\scriptsize] at (0,-0.65) {カチャカ};
+  \draw[fill=white] (0,0.45) circle (0.28);
+  \node[font=\scriptsize, right] at (0.3,0.25) {LiDAR};
+  % ロボットの前
+  \draw[-{Stealth[length=2mm]}, thick, gray] (0,1.0) -- (0,2.1) node[above, font=\scriptsize, text=black]{ロボットの前};
+  % LiDAR の座標系（x 軸が左を向いている）
+  \draw[ax, red!80!black] (0,0.45) -- (-1.9,0.45) node[left, font=\scriptsize]{LiDAR の $x$（角度 0）};
+  \draw[ax, green!50!black] (0,0.45) -- (0,-1.7) node[below, font=\scriptsize]{LiDAR の $y$};
+  % 正面の角度
+  \draw[-{Stealth[length=1.8mm]}, thick, orange!80!black] (-0.8,0.45) arc (180:90:0.8);
+  \node[font=\scriptsize, orange!70!black, align=left, anchor=west] at (1.25,1.45) {ロボットの正面は、LiDAR から見ると\\$-90^\circ$（$-\pi/2$ rad）の向き};
+\end{tikzpicture}

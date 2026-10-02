@@ -1,0 +1,454 @@
+\chapter{Python の練習問題の解答例}
+\label{app:python-answers}
+
+\ref{chap:python_basics}章と\ref{chap:python_class}章の練習問題の解答例です。
+解答例は一例です。
+同じ結果になれば、違う書き方でも構いません。
+解答例を見る前に、まずは自分で考えて、プログラムを書いて動かしてみましょう。
+
+\section{第18章 Python の基本}
+\label{sec:python-basics-answers}
+
+\begin{description}
+  \item[練習問題 18.1 (1)] たとえば \cmd{5 + 8 - 6 / 2} です（$6 / 2 = 3$ が先に計算されるので $5 + 8 - 3 = 10$）。\cmd{/} の計算結果は小数になるので、Python で実行すると \cmd{10.0} と表示されます。
+  \item[練習問題 18.1 (2)] \cmd{200 // 60} で 3（分）、\cmd{200 \% 60} で 20（秒）なので、3 分 20 秒です。
+\end{description}
+
+\begin{lstlisting}[style=python, caption={練習問題 18.2 (1) の解答例}, label={lst:python-basics-a3}]
+money = 4000
+book = 980
+chips = 250
+ice = 150
+book_tax = 0.10
+food_tax = 0.08
+
+total = book * 2 * (1 + book_tax) + (chips + ice) * (1 + food_tax)
+print(round(money - total))   # 1412
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={練習問題 18.2 (2)・(3) の解答例}, label={lst:python-basics-a4}]
+# 練習問題 18.2 (2)
+title = input("アニメ名=> ")
+print(f"{title}は{len(title)}文字です。")
+
+# 練習問題 18.2 (3)
+radius = float(input("車輪の半径 [m] => "))
+rps = float(input("1 秒あたりの回転数 => "))
+print(f"速さは {2 * 3.14 * radius * rps:.2f} m/s です")
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={練習問題 18.3 (1)〜(4) の解答例}, label={lst:python-basics-a6}]
+# 練習問題 18.3 (1)
+colors = ["green", "blue", "red", "black", "white"]
+print(colors[1:4])
+
+# 練習問題 18.3 (2)
+members = ["satou", "tanaka", "suzuki"]
+members.append("itou")
+members.remove("satou")
+print(members)       # ['tanaka', 'suzuki', 'itou']
+print(members[1])    # suzuki
+
+# 練習問題 18.3 (3)
+heights = [176, 158, 164]
+print(sum(heights) / len(heights))   # 166.0
+
+# 練習問題 18.3 (4)
+robot = {"name": "turtle", "max_speed": 0.5}
+robot["max_speed"] = 0.8
+robot["battery"] = 12.0
+print(f"{robot['name']} の最高速度は {robot['max_speed']} m/s")
+\end{lstlisting}
+
+f 文字列の \cmd{\{ \}} の中で辞書のキーを書くときは、外側の \cmd{"} とぶつからないように \cmd{'} を使います。
+
+\begin{lstlisting}[style=python, caption={練習問題 18.4 (1)〜(4) の解答例}, label={lst:python-basics-a10}]
+# 練習問題 18.4 (1)
+a = float(input("a => "))
+b = float(input("b => "))
+if a > b:
+    print("a の方が大きい")
+elif a < b:
+    print("b の方が大きい")
+else:
+    print("a と b は同じ")
+
+# 練習問題 18.4 (2)
+height = float(input("身長 [m] => "))
+weight = float(input("体重 [kg] => "))
+bmi = weight / height ** 2
+print(f"BMI = {bmi:.1f}")
+if bmi < 18.5:
+    print("やせ")
+elif bmi < 25:
+    print("標準")
+elif bmi < 30:
+    print("肥満")
+else:
+    print("高度肥満")
+
+# 練習問題 18.4 (3)
+num = int(input("整数 => "))
+if num % 2 == 0:
+    print("偶数である")
+    if num >= 25:
+        print("25 以上である")
+if num % 3 == 0:
+    print("3 の倍数である")
+
+# 練習問題 18.4 (4)
+voltage = float(input("電圧 [V] => "))
+if voltage <= 0 or voltage > 15:
+    print("センサの値が異常です")
+elif voltage >= 12.0:
+    print("充電十分")
+elif voltage >= 11.0:
+    print("そろそろ充電")
+else:
+    print("すぐに充電してください")
+\end{lstlisting}
+
+練習問題 18.4 (3) のように、if 文の中に if 文を書くこともできます（インデントを 1 段深くします）。
+
+\begin{lstlisting}[style=python, caption={練習問題 18.5 (1)〜(4) の解答例}, label={lst:python-basics-a14}]
+# 練習問題 18.5 (1)
+total = 0
+for i in range(1, 31):
+    total += i
+print(total)   # 465
+
+# 練習問題 18.5 (2)
+nums = [1, 62, 3, 6743, 51, 6783, 42, 4671, 5, 236]
+for n in nums:
+    if n >= 1000:
+        continue
+    print(n)
+
+# 練習問題 18.5 (3)
+n = int(input("数> "))
+for i in range(1, n + 1):
+    print(f"{i}:" + "■" * i)
+
+# 練習問題 18.5 (4)
+count = 0
+total = 0
+while True:
+    data = float(input("データ入力（負の数で終了）> "))
+    if data < 0:
+        break
+    count += 1
+    total += data
+if count > 0:
+    print(f"個数: {count} 合計: {total} 平均: {total / count}")
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={練習問題 18.5 (5)・(6) の解答例}, label={lst:python-basics-a18}]
+import random
+
+# 練習問題 18.5 (5)
+answer = random.randint(1, 30)
+for i in range(5):
+    guess = int(input("値を入力してください=> "))
+    if guess == answer:
+        print("正解です！")
+        break
+    elif guess < answer:
+        print("残念！それよりも大きいです！")
+    else:
+        print("残念！それよりも小さいです！")
+print(f"正解は {answer} でした。")
+
+# 練習問題 18.5 (6)
+hands = ["グー", "チョキ", "パー"]
+results = ["あいこ", "負け", "勝ち"]
+mine = int(input("あなたの手は？（0:グー, 1:チョキ, 2:パー）=> "))
+computer = random.randint(0, 2)
+print(f"あなた: {hands[mine]}  コンピュータ: {hands[computer]}")
+print(results[(mine - computer + 3) % 3])
+\end{lstlisting}
+
+練習問題 18.5 (6) では、手の名前や結果をリストに入れておき、インデックスで取り出しています。
+if 文を何重にも書くよりも、短くわかりやすいプログラムになります。
+
+\begin{lstlisting}[style=python, caption={練習問題 18.6 (1)〜(5) の解答例}, label={lst:python-basics-a20}]
+# 練習問題 18.6 (1)
+def motto():
+    print("完璧を")
+    print("目指すよりも")
+    print("まずは")
+    print("終わらせろ")
+
+
+motto()
+motto()
+motto()
+
+
+# 練習問題 18.6 (2)
+def even_or_odd(num):
+    if num % 2 == 0:
+        print("偶数")
+    else:
+        print("奇数")
+
+
+even_or_odd(5)
+even_or_odd(20)
+even_or_odd(1)
+
+
+# 練習問題 18.6 (3)
+def maximum(a, b, c):
+    largest = a
+    if b > largest:
+        largest = b
+    if c > largest:
+        largest = c
+    return largest
+
+
+print(maximum(40, 23, 60))   # 60
+
+
+# 練習問題 18.6 (4)
+def find_max_min(values):
+    return max(values), min(values)
+
+
+largest, smallest = find_max_min([3, 62, 4, 56, 346, 8, 2, 893, 52, 46])
+print(largest, smallest)   # 893 2
+
+
+# 練習問題 18.6 (5)
+def valid_average(distances):
+    valid = []
+    for d in distances:
+        if d >= 0:
+            valid.append(d)
+    if len(valid) == 0:
+        return None
+    return sum(valid) / len(valid)
+
+
+print(valid_average([1.2, -1.0, 0.8]))   # 1.0
+print(valid_average([-1.0, -1.0]))       # None
+\end{lstlisting}
+
+\section{第19章 クラスとモジュール}
+\label{sec:python-class-answers}
+
+練習問題 19.7（最終課題）には決まった答えがないので、解答例は載せていません。
+
+\begin{lstlisting}[style=python, caption={練習問題 19.1 (1)・(2) の解答例}, label={lst:python-class-a1}]
+# 練習問題 19.1 (1)
+class Human:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def introduce(self):
+        print(f"私の名前は{self.name}です")
+
+    def show_age(self):
+        print(f"年齢は{self.age}歳です")
+
+
+john = Human("ジョン", 23)
+marine = Human("マリン", 18)
+john.introduce()
+john.show_age()
+marine.introduce()
+marine.show_age()
+
+
+# 練習問題 19.1 (2)
+class Tax:
+    def __init__(self, rate):
+        self.rate = rate   # 税率 [%]
+
+    def price(self, value):
+        total = round(value * (1 + self.rate / 100))
+        print(f"{value} 円（税率 {self.rate}%）→ {total} 円")
+
+
+tax8 = Tax(8)
+tax10 = Tax(10)
+for value in [250, 580]:
+    tax8.price(value)
+    tax10.price(value)
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={練習問題 19.1 (3) の解答例}, label={lst:python-class-a3}]
+class Robot:
+    def __init__(self, name, max_speed=0.5):
+        self.name = name
+        self.max_speed = max_speed
+        self.x = 0.0
+        self.battery = 100
+
+    def move(self, speed, duration):
+        if self.battery <= 0:
+            print("バッテリ切れです")
+            return
+        if speed > self.max_speed:
+            speed = self.max_speed
+        distance = speed * duration
+        self.x += distance
+        self.battery -= distance * 10
+        print(f"x = {self.x:.2f} m, バッテリ {self.battery:.0f}%")
+
+
+robot = Robot("turtle")
+for i in range(12):
+    robot.move(0.5, 2.0)
+\end{lstlisting}
+
+\cmd{return} だけを書くと、戻り値を返さずに、その時点で関数（メソッド）を終了します。
+
+\begin{lstlisting}[style=python, caption={練習問題 19.2 (1)・(2) の解答例}, label={lst:python-class-a4}]
+import random
+
+
+class Player:
+    def __init__(self, name, hp):
+        self.name = name
+        self.hp = hp
+
+    def attack(self):
+        print(f"{self.name}は攻撃をした！")
+
+
+# 練習問題 19.2 (1)
+class Wizard(Player):
+    def __init__(self, name, hp, mp):
+        super().__init__(name, hp)
+        self.mp = mp
+
+    def magic(self):
+        if self.mp < 10:
+            print("魔力が足りない")
+            return
+        self.mp -= 10
+        print(f"{self.name}は魔法を唱えた！（残り魔力: {self.mp}）")
+
+
+wizard = Wizard("魔法使い", 60, 25)
+wizard.attack()
+wizard.magic()
+wizard.magic()
+wizard.magic()
+
+
+# 練習問題 19.2 (2)
+class Sensor:
+    def __init__(self, name):
+        self.name = name
+
+    def read(self):
+        return 0.0
+
+
+class DummyLidar(Sensor):
+    def read(self):
+        return random.uniform(0.1, 5.0)
+
+
+lidar = DummyLidar("lidar")
+print(f"{lidar.name}: {lidar.read():.2f} m")
+\end{lstlisting}
+
+\cmd{DummyLidar} では \cmd{\_\_init\_\_} を定義していないので、親クラスの \cmd{\_\_init\_\_} がそのまま使われます。
+
+\begin{lstlisting}[style=python, caption={練習問題 19.3 (1)・(2) の解答例}, label={lst:python-class-a6}]
+# 練習問題 19.3 (1)
+def apply_all(values, func):
+    results = []
+    for v in values:
+        results.append(func(v))
+    return results
+
+
+def to_cm(m):
+    return m * 100
+
+
+print(apply_all([1.0, 2.5, 4.0], to_cm))   # [100.0, 250.0, 400.0]
+
+
+# 練習問題 19.3 (2)
+def watch(distances, on_obstacle):
+    for d in distances:
+        if d < 0.3:
+            on_obstacle(d)
+
+
+def warn(d):
+    print(f"障害物を検出: {d} m")
+
+
+watch([1.2, 0.25, 0.8, 0.1], warn)
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={練習問題 19.4 (1)・(2) の解答例}, label={lst:python-class-a8}]
+import math
+from math import pi
+
+# 練習問題 19.4 (1)
+print(pi * 10 * 10)                # 314.1592653589793
+
+# 練習問題 19.4 (2)
+print(math.radians(30 * 4))        # 2.0943951023931953
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={練習問題 19.4 (3) の解答例（geometry.py）}, label={lst:python-class-a10}]
+import math
+
+
+def distance(x1, y1, x2, y2):
+    """2 点間の距離を返す"""
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
+
+def normalize_angle(deg):
+    """角度を -180 以上 180 未満に正規化する"""
+    return (deg + 180) % 360 - 180
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={練習問題 19.4 (3) の解答例（geometry を使うファイル）}, label={lst:python-class-a10b}]
+import geometry
+
+print(geometry.distance(0, 0, 3, 4))    # 5.0
+print(geometry.normalize_angle(270))    # -90
+\end{lstlisting}
+
+\begin{lstlisting}[style=python, caption={練習問題 19.5 (1)・(2) の解答例}, label={lst:python-class-a11}]
+import random
+
+# 練習問題 19.5 (1)
+for i in range(10):
+    num = random.randint(0, 3)
+    try:
+        print(100 / num)
+    except ZeroDivisionError:
+        print("0 で割ろうとしました")
+
+# 練習問題 19.5 (2)
+try:
+    num = int(input("整数を入力してください=> "))
+except ValueError:
+    num = 10
+print(num + 100)
+\end{lstlisting}
+
+\begin{description}
+  \item[練習問題 19.6 (1)] \cmd{random.randint(1, 10)} は 10 も含むので \cmd{random.randint(1, 9)} に直します。また、ループの中の \cmd{print} で 5 もすでに表示されているので、最後の \cmd{print} を消す（またはループの中の \cmd{print} を \cmd{if} の後ろに移す）と、5 が 2 回表示されなくなります。
+  \item[練習問題 19.6 (2)] \cmd{input( )} の値は文字列なので \cmd{range(int(num))} にする（1 か所目）、条件を \cmd{i \% 5 == 2 or i \% 5 == 3} にする（2 か所目、\ref{sec:python-basics-if}節の注意を参照）、\cmd{print("i")} は文字 \cmd{i} を表示してしまうので \cmd{print(i)} にする（3 か所目）。
+  \item[練習問題 19.6 (3)] 次の 5 か所を直します。
+    \begin{enumerate}
+      \item \cmd{input( )} の値を \cmd{int( )} で整数に変換する
+      \item 条件の \cmd{and} を \cmd{or} にする（\cmd{player} が 0 かつ 1 かつ 2 になることはない）
+      \item \cmd{prin} を \cmd{print} にする
+      \item \cmd{random.randint(0, 3)} を \cmd{random.randint(0, 2)} にする（3 だと \cmd{hands[3]} で \cmd{IndexError} になる）
+      \item \cmd{dceision} を \cmd{decision} にする
+    \end{enumerate}
+\end{description}

@@ -4,26 +4,315 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item rosbag2 を使って、トピックのデータを記録・再生する方法
+    \item ログのレベルと、ログの出し方・見方
+    \item ROS 2 でよくあるトラブルと、その原因の調べ方
+    \item QoS の設定と、QoS が合わないときに起きること
   \end{itemize}
 \end{goalbox}
 
-\section{rosbag2 による記録と再生}
+ロボットのプログラムは、なかなか思ったとおりには動きません。
+しかも、ロボットのプログラムの不具合は、「さっきは壁にぶつかったのに、もう一度試したらぶつからなかった」のように、同じ状況を再現するのが難しいことがよくあります。
+この章では、ロボットのデータを記録して後から何度でも再生できる rosbag2 と、ログの使い方、そして ROS 2 でよくあるトラブルの調べ方を学びます。
+\ref{sec:python-class-debug}節で学んだ Python のデバッグの基本も、思い出しながら読んでください。
 
-TODO
+\section{rosbag2 による記録と再生}
+\label{sec:debug-rosbag}
+
+\subsection{rosbag2 とは}
+
+\textbf{rosbag2} は、トピックに流れたメッセージを、時刻と一緒にファイルに記録し、後から同じタイミングで再生するためのツールです。
+記録したファイルを \textbf{bag ファイル}（バッグファイル）といいます。
+bag ファイルを使うと、次のようなことができます。
+
+\begin{itemize}
+  \item 実際のロボットで記録したセンサのデータを、ロボットがない場所で再生して、プログラムを試す
+  \item 不具合が起きたときのデータを記録しておき、同じ状況を何度でも再現して原因を調べる
+  \item 実験のデータを保存しておき、後から解析する
+\end{itemize}
+
+\subsection{記録する}
+
+turtlesim を使って、試してみましょう。
+\cmd{turtlesim\_node} と \cmd{turtle\_teleop\_key} を起動しておき（\ref{chap:ros2_concepts}章）、別のターミナルで \cmd{ros2 bag record} を実行します。
+後ろには、記録するトピックを並べます。
+\cmd{-o} で、記録する bag ファイルの名前（ディレクトリ名）を指定できます。
+
+\begin{terminal}[トピックを記録する]
+$ mkdir ~/bag_files && cd ~/bag_files
+$ ros2 bag record -o turtle_bag /turtle1/cmd_vel /turtle1/pose
+[INFO] [...] [rosbag2_recorder]: Press SPACE for pausing/resuming
+...
+[INFO] [...] [rosbag2_recorder]: Subscribed to topic '/turtle1/cmd_vel'
+[INFO] [...] [rosbag2_recorder]: Subscribed to topic '/turtle1/pose'
+\end{terminal}
+
+記録している間に、\cmd{turtle\_teleop\_key} でカメを動かします。
+動かし終わったら、\cmd{ros2 bag record} のターミナルで \key{Ctrl}+\key{C} を押して、記録を終わります。
+すべてのトピックを記録したいときは、トピック名の代わりに \cmd{-a} を付けます。
+ただし、カメラの画像などを記録すると、すぐにファイルが大きくなるので注意しましょう。
+
+\subsection{記録した内容を確かめる}
+
+\cmd{ros2 bag info} で、bag ファイルに何が記録されているかを確かめられます。
+
+\begin{terminal}[bag ファイルの情報を表示する]
+$ ros2 bag info turtle_bag
+Files:             turtle_bag_0.mcap
+Bag size:          102.5 KiB
+Storage id:        mcap
+Duration:          25.4s
+Start:             Oct  2 2026 10:00:00.123 (1790902800.123)
+End:               Oct  2 2026 10:00:25.523 (1790902825.523)
+Messages:          1609
+Topic information: Topic: /turtle1/cmd_vel | Type: geometry_msgs/msg/Twist | Count: 21 | Serialization Format: cdr
+                   Topic: /turtle1/pose | Type: turtlesim/msg/Pose | Count: 1588 | Serialization Format: cdr
+\end{terminal}
+
+記録した時間、トピックごとのメッセージの型と数がわかります。
+ROS 2 Jazzy では、bag ファイルは \textbf{MCAP} という形式で保存されます。
+
+\subsection{再生する}
+
+\cmd{ros2 bag play} で、記録したメッセージを再生します。
+\cmd{turtle\_teleop\_key} を止め、turtlesim の \cmd{/reset} サービス（\ref{sec:ros2-concepts-service}節）でカメを最初の位置に戻してから、再生してみましょう。
+
+\begin{terminal}[記録したメッセージを再生する]
+$ ros2 service call /reset std_srvs/srv/Empty
+$ ros2 bag play turtle_bag
+\end{terminal}
+
+記録したときと同じように、カメが動きます。
+記録された \cmd{/turtle1/cmd\_vel} のメッセージが、記録したときと同じタイミングでパブリッシュされたからです。
+ただし、\cmd{/turtle1/pose} も一緒に再生されるので、turtlesim がパブリッシュする \cmd{/turtle1/pose} と混ざってしまいます。
+特定のトピックだけを再生したいときは、\cmd{--topics} で指定します。
+
+\begin{tablebox}[ros2 bag play のよく使うオプション][tab:debug-bag-play]
+  \begin{tabular}{p{0.38\linewidth}p{0.52\linewidth}}
+    \toprule
+    オプション & 意味 \\
+    \midrule
+    \cmd{--topics トピック名 ...} & 指定したトピックだけを再生する \\
+    \cmd{--rate 0.5} & 0.5 倍の速さで再生する（2 なら 2 倍） \\
+    \cmd{--loop} & 最後まで再生したら、最初から繰り返す \\
+    \cmd{--clock} & \cmd{/clock} もパブリッシュする（\cmd{use\_sim\_time} と組み合わせる） \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+再生中に \key{Space} を押すと、一時停止と再開ができます。
+
+\begin{point}[bag ファイルで自分のノードを試す]
+  実際のロボットやシミュレーションで、\cmd{/scan} や \cmd{/odom} などのセンサのデータを記録しておけば、ロボットを動かさなくても、自分のノードに同じデータを何度でも流して試せます。
+  このとき、\cmd{ros2 bag play --clock} で再生し、自分のノードは \cmd{use\_sim\_time} を \cmd{true}（\ref{sec:simulation-bridge}節）にして起動すると、記録したときの時刻で動かせます。
+\end{point}
 
 \section{ログ出力とログレベル}
+\label{sec:debug-log}
 
-TODO
+\subsection{ログレベル}
+
+\ref{sec:rclpy-first}節では、\cmd{get\_logger().info()} でログを出力しました。
+ログには、重要度に応じて 5 つの\textbf{ログレベル}があります。
+
+\begin{tablebox}[ログレベル][tab:debug-log-levels]
+  \begin{tabular}{llp{0.5\linewidth}}
+    \toprule
+    レベル & Python の書き方 & 使う場面 \\
+    \midrule
+    DEBUG & \cmd{get\_logger().debug()} & 開発中に、細かい値や処理の流れを確かめるため \\
+    INFO & \cmd{get\_logger().info()} & 起動した、接続した、など、普段の動作の報告 \\
+    WARN & \cmd{get\_logger().warn()} & 動作は続けられるが、注意が必要なこと \\
+    ERROR & \cmd{get\_logger().error()} & 処理に失敗したこと \\
+    FATAL & \cmd{get\_logger().fatal()} & 動作を続けられない、重大な問題 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+ノードは、決められたレベル以上のログだけを出力します。
+標準では INFO 以上が出力され、DEBUG のログは表示されません。
+デバッグのための細かいログは DEBUG で書いておき、必要なときだけ表示するようにすると、普段の出力が見やすくなります。
+
+\subsection{ログレベルを変える}
+
+起動するときに、\cmd{--ros-args --log-level} でログレベルを変えられます。
+
+\begin{terminal}[DEBUG のログも表示する]
+$ ros2 run my_package talker --ros-args --log-level debug
+\end{terminal}
+
+この方法では、rclpy の内部のログも表示されて、多すぎることがあります。
+特定のノードだけ変えたいときは、\cmd{--log-level ノード名:=debug} のように、ノード名を付けて指定します。
+
+\subsection{ログを出しすぎないために}
+
+タイマのコールバックの中で毎回ログを出すと、ログがあふれて読めなくなります。
+rclpy では、ログの出し方を制限するための引数が用意されています。
+
+\begin{lstlisting}[style=python, caption={ログの出し方を制限する}, label={lst:debug-log-throttle}]
+# 1 秒に 1 回まで出力する
+self.get_logger().info(f'距離: {d:.2f} m', throttle_duration_sec=1.0)
+# 最初の 1 回だけ出力する
+self.get_logger().warn('LiDAR のデータが届いていません', once=True)
+\end{lstlisting}
+
+\subsection{ログの行き先}
+
+ノードが出力したログは、次の 3 か所に送られます。
+
+\begin{itemize}
+  \item ノードを起動したターミナル
+  \item \cmd{/rosout} トピック（\ref{chap:ros2_concepts}章で見た、自動で用意されるトピック）
+  \item \cmd{\textasciitilde/.ros/log/} の下のログファイル
+\end{itemize}
+
+launch ファイルでたくさんのノードを起動していると、ターミナルではどのログがどのノードのものか、わかりにくくなります。
+そのようなときは、\textbf{rqt\_console} を使うと、\cmd{/rosout} に届いたすべてのノードのログを一覧で表示し、レベルやノード名で絞り込めます。
+
+\begin{terminal}[rqt\_console でログを見る]
+$ ros2 run rqt_console rqt_console
+\end{terminal}
 
 \section{よくあるトラブルと対処法}
+\label{sec:debug-trouble}
 
-TODO
+\subsection{まず確かめること}
+
+ROS 2 で思ったとおりに動かないときは、次の順番で確かめていくと、原因を絞り込みやすくなります。
+
+\begin{enumerate}
+  \item エラーメッセージを読む。最初に出たエラーから読む（\ref{sec:python-class-debug}節）
+  \item \cmd{ros2 node list} で、必要なノードが起動しているかを確かめる
+  \item \cmd{ros2 topic list} と \cmd{ros2 topic info -v} で、トピックの名前・型・パブリッシャとサブスクライバの数・QoS を確かめる
+  \item \cmd{ros2 topic echo} と \cmd{ros2 topic hz} で、データが実際に流れているかを確かめる
+  \item \cmd{rqt\_graph} で、ノードとトピックのつながりを確かめる（\ref{sec:ros2-concepts-rqt}節）
+\end{enumerate}
+
+\cmd{ros2 doctor} を使うと、ROS 2 の環境やネットワークの設定に問題がないかを、まとめて調べてくれます。
+
+\begin{terminal}[ROS 2 の環境を調べる]
+$ ros2 doctor
+...
+All 5 checks passed
+\end{terminal}
+
+\subsection{よくあるトラブル}
+
+ROS 2 でよくあるトラブルと、その主な原因をまとめておきます。
+付録\ref{app:troubleshooting}のトラブルシューティング集もあわせて見てください。
+
+\begin{description}
+  \item[\cmd{ros2: command not found} と表示される] ROS 2 の設定を読み込んでいません。\cmd{source /opt/ros/jazzy/setup.bash} を実行するか、\cmd{.bashrc} に書かれているかを確かめます（\ref{sec:ros2-install-setup}節）。
+  \item[\cmd{Package '〇〇' not found} と表示される] ワークスペースをビルドしていないか、ビルドした後に \cmd{source install/local\_setup.bash} を忘れています（\ref{sec:workspace-overlay}節）。apt でインストールするパッケージなら、インストールされているかを確かめます。
+  \item[\cmd{No executable found} と表示される] \cmd{setup.py} の \cmd{entry\_points} にノードを登録していないか、登録した後にビルドし直していません（\ref{sec:rclpy-first}節）。
+  \item[Python のファイルを書き換えたのに動作が変わらない] \cmd{--symlink-install} を付けずにビルドしています。ビルドし直しましょう（\ref{sec:workspace-colcon}節）。
+  \item[別のパソコンのノードが見えない] 2 台の \cmd{ROS\_DOMAIN\_ID} と \cmd{ROS\_AUTOMATIC\_DISCOVERY\_RANGE} が同じか、同じネットワークにつながっているか、ファイアウォールで通信が止められていないかを確かめます（\ref{sec:ros2-install-network}節）。
+  \item[トピックがあるのにデータが届かない] トピックの名前（名前空間やリマップ、\ref{sec:launch-namespace}節）・型・QoS が、パブリッシャとサブスクライバで合っているかを確かめます。QoS については次の節で説明します。
+  \item[ノードを止めたのに、一覧に残っている] \cmd{ros2} コマンドは、ノードの情報を覚えておくための\textbf{デーモン}というプロセスを裏で動かしています。古い情報が残っているときは、\cmd{ros2 daemon stop} を実行してから、もう一度調べてみましょう。
+  \item[シミュレーションで座標変換や時刻のエラーが出る] ノードによって \cmd{use\_sim\_time} の設定が違っていると、時刻が合わず、\cmd{extrapolation} などのエラーが出ます。すべてのノードで \cmd{use\_sim\_time} をそろえましょう（\ref{sec:simulation-bridge}節）。
+\end{description}
 
 \section{QoS 設定の基礎}
+\label{sec:debug-qos}
 
-TODO
+\subsection{QoS とは}
+
+\ref{sec:rclpy-pubsub}節では、パブリッシャとサブスクライバを作るときに、QoS として \cmd{10} を指定しました。
+\textbf{QoS}（Quality of Service）は、トピックの通信の品質を決める設定です。
+ネットワークが不安定な無線の環境や、大量のデータを送るセンサなど、場面に合わせて通信の仕方を選べるようになっています。
+主な設定は、次の 3 つです。
+
+\begin{tablebox}[QoS の主な設定][tab:debug-qos]
+  \begin{tabular}{lp{0.28\linewidth}p{0.42\linewidth}}
+    \toprule
+    設定 & 選べる値 & 意味 \\
+    \midrule
+    信頼性（Reliability） & \cmd{RELIABLE} & 届かなかったメッセージを送り直して、確実に届ける \\
+     & \cmd{BEST\_EFFORT} & 送り直さない。届かなくてもよいので、新しいデータを早く送る \\
+    \midrule
+    永続性（Durability） & \cmd{VOLATILE} & 後から起動したサブスクライバには、過去のメッセージを送らない \\
+     & \cmd{TRANSIENT\_LOCAL} & 後から起動したサブスクライバにも、最後のメッセージを送る \\
+    \midrule
+    履歴（History） & \cmd{KEEP\_LAST} と数 & 最新の決まった数のメッセージだけを溜めておく \\
+     & \cmd{KEEP\_ALL} & すべてのメッセージを溜めておく \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+QoS に数字だけを指定すると、\cmd{RELIABLE}・\cmd{VOLATILE}・\cmd{KEEP\_LAST}（その数）になります。
+
+\subsection{場面に合わせた QoS}
+
+たとえば、LiDAR のように 1 秒に何十回も新しいデータを送るセンサでは、途中のデータが 1 つ届かなくても、すぐに次のデータが来ます。
+古いデータを送り直すより、新しいデータを早く届けたほうがよいので、\cmd{BEST\_EFFORT} がよく使われます。
+一方、地図（\cmd{/map}）は、1 回だけパブリッシュされることが多いので、\cmd{TRANSIENT\_LOCAL} にして、後から起動したノードにも届くようにします。
+
+rclpy には、センサのデータ用の QoS の設定が、\cmd{qos\_profile\_sensor\_data} として用意されています。
+QoS を細かく決めるときは、\cmd{QoSProfile} を使います。
+
+\begin{lstlisting}[style=python, caption={QoS を指定してサブスクライバを作る}, label={lst:debug-qos}]
+from rclpy.qos import (QoSProfile, ReliabilityPolicy, DurabilityPolicy,
+                       qos_profile_sensor_data)
+
+# センサのデータ用の QoS（BEST_EFFORT）
+self.create_subscription(LaserScan, 'scan', self.scan_callback,
+                         qos_profile_sensor_data)
+
+# 地図のように、後から起動しても最後のメッセージを受け取りたい場合
+map_qos = QoSProfile(depth=1,
+                     reliability=ReliabilityPolicy.RELIABLE,
+                     durability=DurabilityPolicy.TRANSIENT_LOCAL)
+self.create_subscription(OccupancyGrid, 'map', self.map_callback, map_qos)
+\end{lstlisting}
+
+\subsection{QoS が合わないとき}
+
+パブリッシャとサブスクライバの QoS の組み合わせによっては、通信できないことがあります。
+特に気をつけたいのは、信頼性の組み合わせです。
+
+\begin{tablebox}[信頼性の組み合わせと通信できるか][tab:debug-qos-compat]
+  \begin{tabular}{llc}
+    \toprule
+    パブリッシャ & サブスクライバ & 通信できるか \\
+    \midrule
+    \cmd{RELIABLE} & \cmd{RELIABLE} & できる \\
+    \cmd{RELIABLE} & \cmd{BEST\_EFFORT} & できる \\
+    \cmd{BEST\_EFFORT} & \cmd{BEST\_EFFORT} & できる \\
+    \cmd{BEST\_EFFORT} & \cmd{RELIABLE} & \textbf{できない} \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\cmd{BEST\_EFFORT} でパブリッシュしているセンサのデータを、QoS に \cmd{10}（\cmd{RELIABLE}）を指定したサブスクライバで受け取ろうとすると、トピックはあるのにデータが届きません。
+このようなときは、\cmd{ros2 topic info -v} で、両者の QoS を確かめましょう。
+
+\begin{terminal}[トピックの QoS を確かめる]
+$ ros2 topic info -v /scan
+Type: sensor_msgs/msg/LaserScan
+
+Publisher count: 1
+
+Node name: ros_gz_bridge
+...
+QoS profile:
+  Reliability: BEST_EFFORT
+  History (Depth): KEEP_LAST (5)
+  Durability: VOLATILE
+...
+\end{terminal}
+
+\cmd{ros2 topic echo} でも、QoS が合わずにデータが表示されないことがあります。
+そのときは、\cmd{--qos-reliability best\_effort} のように、QoS を指定して実行します。
+
+\begin{terminal}[QoS を指定してトピックを表示する]
+$ ros2 topic echo --qos-reliability best_effort /scan
+\end{terminal}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item rosbag2 で、トピックのデータを記録（\cmd{ros2 bag record}）し、後から何度でも再生（\cmd{ros2 bag play}）できます。不具合の再現や、ロボットがない場所での開発に便利です。
+  \item ログには DEBUG・INFO・WARN・ERROR・FATAL の 5 つのレベルがあります。\cmd{--log-level} で表示するレベルを変え、rqt\_console でまとめて見られます。
+  \item うまく動かないときは、エラーメッセージを読み、ノード・トピック・データの流れを、\cmd{ros2} コマンドで順に確かめていきます。
+  \item QoS は通信の品質の設定です。センサのデータは \cmd{BEST\_EFFORT} がよく使われます。QoS が合わないと、トピックがあってもデータが届きません。
+\end{itemize}

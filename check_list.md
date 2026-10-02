@@ -202,6 +202,63 @@
 - [ ] `--ros-args -p max_speed:=1` が型の違いでエラーになること
 - [ ] コラムの rclcpp のコード片（`create_wall_timer(500ms, ...)` には `using namespace std::chrono_literals;` が必要）
 
+### 第26章 座標変換と可視化（`chapters/ros2/tf_viz.tex`）
+
+- [ ] `turtle_tf2_py` のデモ（`ros2 launch turtle_tf2_py turtle_tf2_demo.launch.py`）が Jazzy で動き、座標系の名前が `world`・`turtle1`・`turtle2` であること
+- [ ] `tf2_echo` と `view_frames` の出力の形式
+- [ ] `static_transform_publisher` の新しい形式の引数（`--x` `--yaw` `--frame-id` など）
+- [ ] サンプルの `frame_listener.py`、`urdf/simple_robot.urdf`、`launch/display.launch.py` が動き、RViz2 にロボットが正しく表示されること（車輪の向き、LiDAR の位置）
+- [ ] `ros-jazzy-joint-state-publisher-gui` のパッケージ名
+- [ ] RViz2 の操作の手順（RobotModel の「Description Topic」など）と、`LIBGL_ALWAYS_SOFTWARE=1` で VirtualBox でも表示できるか
+
+### 第27章 シミュレーション（`chapters/ros2/simulation.tex`）
+
+- [ ] `ros-jazzy-ros-gz` で Gazebo Harmonic がインストールされ、`gz sim shapes.sdf` が起動すること
+- [ ] TurtleBot3 の Jazzy でのインストール手順（`ros-jazzy-turtlebot3` などの apt パッケージ名と、`turtlebot3_simulations` の `jazzy` ブランチ）を ROBOTIS e-Manual と照らし合わせる
+- [ ] `ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py` で表示される世界と、`ros2 topic list` の出力
+- [ ] Jazzy の TurtleBot3 の `/cmd_vel` が `TwistStamped` であること（`turtlebot3_teleop` の表示内容も）
+- [ ] ros_gz_bridge の YAML の書式の例が正しいこと
+- [ ] Waffle のカメラのトピック名（`/camera/image_raw`）と、`ros2 topic echo --field` の使い方
+- [ ] Gazebo Classic のサポート終了の時期（2025 年 1 月）
+
+### 第28章 データの記録とデバッグ（`chapters/ros2/debug.tex`）
+
+- [ ] `ros2 bag record` / `info` / `play` の出力の形式（Jazzy では MCAP が標準であること）
+- [ ] `--log-level ノード名:=debug` の書式、`throttle_duration_sec` と `once` の引数
+- [ ] `ros2 doctor` の出力
+- [ ] `ros2 topic info -v` の QoS の表示の形式と、`ros2 topic echo --qos-reliability` のオプション名
+- [ ] QoS の互換性の表が正しいこと
+
+### 第29章 実践：移動ロボットを動かす（`chapters/ros2/practice.tex`）
+
+- [ ] `teleop_twist_keyboard` の `stamped` パラメータで `TwistStamped` を送れること
+- [ ] サンプルの `obstacle_avoider.py` で TurtleBot3 が障害物を避けて走ること（TurtleBot3 の LiDAR の `angle_min` が 0 で 0〜2π の範囲であること、`safe_distance` などの初期値が適切か）
+- [ ] `ros2 topic pub --once /cmd_vel geometry_msgs/msg/TwistStamped "{}"` でロボットが止まること
+- [ ] `slam_toolbox` の `online_async_launch.py` と、`map_saver_cli` で `map.pgm` と `map.yaml` が保存されること
+- [ ] `ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=...` の引数と、RViz2 のボタンの名前（「2D Pose Estimate」「Nav2 Goal」）
+- [ ] `ros2 action send_goal /navigate_to_pose ...` の例が動くこと
+
+### 付録・おわりに
+
+- [ ] 付録A・B・D の内容が、本文の説明と食い違っていないか（特に付録B の Ubuntu と VirtualBox のキー操作）
+- [ ] 付録F の URL がすべて開けること、書籍の著者名・書名・出版社・発行年が正しいこと
+- [ ] 「おわりに」の内容と署名（今は `main.tex` の著者名「坂巻 新」にしている）
+
+### 第30章 実践：カチャカを動かす（`chapters/ros2/kachaka.tex`）
+
+`robot_project/`（Ubuntu 22.04 / Humble 向けの以前の教材）のカチャカの実機の部分を、本の構成に合わせて移植した章です。erasers_kachaka が **Jazzy に対応した版** を前提に書いています。
+
+- [ ] Jazzy 対応版の erasers_kachaka のインストール手順（ブランチ名、`depends.repos`、`rosdep`、`colcon build --packages-up-to erasers_kachaka_bringup`、Python のパッケージの入れ方）を確定させ、30.3 節を直す（現在の main ブランチは Humble 向けで、`numpy==1.22.4` や cartographer の `/opt/ros/humble` のパスがある）
+- [ ] `.bashrc` に書く環境変数（`KACHAKA_NAME`・`KACHAKA_IP`・`GRPC_PORT`・`API_GRPC_BRIDGE_SERVER_URI`・`RMW_IMPLEMENTATION`）が Jazzy 版でも同じか（教材にあった `ROS_LOCALHOST_ONLY` は Jazzy では非推奨のため載せていない）
+- [ ] 起動したときにカチャカが話す内容（「スタート」）と、`ros2 topic list` の出力
+- [ ] トピック名と型（`manual_control/cmd_vel` が `Twist`、`kachaka_speak` が `String`、`front_camera/image_raw`、`lidar/scan`）と、カメラ・LiDAR の QoS が `BEST_EFFORT` であること
+- [ ] `ros2 topic pub --rate 5 --times 10 ...` で 2 秒だけ動き、指令が途切れると止まること
+- [ ] カチャカの LiDAR の正面が `-π/2` であること（`lidar/scan` は `lidar_resampler` を通した後のデータ。点の数が変わるのは元の `lidar/scan_raw` か）
+- [ ] サンプルの `kachaka_speaker.py`・`camera_viewer.py`・`front_distance.py` が `__ns:=/er_kachaka` で動くこと
+- [ ] 第29章の `obstacle_avoider.py`（`front_angle`・`stamped` のパラメータを追加した）が、TurtleBot3 とカチャカの両方で動くこと
+- [ ] 「玉川大学のロボットチーム eR@sers が開発している」という紹介の書き方でよいか
+- [ ] 移植しなかった内容：`robot_project/` の AI 活用編（Raspberry Pi と Hailo）はカチャカと関係がないため移植していない。研究室の IP アドレスの対応表と VM のパスワードは載せていない
+
 ### 補章1 C++ でノードを書く（`supplement/rclcpp.tex`、`book/samples/rclcpp/my_cpp_package/`）
 
 - [ ] `my_cpp_package` を Jazzy で `colcon build` し、6 つのノード（`hello_node`・`talker`・`listener`・`turtle_controller`・`add_two_ints_server`・`param_node`）が本文どおりに動くこと（本書を書いた環境には C++ のコンパイラがないため、コンパイルも未確認）
@@ -244,14 +301,14 @@
 
 ## 3. 未執筆・書き残し
 
-- [ ] 後の章で OSS の話を振り返る（第2章 2.2 節からの流れ）
+- [x] 後の章で OSS の話を振り返る（第2章 2.2 節からの流れ）
   - [x] 第11章 パッケージ管理：`apt` で入れるソフトウェアの多くは OSS で、ディストリビューションが配布している（11.1 節に記載済み）
   - [x] 第13章 Git：GitHub が OSS 開発の中心の場であること、Issue / Pull Request での貢献（13.4 節に記載済み）
   - [x] 第20章 ROS とは：ROS 2 自体が Apache 2.0 ライセンスの OSS であること（20.2 節に記載済み）
   - [x] 第23章 ワークスペースとパッケージ：`package.xml` の `<license>` タグ（23.3・23.4 節に記載済み）
-  - [ ] 第29章 次のステップへ：使う側から貢献する側へ
+  - [x] 第29章 次のステップへ：使う側から貢献する側へ（29.5 節に記載済み）
 - [x] 第10章 シェルスクリプト入門の「実践：開発環境セットアップスクリプトを書く」は、`apt` を扱う第11章より前にある → 題材はそのままで、`apt-get` について断り書きを入れた
-- [ ] 付録D 用語集（`appendix/glossary.tex`）に、これまでの章で導入した用語を追加する
+- [ ] 付録E 用語集（`appendix/glossary.tex`）に、これまでの章で導入した用語を追加する（主な用語約 150 語で執筆済み。下の候補のうち、載せていない用語を追加するか検討する）
   - 第1章：プログラミング、アルゴリズム、流れ図（フローチャート）、順次・分岐・繰り返し、バグ、デバッグ、CPU、コア、クロック周波数、メモリ（RAM）、ストレージ、GPU、VRAM、入出力装置、ハードウェア、ソフトウェア、機械語、OS、デバイスドライバ、マイコン
   - 第2章：カーネル、UNIX、GNU、UNIX 哲学、OSS、フリーソフトウェア、ライセンス、コピーレフト、パーミッシブ、ディストリビューション、LTS
   - 第3章：ユーザ空間、カーネル空間、システムコール、ファイルシステム、ルートディレクトリ、マウント、FHS、ユーザ、UID、グループ、GID、root、sudo、プロセス、PID、親プロセス・子プロセス、systemd、スケジューラ、デバイスファイル
@@ -277,17 +334,18 @@
   - 第18章・第19章（追加分）：None、リスト内包表記、型ヒント
   - 第25章：launch ファイル、LaunchDescription、YAML、ros__parameters、名前空間、相対名、絶対名、リマップ、launch 引数、インクルード、bringup
   - 補章1：rclcpp、コンストラクタ、メンバ変数、スマートポインタ（shared_ptr）、std::bind、std::optional、CMakeLists.txt、add_executable
+  - 第30章：カチャカ、kachaka API、gRPC、erasers_kachaka、vcstool、Cyclone DDS、OpenCV、cv_bridge、エッジ検出
   - 第24章：rclpy、rclcpp、ログ、spin、コールバック、タイマ、QoS、future、デッドロック、エントリポイント、インタフェース、rosidl
   - 第4章：GUI、CUI、CLI、ターミナル、シェル、bash、プロンプト、ビルトインコマンド、man ページ、Tab 補完
   - 第5章：テキストエディタ、テキストエディター（GNOME Text Editor）、カレントディレクトリ、ホームディレクトリ、隠しファイル、パス、絶対パス、相対パス、ワイルドカード、ブレース展開
-- [ ] 付録A コマンド早見表に、第4章・第5章のコマンドを追加する
+- [x] 付録A コマンド早見表に、第4章・第5章のコマンドを追加する（付録A を執筆済み）
 
 ---
 
 ## 4. 図版
 
-図は TikZ で描いて `images/<章のファイル名>/` に置いています（38 点）。
-残りの 9 か所はスクリーンショットが必要なため、プレースホルダのままです。
+図は TikZ で描いて `images/<章のファイル名>/` に置いています（44 点）。
+残りの 15 か所はスクリーンショットが必要なため、プレースホルダのままです。
 残っている箇所は `grep -rn '入れる画像' book/` で一覧できます。
 
 | 章 | ラベル | 内容 | 状態 |
@@ -298,12 +356,18 @@
 | 第5章 | `fig:files-text-editor` | Ubuntu のテキストエディター | 要スクリーンショット |
 | 第21章 | `fig:ros2-install-turtlesim` | turtlesim のウィンドウ | 要スクリーンショット |
 | 第22章 | `fig:ros2-concepts-rqt-graph` | rqt_graph の表示 | 要スクリーンショット |
+| 第26章 | `fig:tf-viz-rviz` | RViz2 でロボットのモデルと座標系を表示した画面と joint_state_publisher_gui | 要スクリーンショット |
+| 第27章 | `fig:simulation-tb3` | Gazebo で TurtleBot3 を起動した様子 | 要スクリーンショット |
+| 第29章 | `fig:practice-slam` | SLAM で地図を作っている RViz2 の画面 | 要スクリーンショット |
+| 第29章 | `fig:practice-nav2` | Navigation2 で自律移動している RViz2 の画面 | 要スクリーンショット |
+| 第30章 | `fig:kachaka-robot` | カチャカの本体の写真（`robot_project/imgs/kachaka_lidar.png` が使えるかも） | 要写真 |
+| 第30章 | `fig:kachaka-rviz` | erasers_kachaka を起動したときの RViz2 の画面（`robot_project/imgs/vb_test3.png` が使えるかも） | 要スクリーンショット |
 | 第4章 | `fig:terminal-gui-cli` | 同じディレクトリを GUI と CLI で表示した例 | 要スクリーンショット |
 | 第4章 | `fig:terminal-window` | Ubuntu のターミナル | 要スクリーンショット |
 | 第4章 | `fig:terminal-man` | `man ls` の表示画面 | 要スクリーンショット |
 
-- [ ] 上の 9 点のスクリーンショットを撮影する（VirtualBox の画面はホスト OS で、それ以外は Ubuntu 24.04 で）
-- [ ] TikZ で描いた 38 点の図の内容・見た目を確認する（第1章 6 点、第2章 4 点、第3章 3 点、第4章 2 点、第5章 2 点、第6章 1 点、第7章 2 点、第8章 1 点、第9章 1 点、第11章 1 点、第12章 1 点、第13章 2 点、第14章 3 点、第15章 2 点、第16章 1 点、第17章 1 点、第20章 2 点、第21章 1 点、第22章 1 点、第23章 1 点）
+- [ ] 上の 15 点のスクリーンショットを撮影する（VirtualBox の画面はホスト OS で、それ以外は Ubuntu 24.04 で）
+- [ ] TikZ で描いた 44 点の図の内容・見た目を確認する（第1章 6 点、第2章 4 点、第3章 3 点、第4章 2 点、第5章 2 点、第6章 1 点、第7章 2 点、第8章 1 点、第9章 1 点、第11章 1 点、第12章 1 点、第13章 2 点、第14章 3 点、第15章 2 点、第16章 1 点、第17章 1 点、第20章 2 点、第21章 1 点、第22章 1 点、第23章 1 点、第26章 2 点、第27章 1 点、第29章 1 点、第30章 2 点）
 - [ ] 第5章のコラム「ホームディレクトリの中のディレクトリ名」に `xdg-user-dirs-gtk-update` のダイアログの画像を入れるか（コラムの囲みの中には `figure` を置けないため、入れる場合はコラムの外に出すか、囲みの中に `\includegraphics` を直接書く）
 
 ---

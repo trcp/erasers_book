@@ -1,4 +1,146 @@
 \chapter{よく使うキーボードショートカット}
 \label{app:shortcuts}
 
-TODO
+本書で使った主なキー操作をまとめました。
+「\key{Ctrl}+\key{C}」は、\key{Ctrl} を押したまま \key{C} を押すことを、「\key{Ctrl}+\key{B} → \key{c}」は、\key{Ctrl}+\key{B} を押して離してから \key{c} を押すことを表します。
+
+\section{ターミナルとシェル}
+\label{sec:shortcuts-terminal}
+
+ターミナルとシェルで使うキー操作です。
+
+\begin{tablebox}[シェル（bash）のキー操作（第4章）][tab:shortcuts-bash]
+  \begin{tabular}{p{0.3\linewidth}p{0.6\linewidth}}
+    \toprule
+    キー & 操作 \\
+    \midrule
+    \key{Tab} & コマンドやファイル名を補完する（2 回押すと候補を表示） \\
+    \key{$\uparrow$} / \key{$\downarrow$} & 前 / 次に入力したコマンドを呼び出す \\
+    \key{Ctrl}+\key{R} & 入力したコマンドの履歴を検索する \\
+    \key{Ctrl}+\key{C} & 実行中のコマンドを止める \\
+    \key{Ctrl}+\key{Z} & 実行中のコマンドを一時停止する（\cmd{fg} で再開） \\
+    \key{Ctrl}+\key{D} & 入力の終わりを知らせる（シェルや対話モードを終了する） \\
+    \key{Ctrl}+\key{L} & 画面をきれいにする \\
+    \key{Ctrl}+\key{A} / \key{Ctrl}+\key{E} & カーソルを行頭 / 行末に移動する \\
+    \key{Ctrl}+\key{U} / \key{Ctrl}+\key{K} & カーソルより前 / 後ろを削除する \\
+    \key{Ctrl}+\key{W} & カーソルの前の 1 単語を削除する \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[ターミナル（GNOME 端末）のキー操作][tab:shortcuts-gnome-terminal]
+  \begin{tabular}{p{0.3\linewidth}p{0.6\linewidth}}
+    \toprule
+    キー & 操作 \\
+    \midrule
+    \key{Ctrl}+\key{Alt}+\key{T} & ターミナルを開く \\
+    \key{Ctrl}+\key{Shift}+\key{C} & 選んだ文字をコピーする \\
+    \key{Ctrl}+\key{Shift}+\key{V} & 貼り付ける \\
+    \key{Ctrl}+\key{Shift}+\key{T} & 新しいタブを開く \\
+    \key{Ctrl}+\key{PageUp} / \key{PageDown} & 前 / 次のタブに切り替える \\
+    \key{Ctrl}+\key{Shift}+\key{W} & タブを閉じる \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[tmux のキー操作（第14章）][tab:shortcuts-tmux]
+  \begin{tabular}{p{0.3\linewidth}p{0.6\linewidth}}
+    \toprule
+    キー & 操作 \\
+    \midrule
+    \key{Ctrl}+\key{B} → \key{\%} & 画面を左右に分割する \\
+    \key{Ctrl}+\key{B} → \key{"} & 画面を上下に分割する \\
+    \key{Ctrl}+\key{B} → 矢印キー & ペインを移動する \\
+    \key{Ctrl}+\key{B} → \key{x} & 今のペインを閉じる \\
+    \key{Ctrl}+\key{B} → \key{c} & 新しいウィンドウを作る \\
+    \key{Ctrl}+\key{B} → \key{n} & 次のウィンドウに切り替える \\
+    \key{Ctrl}+\key{B} → \key{d} & セッションから離れる（デタッチ） \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\section{Ubuntu と VirtualBox}
+\label{sec:shortcuts-ubuntu}
+
+Ubuntu のデスクトップと、VirtualBox で使うキー操作です。
+
+\begin{tablebox}[Ubuntu のデスクトップのキー操作（第2章）][tab:shortcuts-ubuntu]
+  \begin{tabular}{p{0.3\linewidth}p{0.6\linewidth}}
+    \toprule
+    キー & 操作 \\
+    \midrule
+    \key{Super} & アクティビティ画面を開く（アプリの検索） \\
+    \key{Alt}+\key{Tab} & ウィンドウを切り替える \\
+    \key{Super}+\key{$\leftarrow$} / \key{$\rightarrow$} & ウィンドウを画面の左半分 / 右半分に並べる \\
+    \key{Super}+\key{$\uparrow$} & ウィンドウを最大化する \\
+    \key{Print} & スクリーンショットを撮る \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[VirtualBox のキー操作][tab:shortcuts-virtualbox]
+  \begin{tabular}{p{0.3\linewidth}p{0.6\linewidth}}
+    \toprule
+    キー & 操作 \\
+    \midrule
+    ホストキー（右 \key{Ctrl}） & キーボードとマウスを仮想マシンから外す \\
+    ホストキー+\key{F} & フルスクリーン表示を切り替える \\
+    ホストキー+\key{Del} & 仮想マシンに \key{Ctrl}+\key{Alt}+\key{Del} を送る \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\section{エディタ}
+\label{sec:shortcuts-editor}
+
+エディタで使うキー操作です。
+
+\begin{tablebox}[VS Code のキー操作（第12章）][tab:shortcuts-vscode]
+  \begin{tabular}{p{0.3\linewidth}p{0.6\linewidth}}
+    \toprule
+    キー & 操作 \\
+    \midrule
+    \key{Ctrl}+\key{S} & 保存する \\
+    \key{Ctrl}+\key{P} & ファイル名で探して開く \\
+    \key{Ctrl}+\key{Shift}+\key{P} & コマンドパレットを開く \\
+    \key{Ctrl}+\key{`} & 統合ターミナルを開く・閉じる \\
+    \key{Ctrl}+\key{B} & サイドバーを表示する・隠す \\
+    \key{Ctrl}+\key{F} / \key{Ctrl}+\key{H} & 検索する / 置換する \\
+    \key{Ctrl}+\key{Shift}+\key{F} & すべてのファイルから検索する \\
+    \key{Ctrl}+\key{/} & 選んだ行をコメントにする・戻す \\
+    \key{Alt}+\key{$\uparrow$} / \key{$\downarrow$} & 今の行を上 / 下に移動する \\
+    \key{F12} & 関数などの定義に移動する \\
+    \key{F5} & デバッグを始める \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{tablebox}[nano・Vim・Emacs の最低限のキー操作（第12章）][tab:shortcuts-terminal-editor]
+  \begin{tabular}{lp{0.3\linewidth}p{0.3\linewidth}}
+    \toprule
+    エディタ & 保存 & 終了 \\
+    \midrule
+    nano & \key{Ctrl}+\key{O} → \key{Enter} & \key{Ctrl}+\key{X} \\
+    Vim & \key{Esc} → \cmd{:w} → \key{Enter} & \key{Esc} → \cmd{:q} → \key{Enter}（保存せずに終了は \cmd{:q!}） \\
+    Emacs & \key{Ctrl}+\key{X} → \key{Ctrl}+\key{S} & \key{Ctrl}+\key{X} → \key{Ctrl}+\key{C} \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\section{ROS 2 のツール}
+\label{sec:shortcuts-ros2}
+
+ROS 2 のツールで使うキー操作です。
+
+\begin{tablebox}[ROS 2 のツールのキー操作][tab:shortcuts-ros2]
+  \begin{tabular}{p{0.3\linewidth}p{0.6\linewidth}}
+    \toprule
+    キー & 操作 \\
+    \midrule
+    \key{Ctrl}+\key{C} & ノード・launch ファイル・\cmd{ros2 topic echo} などを止める \\
+    矢印キー（turtle\_teleop\_key） & turtlesim のカメを動かす（第21章） \\
+    \key{I} \key{J} \key{K} \key{L} \key{,}（teleop\_twist\_keyboard） & 前進・左回転・停止・右回転・後退（第29章） \\
+    \key{Space}（\cmd{ros2 bag record} / \cmd{play}） & 記録・再生を一時停止する・再開する（第28章） \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}

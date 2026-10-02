@@ -1,0 +1,18 @@
+% 図：LiDAR の正面の範囲で障害物を見つける（chapters/ros2/practice.tex）
+\begin{tikzpicture}
+  % 正面 ±30 度の範囲
+  \fill[orange!15] (0,0) -- (30:3.3) arc (30:-30:3.3) -- cycle;
+  \draw[orange!70!black, dashed] (0,0) -- (30:3.3) (0,0) -- (-30:3.3);
+  \node[font=\scriptsize, orange!60!black, align=center] at (2.75,0.62) {正面\\（左右 30°）};
+  % LiDAR の測定線
+  \foreach \a in {-150,-120,...,180} {\draw[black!25] (0,0) -- (\a:2.2);}
+  % ロボット
+  \draw[fill=blue!10, rounded corners=2pt] (-0.35,-0.3) rectangle (0.35,0.3);
+  \node[font=\scriptsize, below] at (0,-0.3) {ロボット（右が前）};
+  % 障害物
+  \fill[black!60] (2.1,-0.55) rectangle (2.5,0.15);
+  \draw[{Stealth[length=1.8mm]}-{Stealth[length=1.8mm]}, thick, blue!70!black] (0.35,0) -- node[above, font=\scriptsize, fill=white, inner sep=1pt]{最も近い距離} (2.1,0);
+  % 判定
+  \node[draw, rounded corners=2pt, font=\scriptsize, align=left, anchor=west, fill=white] at (4.0,0.5) {最も近い距離 $<$ \texttt{safe\_distance}\\ \quad → その場で左に回る};
+  \node[draw, rounded corners=2pt, font=\scriptsize, align=left, anchor=west, fill=white] at (4.0,-0.5) {それ以外\\ \quad → まっすぐ進む};
+\end{tikzpicture}

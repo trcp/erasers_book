@@ -16,7 +16,7 @@
 この章では、もう少し大きなプログラムを書くための道具を学びます。
 特に、クラス・継承・コールバックは、ROS 2 のノードを書くとき（\ref{chap:rclpy}章）に毎回使う、とても大切な考え方です。
 この章でも、各節の最後に練習問題を用意しました。
-解答例は章の最後（\ref{sec:python-class-answers}節）にあります。
+解答例は付録\ref{app:python-answers}（\ref{sec:python-class-answers}節）にあります。
 
 \section{クラスとオブジェクト}
 \label{sec:python-class-class}
@@ -712,7 +712,7 @@ if player == 0 and player == 1 and player == 2:
 \end{enumerate}
 \end{exercise}
 
-\begin{column}{最終課題：自由製作}
+\begin{exercise}[title={練習問題 \thetcbcounter（最終課題：自由製作）}]
   第IV部で学んだことを使って、自由にプログラムを作ってみましょう。
   何を作るかを自分で決め、必要な機能を考えて、少しずつ作っていくことが、プログラミングの一番の練習になります。
   たとえば、次のようなものが考えられます。
@@ -724,224 +724,8 @@ if player == 0 and player == 1 and player == 2:
   わからないことは、検索したり、資料を読み返したり、人に聞いたりして構いません。
   ただし、コピーしたコードをそのまま使うのではなく、1 行 1 行、何をしているのかを説明できるようにしておきましょう。
   作ったプログラムは Git で管理して（\ref{chap:git}章）、README に何を作ったのかを書いておくとよいでしょう。
-\end{column}
-
-\section{練習問題の解答例}
-\label{sec:python-class-answers}
-
-\begin{lstlisting}[style=python, caption={練習問題 19.1 (1)・(2) の解答例}, label={lst:python-class-a1}]
-# 練習問題 19.1 (1)
-class Human:
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-
-    def introduce(self):
-        print(f"私の名前は{self.name}です")
-
-    def show_age(self):
-        print(f"年齢は{self.age}歳です")
-
-
-john = Human("ジョン", 23)
-marine = Human("マリン", 18)
-john.introduce()
-john.show_age()
-marine.introduce()
-marine.show_age()
-
-
-# 練習問題 19.1 (2)
-class Tax:
-    def __init__(self, rate):
-        self.rate = rate   # 税率 [%]
-
-    def price(self, value):
-        total = round(value * (1 + self.rate / 100))
-        print(f"{value} 円（税率 {self.rate}%）→ {total} 円")
-
-
-tax8 = Tax(8)
-tax10 = Tax(10)
-for value in [250, 580]:
-    tax8.price(value)
-    tax10.price(value)
-\end{lstlisting}
-
-\begin{lstlisting}[style=python, caption={練習問題 19.1 (3) の解答例}, label={lst:python-class-a3}]
-class Robot:
-    def __init__(self, name, max_speed=0.5):
-        self.name = name
-        self.max_speed = max_speed
-        self.x = 0.0
-        self.battery = 100
-
-    def move(self, speed, duration):
-        if self.battery <= 0:
-            print("バッテリ切れです")
-            return
-        if speed > self.max_speed:
-            speed = self.max_speed
-        distance = speed * duration
-        self.x += distance
-        self.battery -= distance * 10
-        print(f"x = {self.x:.2f} m, バッテリ {self.battery:.0f}%")
-
-
-robot = Robot("turtle")
-for i in range(12):
-    robot.move(0.5, 2.0)
-\end{lstlisting}
-
-\cmd{return} だけを書くと、戻り値を返さずに、その時点で関数（メソッド）を終了します。
-
-\begin{lstlisting}[style=python, caption={練習問題 19.2 (1)・(2) の解答例}, label={lst:python-class-a4}]
-import random
-
-
-class Player:
-    def __init__(self, name, hp):
-        self.name = name
-        self.hp = hp
-
-    def attack(self):
-        print(f"{self.name}は攻撃をした！")
-
-
-# 練習問題 19.2 (1)
-class Wizard(Player):
-    def __init__(self, name, hp, mp):
-        super().__init__(name, hp)
-        self.mp = mp
-
-    def magic(self):
-        if self.mp < 10:
-            print("魔力が足りない")
-            return
-        self.mp -= 10
-        print(f"{self.name}は魔法を唱えた！（残り魔力: {self.mp}）")
-
-
-wizard = Wizard("魔法使い", 60, 25)
-wizard.attack()
-wizard.magic()
-wizard.magic()
-wizard.magic()
-
-
-# 練習問題 19.2 (2)
-class Sensor:
-    def __init__(self, name):
-        self.name = name
-
-    def read(self):
-        return 0.0
-
-
-class DummyLidar(Sensor):
-    def read(self):
-        return random.uniform(0.1, 5.0)
-
-
-lidar = DummyLidar("lidar")
-print(f"{lidar.name}: {lidar.read():.2f} m")
-\end{lstlisting}
-
-\cmd{DummyLidar} では \cmd{\_\_init\_\_} を定義していないので、親クラスの \cmd{\_\_init\_\_} がそのまま使われます。
-
-\begin{lstlisting}[style=python, caption={練習問題 19.3 (1)・(2) の解答例}, label={lst:python-class-a6}]
-# 練習問題 19.3 (1)
-def apply_all(values, func):
-    results = []
-    for v in values:
-        results.append(func(v))
-    return results
-
-
-def to_cm(m):
-    return m * 100
-
-
-print(apply_all([1.0, 2.5, 4.0], to_cm))   # [100.0, 250.0, 400.0]
-
-
-# 練習問題 19.3 (2)
-def watch(distances, on_obstacle):
-    for d in distances:
-        if d < 0.3:
-            on_obstacle(d)
-
-
-def warn(d):
-    print(f"障害物を検出: {d} m")
-
-
-watch([1.2, 0.25, 0.8, 0.1], warn)
-\end{lstlisting}
-
-\begin{lstlisting}[style=python, caption={練習問題 19.4 (1)・(2) の解答例}, label={lst:python-class-a8}]
-import math
-from math import pi
-
-# 練習問題 19.4 (1)
-print(pi * 10 * 10)                # 314.1592653589793
-
-# 練習問題 19.4 (2)
-print(math.radians(30 * 4))        # 2.0943951023931953
-\end{lstlisting}
-
-\begin{lstlisting}[style=python, caption={練習問題 19.4 (3) の解答例（geometry.py）}, label={lst:python-class-a10}]
-import math
-
-
-def distance(x1, y1, x2, y2):
-    """2 点間の距離を返す"""
-    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-
-
-def normalize_angle(deg):
-    """角度を -180 以上 180 未満に正規化する"""
-    return (deg + 180) % 360 - 180
-\end{lstlisting}
-
-\begin{lstlisting}[style=python, caption={練習問題 19.4 (3) の解答例（geometry を使うファイル）}, label={lst:python-class-a10b}]
-import geometry
-
-print(geometry.distance(0, 0, 3, 4))    # 5.0
-print(geometry.normalize_angle(270))    # -90
-\end{lstlisting}
-
-\begin{lstlisting}[style=python, caption={練習問題 19.5 (1)・(2) の解答例}, label={lst:python-class-a11}]
-import random
-
-# 練習問題 19.5 (1)
-for i in range(10):
-    num = random.randint(0, 3)
-    try:
-        print(100 / num)
-    except ZeroDivisionError:
-        print("0 で割ろうとしました")
-
-# 練習問題 19.5 (2)
-try:
-    num = int(input("整数を入力してください=> "))
-except ValueError:
-    num = 10
-print(num + 100)
-\end{lstlisting}
-
-\begin{description}
-  \item[練習問題 19.6 (1)] \cmd{random.randint(1, 10)} は 10 も含むので \cmd{random.randint(1, 9)} に直します。また、ループの中の \cmd{print} で 5 もすでに表示されているので、最後の \cmd{print} を消す（またはループの中の \cmd{print} を \cmd{if} の後ろに移す）と、5 が 2 回表示されなくなります。
-  \item[練習問題 19.6 (2)] \cmd{input( )} の値は文字列なので \cmd{range(int(num))} にする（1 か所目）、条件を \cmd{i \% 5 == 2 or i \% 5 == 3} にする（2 か所目、\ref{sec:python-basics-if}節の注意を参照）、\cmd{print("i")} は文字 \cmd{i} を表示してしまうので \cmd{print(i)} にする（3 か所目）。
-  \item[練習問題 19.6 (3)] 次の 5 か所を直します。
-    \begin{enumerate}
-      \item \cmd{input( )} の値を \cmd{int( )} で整数に変換する
-      \item 条件の \cmd{and} を \cmd{or} にする（\cmd{player} が 0 かつ 1 かつ 2 になることはない）
-      \item \cmd{prin} を \cmd{print} にする
-      \item \cmd{random.randint(0, 3)} を \cmd{random.randint(0, 2)} にする（3 だと \cmd{hands[3]} で \cmd{IndexError} になる）
-      \item \cmd{dceision} を \cmd{decision} にする
-    \end{enumerate}
-\end{description}
+  この問題には決まった答えがないので、解答例は載せていません。
+\end{exercise}
 
 \section*{この章のまとめ}
 

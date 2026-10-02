@@ -174,7 +174,6 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 18.4 条件分岐（if 文、比較演算子、論理演算子、None）
 - 18.5 繰り返し（for 文、while 文、break / continue、リスト内包表記、乱数）
 - 18.6 関数
-- 18.7 練習問題の解答例
 
 #### 第19章 クラスとモジュール
 - 19.1 クラスとオブジェクト
@@ -183,8 +182,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 19.4 モジュールと import（`if __name__ == "__main__":`）
 - 19.5 例外処理（try / except / finally、Ctrl+C）
 - 19.6 読みやすいコードを書く（PEP 8・フォーマッタ・型ヒント）
-- 19.7 デバッグの基本（最終課題：自由製作）
-- 19.8 練習問題の解答例
+- 19.7 デバッグの基本（練習問題の最終課題：自由製作）
 
 ### 第V部 ROS 2 入門
 
@@ -260,6 +258,17 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 29.4 Navigation2 による自律移動の体験
 - 29.5 次のステップへ
 
+#### 第30章 実践：カチャカを動かす
+- 30.1 カチャカとは（Preferred Robotics 社の家庭用ロボット、kachaka API、erasers_kachaka）
+- 30.2 パソコンとつなぐ（ネットワーク、IP アドレス、`ping`）
+- 30.3 erasers_kachaka を用意する（ビルド、環境変数）
+- 30.4 起動して RViz2 で見る
+- 30.5 カチャカを動かす（`ros2 topic pub`、teleop_twist_keyboard）
+- 30.6 カチャカに話させる
+- 30.7 カメラの画像を見る（cv_bridge、OpenCV）
+- 30.8 LiDAR のデータを読む（カチャカの LiDAR の向き）
+- 30.9 障害物を避けて走らせる（第29章のノードを実機で動かす）
+
 ### 補章
 
 本編の章の内容を、別の書き方などで補う章です（付録は早見表・用語集などの資料）。
@@ -271,9 +280,10 @@ Linux とは何かというところから始め、コマンドラインの基�
 
 - 付録A コマンド早見表（Linux / Git / ROS 2）
 - 付録B よく使うキーボードショートカット
-- 付録C トラブルシューティング集
-- 付録D 用語集
-- 付録E 参考文献・オンラインリソース
+- 付録C Python の練習問題の解答例（第18章・第19章）
+- 付録D トラブルシューティング集
+- 付録E 用語集
+- 付録F 参考文献・オンラインリソース
 
 ---
 
@@ -416,13 +426,15 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | 27 | シミュレーション | `chapters/ros2/simulation.tex` |
 | 28 | データの記録とデバッグ | `chapters/ros2/debug.tex` |
 | 29 | 実践：移動ロボットを動かす | `chapters/ros2/practice.tex` |
+| 30 | 実践：カチャカを動かす | `chapters/ros2/kachaka.tex` |
 | 補章1 | C++ でノードを書く（rclcpp） | `supplement/rclcpp.tex` |
 | 補章2 | XML による launch ファイルの書き方 | `supplement/launch_xml.tex` |
 | 付録A | コマンド早見表 | `appendix/cheatsheet.tex` |
 | 付録B | よく使うキーボードショートカット | `appendix/shortcuts.tex` |
-| 付録C | トラブルシューティング集 | `appendix/troubleshooting.tex` |
-| 付録D | 用語集 | `appendix/glossary.tex` |
-| 付録E | 参考文献・オンラインリソース | `appendix/references.tex` |
+| 付録C | Python の練習問題の解答例 | `appendix/python_answers.tex` |
+| 付録D | トラブルシューティング集 | `appendix/troubleshooting.tex` |
+| 付録E | 用語集 | `appendix/glossary.tex` |
+| 付録F | 参考文献・オンラインリソース | `appendix/references.tex` |
 | — | はじめに / おわりに | `frontmatter/preface.tex` / `frontmatter/afterword.tex` |
 
 章の追加・削除・順番の入れ替えは `main.tex` の `\include` を編集して行います。
@@ -474,7 +486,7 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | コラム | `\begin{column}{タイトル} ... \end{column}` |
 | TIPS | `\begin{tips}{タイトル} ... \end{tips}`（本筋とは別の、すぐに役立つ実践的なアドバイス。コラムは読み物・背景知識に使う） |
 | 本文中の表 | `\begin{tablebox}[キャプション][tab:ラベル] \begin{tabular}{ll} ... \end{tabular} \end{tablebox}`（前後に余白が空き、表の上に「表 5.1 キャプション」が付く。キャプションと表は同じページに置かれる） |
-| 練習問題 | `\begin{exercise} \begin{enumerate} \item ... \end{enumerate} \end{exercise}`（章ごとに「練習問題 18.1」と番号が付き、中の問題は (1), (2), ... になる。解答例では「練習問題 18.1 (2)」のように参照する） |
+| 練習問題 | `\begin{exercise} \begin{enumerate} \item ... \end{enumerate} \end{exercise}`（章ごとに「練習問題 18.1」と番号が付き、中の問題は (1), (2), ... になる。解答例は付録「Python の練習問題の解答例」（`appendix/python_answers.tex`）に章ごとの節としてまとめ、「練習問題 18.1 (2)」のように参照する） |
 | 文中のコマンド・ファイル名 | `\cmd{ls -l}` |
 | キー入力 | `\key{Ctrl}+\key{C}` |
 | 未完成箇所 | `\todo{あとで図を追加}` |
@@ -608,7 +620,7 @@ PDF 上には「Sample」と書かれた枠が表示されます（TikZ は `pre
 - 和文と半角英数字の間には半角スペースを入れます（例：「Linux の仕組み」「ROS 2 を使う」）。
 - 数字・英字・記号は半角を使います。
 - カタカナ語の語末の長音は省略します（例：ユーザ、サーバ、コンピュータ、パブリッシャ、サブスクライバ）。
-- 用語は以下のように統一します。新しい用語を導入したら付録D（用語集）にも追加してください。
+- 用語は以下のように統一します。新しい用語を導入したら付録E（用語集）にも追加してください。
 
 | 使う表記 | 使わない表記 |
 | --- | --- |

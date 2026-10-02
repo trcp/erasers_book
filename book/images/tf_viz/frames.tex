@@ -1,0 +1,21 @@
+% 図：移動ロボットの座標系のつながり（chapters/ros2/tf_viz.tex）
+\begin{tikzpicture}[fr/.style={draw, rounded corners=2pt, font=\small\ttfamily, minimum width=24mm, minimum height=7mm, fill=blue!6},
+    note/.style={font=\scriptsize, align=left, text=black!70, anchor=west}]
+  \node[fr] (map) at (0,0) {map};
+  \node[fr] (odom) at (0,-1.4) {odom};
+  \node[fr] (base) at (0,-2.8) {base\_link};
+  \node[fr] (laser) at (-3.2,-4.3) {laser};
+  \node[fr] (camera) at (0,-4.3) {camera\_link};
+  \node[fr] (wheel) at (3.2,-4.3) {left\_wheel など};
+  \draw[figarrow] (map) -- (odom);
+  \draw[figarrow] (odom) -- (base);
+  \draw[figarrow] (base) -- (laser);
+  \draw[figarrow] (base) -- (camera);
+  \draw[figarrow] (base) -- (wheel);
+  \node[note] at (1.5,0) {地図の座標系（世界に固定）};
+  \node[note] at (1.5,-0.7) {SLAM や自己位置推定が求める（ずれを補正する）};
+  \node[note] at (1.5,-1.4) {動き始めた位置の座標系};
+  \node[note] at (1.5,-2.1) {車輪の回転などから求める（だんだんずれる）};
+  \node[note] at (1.5,-2.8) {ロボットの本体の座標系};
+  \node[note] at (-4.4,-5.05) {センサや部品の座標系（URDF に書いた取り付け位置で決まる）};
+\end{tikzpicture}
