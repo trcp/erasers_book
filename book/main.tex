@@ -57,10 +57,15 @@
 
 % 補章（本編の内容を別の書き方などで補う章）
 \hoshou
+% 第V部の中に入らないように、番号なしの部として目次に載せる
+\clearpage\phantomsection\addcontentsline{toc}{part}{補章}
+\part*{補章}
 \include{supplement/rclcpp}
 \include{supplement/launch_xml}
 
 \appendix
+\clearpage\phantomsection\addcontentsline{toc}{part}{付録}
+\part*{付録}
 \include{appendix/cheatsheet}
 \include{appendix/shortcuts}
 \include{appendix/troubleshooting}

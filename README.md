@@ -519,7 +519,7 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | 補章 | `sup:` | `\label{sup:launch-xml}` |
 | 付録 | `app:` | `\label{app:cheatsheet}` |
 
-補章は `main.tex` の `\hoshou` の後に `\include` します。見出しは「補章1」、節・図・表・コードの番号は「補1.1」のようになり、本文からは `補章\ref{sup:launch-xml}` のように参照します。
+補章は `main.tex` の `\hoshou` の後に `\include` します（補章と付録は、第V部の中に入らないように、それぞれ番号なしの部「補章」「付録」の後に置いています）。見出しは「補章1」、節・図・表・コードの番号は「補1.1」のようになり、本文からは `補章\ref{sup:launch-xml}` のように参照します。
 
 ラベルは本全体で一意になるよう、節以下のラベルには章を表す語を含めてください（例：`sec:rclpy-publisher`）。
 
