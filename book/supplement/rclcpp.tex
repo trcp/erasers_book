@@ -1,0 +1,276 @@
+\chapter{C++ でノードを書く（rclcpp）}
+\label{sup:rclcpp}
+
+\ref{chap:rclpy}章では、Python でノードを書きました。
+ROS 2 のノードは、C++ でも書けます。
+C++ でノードを書くためのライブラリを \textbf{rclcpp}（ROS Client Library for C++）といいます。
+この補章では、\ref{chap:rclpy}章で作ったノードのいくつかを C++ で書き直しながら、rclcpp の書き方を説明します。
+\ref{chap:rclpy}章の各節と見比べながら読んでください。
+
+この補章のファイルは、\cmd{book/samples/rclcpp/}\allowbreak\cmd{my\_cpp\_package/} にあります。
+
+\section{C++ と rclcpp}
+\label{sec:rclcpp-intro}
+
+\subsection{なぜ C++ で書くのか}
+
+\ref{sec:python-vs-c}節で学んだように、C++ は、プログラムを実行する前にコンパイル（ビルド）が必要で、書く量も Python より多くなります。
+その代わり、プログラムが速く動き、メモリの使い方も細かく決められます。
+そのため、ROS 2 では、次のようなノードを C++ で書くことがよくあります。
+
+\begin{itemize}
+  \item カメラの画像や、LiDAR の点群など、大きなデータを処理するノード
+  \item モータの制御のように、短い周期で、決まった時間内に処理を終える必要があるノード
+  \item ROS 2 本体や、Navigation2 などの主要なパッケージ（多くが C++ で書かれています）
+\end{itemize}
+
+一方、試しに動かしてみるノードや、処理の重くないノードは、Python で手早く書くのが便利です。
+ROS 2 では、トピックの名前と型が同じなら、C++ のノードと Python のノードが問題なく通信できるので、ノードごとに向いている言語を選べます。
+
+\subsection{C++ の文法の最小限}
+
+この本では C++ の文法は詳しく扱いませんが、この補章のプログラムを読むために、Python との主な違いを紹介しておきます。
+
+\begin{tablebox}[Python と C++ の主な違い][tab:rclcpp-syntax]
+  \begin{tabular}{p{0.2\linewidth}p{0.33\linewidth}p{0.36\linewidth}}
+    \toprule
+     & Python & C++ \\
+    \midrule
+    ブロック & インデントで表す & \cmd{\{ \}} で囲む \\
+    文の終わり & 改行 & \cmd{;}（セミコロン） \\
+    変数 & 型を書かない & 型を書く（\cmd{int count;}）。\cmd{auto} と書くと型を自動で決める \\
+    読み込み & \cmd{import} & \cmd{\#include} \\
+    コメント & \cmd{\#} & \cmd{//} \\
+    名前の区切り & \cmd{rclpy.node} & \cmd{rclcpp::Node}（\cmd{::} で区切る） \\
+    自分自身 & \cmd{self} & \cmd{this}（省略できることが多い） \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+C++ のプログラムは、\cmd{main} という名前の関数から実行が始まります。
+Python の \cmd{if \_\_name\_\_ == '\_\_main\_\_':}（\ref{sec:python-class-module}節）にあたるものです。
+
+\section{パッケージを作る}
+\label{sec:rclcpp-package}
+
+C++ のノードは、\cmd{ament\_cmake} のパッケージに入れます（\ref{sec:workspace-create}節）。
+\cmd{--dependencies} で、使うパッケージも指定しておきます。
+
+\begin{terminal}[C++ のパッケージを作る]
+$ cd ~/ros2_ws/src
+$ ros2 pkg create --build-type ament_cmake --license Apache-2.0 --dependencies rclcpp std_msgs geometry_msgs turtlesim example_interfaces my_cpp_package
+\end{terminal}
+
+\begin{terminal}[C++ のパッケージの中身]
+$ tree my_cpp_package
+my_cpp_package
+├── CMakeLists.txt
+├── include
+│   └── my_cpp_package
+├── package.xml
+└── src
+\end{terminal}
+
+\begin{description}
+  \item[\cmd{src/}] ノードのソースファイル（\cmd{.cpp}）を置きます。
+  \item[\cmd{include/}] ほかのファイルやパッケージから使うヘッダファイル（\cmd{.hpp}）を置きます。この補章では使いません。
+  \item[\cmd{CMakeLists.txt}] ビルドの方法を書くファイルです（\ref{sec:rclcpp-build}節）。Python のパッケージの \cmd{setup.py} にあたります。
+  \item[\cmd{package.xml}] Python のパッケージと同じく、パッケージの情報と依存関係を書きます。\cmd{--dependencies} で指定したパッケージが、\cmd{<depend>} として書き込まれています。
+\end{description}
+
+\section{はじめてのノード}
+\label{sec:rclcpp-first}
+
+\subsection{ノードのプログラム}
+
+\ref{sec:rclpy-first}節の \cmd{hello\_node.py} を C++ で書くと、次のようになります。
+\cmd{src} の中に \cmd{hello\_node.cpp} を作ります。
+
+\lstinputlisting[style=cpp, caption={はじめてのノード（src/hello\_node.cpp）}, label={lst:rclcpp-hello}]{samples/rclcpp/my_cpp_package/src/hello_node.cpp}
+
+\begin{description}
+  \item[3 行目] rclcpp を読み込みます。
+  \item[5 行目] \cmd{rclcpp::Node} クラスを継承して、\cmd{HelloNode} クラスを作ります。C++ では、\cmd{class クラス名 : public 親クラス} と書きます。
+  \item[7 行目] \cmd{public:} の後に書いたものは、クラスの外から使えます。
+  \item[8〜12 行目] クラスと同じ名前の関数は、\textbf{コンストラクタ}といい、Python の \cmd{\_\_init\_\_} にあたります。9 行目の \cmd{: Node("hello\_node")} で、親クラスにノードの名前を渡しています（Python の \cmd{super().\_\_init\_\_('hello\_node')} にあたります）。
+  \item[11 行目] \cmd{RCLCPP\_INFO} で、ログを出力します。Python の \cmd{get\_logger().info()} にあたります。
+  \item[17〜19 行目] rclcpp の準備（\cmd{init}）、ノードを作って動かし続ける（\cmd{spin}）、終了（\cmd{shutdown}）という流れは、Python と同じです。\cmd{std::make\_shared<HelloNode>()} は、\cmd{HelloNode} のインスタンスを作る書き方です（後のポイントで説明します）。
+\end{description}
+
+Python と違い、\key{Ctrl}+\key{C} を受け止める \cmd{try} を書く必要はありません。
+\key{Ctrl}+\key{C} が押されると、\cmd{rclcpp::spin()} が終わり、そのまま \cmd{shutdown()} に進みます。
+
+\section{ビルドの設定}
+\label{sec:rclcpp-build}
+
+\subsection{CMakeLists.txt}
+
+C++ のノードは、ソースファイルから実行ファイルを作る（コンパイルする）必要があります。
+その方法を \cmd{CMakeLists.txt} に書きます。
+この補章のすべてのノードをビルドする \cmd{CMakeLists.txt} は、次のとおりです。
+
+\lstinputlisting[style=bash, caption={my\_cpp\_package/CMakeLists.txt}, label={lst:rclcpp-cmake}]{samples/rclcpp/my_cpp_package/CMakeLists.txt}
+
+\begin{description}
+  \item[\cmd{find\_package}] 使うパッケージを探します。\cmd{package.xml} に書いたパッケージを、ここにも書きます。
+  \item[\cmd{add\_executable}] ソースファイルから、実行ファイルを作ります。最初に書いた名前（\cmd{hello\_node}）が、\cmd{ros2 run} で指定する名前になります。
+  \item[\cmd{ament\_target\_dependencies}] その実行ファイルが使うパッケージを指定します。
+  \item[\cmd{install}] 作った実行ファイルを、\cmd{install} ディレクトリにコピーします。
+\end{description}
+
+新しいノードを追加したときは、\cmd{add\_executable}・\cmd{ament\_target\_dependencies}・\cmd{install} の 3 か所に書き加えます。
+Python のパッケージで、\cmd{setup.py} の \cmd{entry\_points} に 1 行追加したのにあたる作業です。
+
+\subsection{ビルドして実行する}
+
+\begin{terminal}[C++ のノードをビルドして実行する]
+$ cd ~/ros2_ws
+$ colcon build --packages-select my_cpp_package
+Starting >>> my_cpp_package
+Finished <<< my_cpp_package [35.2s]
+
+Summary: 1 package finished [35.5s]
+$ source install/local_setup.bash
+$ ros2 run my_cpp_package hello_node
+[INFO] [1727852400.123456789] [hello_node]: こんにちは、ROS 2!
+\end{terminal}
+
+Python のパッケージより、ビルドに時間がかかることがわかります。
+また、C++ では、\textbf{ソースファイルを書き換えるたびにビルドし直す必要があります}。
+\cmd{--symlink-install} を付けても、ビルドしないと変更は反映されません。
+
+\begin{caution}[ビルドのエラーを読む]
+  C++ では、文法の誤りや型の間違いは、実行する前の、ビルドのときにエラーとして見つかります。
+  エラーが出たら、\ref{sec:python-class-debug}節と同じく、最初のエラーメッセージから読みましょう。
+  \cmd{src/talker.cpp:19:5: error: ...} のように、ファイル名・行番号・列番号が表示されます。
+  1 つの誤りから、たくさんのエラーが続けて表示されることもあるので、まず一番上のエラーを直してから、ビルドし直すのがコツです。
+\end{caution}
+
+\section{パブリッシャとサブスクライバ}
+\label{sec:rclcpp-pubsub}
+
+\subsection{パブリッシャ}
+
+\ref{sec:rclpy-pubsub}節の \cmd{talker.py} を C++ で書くと、次のようになります。
+\cmd{main} 関数は、ノードのクラスの名前が違うだけなので省略します。
+
+\lstinputlisting[style=cpp, lastline=35, caption={パブリッシャ（src/talker.cpp）}, label={lst:rclcpp-talker}]{samples/rclcpp/my_cpp_package/src/talker.cpp}
+
+\begin{description}
+  \item[6 行目] メッセージ型 \cmd{std\_msgs/msg/String} を読み込みます。C++ では、\cmd{パッケージ名/msg/型の名前.hpp} を \cmd{\#include} します。ファイル名は、型の名前を小文字とアンダースコアにしたものです（\cmd{RobotStatus} なら \cmd{robot\_status.hpp}）。
+  \item[8 行目] \cmd{500ms} や \cmd{1s} のように、時間を単位付きで書けるようにします。
+  \item[14 行目] \cmd{count\_(0)} で、メンバ変数（Python の \cmd{self.count}）の初期値を決めています。
+  \item[17 行目] パブリッシャを作ります。メッセージ型は \cmd{<>} の中に書きます。
+  \item[19 行目] タイマを作ります。\cmd{std::bind(\&Talker::timer\_callback, this)} は、「このノード（\cmd{this}）の \cmd{timer\_callback} を呼び出す」という関数を作る書き方で、Python の \cmd{self.timer\_callback} にあたります。
+  \item[22 行目] \cmd{private:} の後に書いたものは、クラスの中からだけ使えます。
+  \item[32〜34 行目] パブリッシャ・タイマ・カウンタを、メンバ変数として宣言します。C++ では、メンバ変数もここで型を書いて宣言しておく必要があります。名前の最後の \cmd{\_} は、メンバ変数であることを示すための習慣です。
+\end{description}
+
+\cmd{publisher\_->publish(msg)} の \cmd{->} は、後のポイントで説明する「スマートポインタ」の先にあるものを使うときの書き方です。
+\cmd{RCLCPP\_INFO} は、C 言語の \cmd{printf} と同じく、\cmd{\%s}（文字列）や \cmd{\%d}（整数）、\cmd{\%.1f}（小数）の部分に、後ろの値を埋め込んで表示します。
+
+\begin{point}[SharedPtr と make\_shared]
+  rclcpp では、ノードやパブリッシャなどを、\textbf{スマートポインタ}（\cmd{std::shared\_ptr}）で扱います。
+  \textbf{ポインタ}は、データそのものではなく、データがメモリのどこにあるかを指し示す値です。
+  スマートポインタは、そのデータを誰も使わなくなったら、自動でメモリを片付けてくれる、便利なポインタです。
+  \begin{itemize}
+    \item \cmd{〇〇::SharedPtr} は、\cmd{〇〇} を指すスマートポインタの型です。
+    \item \cmd{std::make\_shared<クラス>()} で、インスタンスを作り、それを指すスマートポインタを受け取ります。
+    \item スマートポインタの先にあるメソッドや変数は、\cmd{.} ではなく \cmd{->} で使います（\cmd{publisher\_->publish(msg)}）。
+  \end{itemize}
+  Python では、すべての値がこれと似たしくみで扱われているので、意識する必要がありませんでした。
+\end{point}
+
+\subsection{サブスクライバ}
+
+\ref{sec:rclpy-pubsub}節の \cmd{listener.py} を C++ で書くと、次のようになります。
+
+\lstinputlisting[style=cpp, lastline=25, caption={サブスクライバ（src/listener.cpp）}, label={lst:rclcpp-listener}]{samples/rclcpp/my_cpp_package/src/listener.cpp}
+
+コールバックには、届いたメッセージが引数として渡されるので、\cmd{std::bind} に \cmd{std::placeholders::\_1}（「1 つ目の引数をここに渡す」という意味）を付けます。
+コールバックの引数の \cmd{const std\_msgs::msg::String \& msg} は、「メッセージをコピーせずに、変更しない約束で受け取る」という意味です。
+大きなメッセージでもコピーしないので、速く処理できます。
+
+ビルドして、C++ の talker と、\ref{chap:rclpy}章の Python の listener を組み合わせてみましょう。
+
+\begin{terminal}[C++ のノードと Python のノードで通信する]
+$ ros2 run my_cpp_package talker   # 1 つ目のターミナル
+$ ros2 run my_package listener     # 2 つ目のターミナル
+[INFO] [...] [listener]: I heard: "Hello, ROS 2! 3"
+...
+\end{terminal}
+
+C++ で書いたノードと Python で書いたノードが、問題なく通信できることがわかります。
+
+\section{タイマとコールバック}
+\label{sec:rclcpp-timer}
+
+\ref{sec:rclpy-timer}節の \cmd{turtle\_controller.py} を C++ で書くと、次のようになります。
+
+\lstinputlisting[style=cpp, lastline=54, caption={カメを自動で動かすノード（src/turtle\_controller.cpp）}, label={lst:rclcpp-turtle-controller}]{samples/rclcpp/my_cpp_package/src/turtle_controller.cpp}
+
+構成は Python とまったく同じです。
+Python では、まだ位置が届いていないことを \cmd{None}（\ref{sec:python-basics-none}節）で表しましたが、C++ では \cmd{std::optional} を使っています。
+\cmd{std::optional<型>} は「値があるか、値がないか」のどちらかを持てる型で、\cmd{if (!pose\_)} で値がないことを調べ、\cmd{pose\_->x} で中の値を使います。
+
+\begin{terminal}[C++ のノードで turtlesim を動かす]
+$ ros2 run turtlesim turtlesim_node             # 1 つ目のターミナル
+$ ros2 run my_cpp_package turtle_controller     # 2 つ目のターミナル
+\end{terminal}
+
+\section{サービスサーバ}
+\label{sec:rclcpp-service}
+
+\ref{sec:rclpy-service}節の \cmd{add\_two\_ints\_server.py} を C++ で書くと、次のようになります。
+
+\lstinputlisting[style=cpp, lastline=35, caption={サービスサーバ（src/add\_two\_ints\_server.cpp）}, label={lst:rclcpp-service-server}]{samples/rclcpp/my_cpp_package/src/add_two_ints_server.cpp}
+
+\cmd{using AddTwoInts = ...} は、長い型の名前に、短い別名を付ける書き方です。
+サービスのコールバックは、リクエストとレスポンスの 2 つを受け取るので、\cmd{std::placeholders::\_1} と \cmd{\_2} を付けます。
+Python ではレスポンスを \cmd{return} しましたが、C++ では、受け取ったレスポンスに値を入れるだけで、クライアントに返されます。
+
+\cmd{ros2 service call} で呼び出せば、\ref{sec:rclpy-service}節の Python のサーバと同じ結果が返ってきます。
+サービスクライアントやアクションも C++ で書けますが、書き方が少し複雑になるので、この本では省略します。
+ROS 2 の公式のチュートリアル（付録\ref{app:references}）に、C++ での書き方が載っています。
+
+\section{パラメータ}
+\label{sec:rclcpp-param}
+
+\ref{sec:rclpy-param}節の \cmd{param\_node.py} を C++ で書くと、次のようになります。
+
+\lstinputlisting[style=cpp, lastline=31, caption={パラメータを使うノード（src/param\_node.cpp）}, label={lst:rclcpp-param}]{samples/rclcpp/my_cpp_package/src/param_node.cpp}
+
+パラメータの宣言は、Python と同じく、名前と初期値を渡します。
+値を取得するときは、\cmd{as\_string()} や \cmd{as\_double()} のように、型を指定して取り出します。
+C++ では、変数にも型があるので、取り出す型と変数の型をそろえる必要があります。
+
+起動のときの \cmd{-p} や、\cmd{ros2 param set} での変更も、Python のノードとまったく同じように使えます。
+launch ファイル（\ref{chap:launch}章）からも、Python のノードと同じように起動し、パラメータを設定できます。
+
+\section{Python と C++ の対応}
+\label{sec:rclcpp-summary}
+
+この補章で使った書き方と、\ref{chap:rclpy}章の Python の書き方の対応をまとめておきます。
+
+\begin{tablebox}[rclpy と rclcpp の対応][tab:rclcpp-compare]
+  \begin{tabular}{ll}
+    \toprule
+    rclpy（Python） & rclcpp（C++） \\
+    \midrule
+    \cmd{from std\_msgs.msg import String} & \cmd{\#include "std\_msgs/msg/string.hpp"} \\
+    \cmd{class Talker(Node):} & \cmd{class Talker : public rclcpp::Node} \\
+    \cmd{super().\_\_init\_\_('talker')} & \cmd{: Node("talker")} \\
+    \cmd{self.get\_logger().info(...)} & \cmd{RCLCPP\_INFO(get\_logger(), ...)} \\
+    \cmd{create\_publisher(String, ...)} & \cmd{create\_publisher<std\_msgs::msg::String>(...)} \\
+    \cmd{create\_timer(0.5, ...)} & \cmd{create\_wall\_timer(500ms, ...)} \\
+    \cmd{self.timer\_callback} & \cmd{std::bind(\&Talker::timer\_callback, this)} \\
+    \cmd{None} & \cmd{std::optional} \\
+    \cmd{get\_parameter(...).value} & \cmd{get\_parameter(...).as\_double()} など \\
+    \cmd{setup.py} の \cmd{entry\_points} & \cmd{CMakeLists.txt} の \cmd{add\_executable} など \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+文法は違いますが、「\cmd{Node} を継承したクラスを作り、コンストラクタでパブリッシャ・サブスクライバ・タイマなどを作って、あとはコールバックで処理する」という構成は、Python と C++ でまったく同じです。
+rclpy で考え方を身につけておけば、rclcpp で書かれたノードも読めるようになります。
+C++ の文法をもっと学びたい人は、C++ の入門書と、ROS 2 の公式のチュートリアルを合わせて読むのがおすすめです。

@@ -1,0 +1,6 @@
+<launch>
+  <!-- turtlesim のノード -->
+  <node pkg="turtlesim" exec="turtlesim_node" name="sim"/>
+  <!-- 第24章で作った、カメを自動で動かすノード -->
+  <node pkg="my_package" exec="turtle_controller" output="screen"/>
+</launch>

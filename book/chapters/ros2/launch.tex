@@ -4,30 +4,340 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item launch ファイルを使って、複数のノードをまとめて起動する方法
+    \item Python で launch ファイルを書く方法
+    \item YAML ファイルでパラメータを設定する方法
+    \item 名前空間とリマップによる、ノードやトピックの名前の付け替え
+    \item launch 引数と、launch ファイルの読み込み（インクルード）
   \end{itemize}
 \end{goalbox}
 
-\section{launch ファイルとは}
+ここまでは、ノードを 1 つずつ、別々のターミナルで \cmd{ros2 run} で起動してきました。
+しかし、実際のロボットでは、センサ・地図・経路計画・モータなど、数十個のノードを、それぞれ決まった設定で起動する必要があります。
+これを毎回手で行うのは大変ですし、設定を間違える原因にもなります。
+この章では、たくさんのノードを、決まった設定でまとめて起動するための \textbf{launch}（ローンチ）のしくみを学びます。
 
-TODO
+この章のファイルは、\ref{chap:rclpy}章の \cmd{my\_package} に追加していきます（\cmd{book/samples/rclpy/}\allowbreak\cmd{my\_package/} にもあります）。
+
+\section{launch ファイルとは}
+\label{sec:launch-what}
+
+\subsection{まとめて起動する}
+
+\textbf{launch ファイル}は、「どのパッケージの、どのノードを、どんな名前と設定で起動するか」を書いたファイルです。
+launch ファイルを \cmd{ros2 launch} コマンドで実行すると、書かれたノードがまとめて起動します。
+シェルスクリプト（\ref{chap:shellscript}章）で、コマンドをまとめて実行したのと似ています。
+
+まずは、turtlesim に入っている launch ファイルを実行してみましょう。
+
+\begin{terminal}[turtlesim の launch ファイルを実行する]
+$ ros2 launch turtlesim multisim.launch.py
+[INFO] [launch]: All log files can be found below /home/user/.ros/log/...
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [turtlesim_node-1]: process started with pid [12345]
+[INFO] [turtlesim_node-2]: process started with pid [12346]
+...
+\end{terminal}
+
+turtlesim のウィンドウが 2 つ開きます。
+\cmd{ros2 launch} の後ろには、パッケージ名と launch ファイルの名前を書きます。
+別のターミナルで \cmd{ros2 node list} を実行すると、2 つのノードが起動していることがわかります。
+
+\begin{terminal}[launch ファイルで起動したノード]
+$ ros2 node list
+/turtlesim1/sim
+/turtlesim2/sim
+\end{terminal}
+
+\key{Ctrl}+\key{C} を押すと、launch ファイルで起動したすべてのノードが、まとめて終了します。
+
+\subsection{launch ファイルの形式}
+
+launch ファイルは、Python・XML・YAML の 3 つの形式で書けます。
+Python の形式は、条件によって起動するノードを変えるなど、プログラムとして柔軟に書けるので、ROS 2 では最もよく使われています。
+この本でも、Python の形式を使います。
+XML の形式については、この章の最後のコラムと補章\ref{sup:launch-xml}で紹介します。
+
+launch ファイルの名前は、\cmd{〇〇.launch.py} とするのが決まりです。
+パッケージの中の \cmd{launch} というディレクトリに置きます。
 
 \section{Python launch ファイルの書き方}
+\label{sec:launch-python}
 
-TODO
+\subsection{はじめての launch ファイル}
+
+\ref{sec:rclpy-timer}節では、turtlesim と、カメを自動で動かす \cmd{turtle\_controller} を、2 つのターミナルで起動しました。
+これを 1 つの launch ファイルにまとめてみましょう。
+\cmd{my\_package} の中に \cmd{launch} ディレクトリを作り、\cmd{turtlesim\_controller.launch.py} というファイルを作ります。
+
+\begin{terminal}[launch ディレクトリを作る]
+$ mkdir ~/ros2_ws/src/my_package/launch
+\end{terminal}
+
+\lstinputlisting[style=python, caption={はじめての launch ファイル（launch/turtlesim\_controller.launch.py）}, label={lst:launch-first}]{samples/rclpy/my_package/launch/turtlesim_controller.launch.py}
+
+\begin{description}
+  \item[\cmd{generate\_launch\_description()}] launch ファイルには、必ずこの名前の関数を書きます。\cmd{ros2 launch} は、この関数を呼び出して、何を起動するかを受け取ります。
+  \item[\cmd{LaunchDescription}] 起動するものを、リストにして渡します。
+  \item[\cmd{Node}] 起動するノードを 1 つ表します。\cmd{package} にパッケージ名、\cmd{executable} に実行ファイルの名前（\cmd{ros2 run} で指定する名前）を書きます。
+  \item[\cmd{name}] ノードの名前を付け替えます。省略すると、プログラムの中で決めた名前（\cmd{turtlesim} など）になります。
+  \item[\cmd{output='screen'}] ノードのログを、ターミナルに表示します。
+\end{description}
+
+\cmd{LaunchDescription} や \cmd{Node} は、\ref{sec:python-class-class}節で学んだクラスです。
+launch ファイルは、普通の Python のプログラムだということがわかります。
+
+\subsection{launch ファイルをインストールする}
+
+launch ファイルを \cmd{ros2 launch} で実行できるようにするには、ビルドしたときに \cmd{install} にコピーされるように設定します。
+\cmd{setup.py} を、次のように編集します。
+
+\begin{lstlisting}[style=python, caption={setup.py に launch ファイルと設定ファイルのインストールを追加する}, label={lst:launch-setup}]
+import os
+from glob import glob
+
+from setuptools import find_packages, setup
+
+package_name = 'my_package'
+
+setup(
+    ...
+    data_files=[
+        ('share/ament_index/resource_index/packages',
+            ['resource/' + package_name]),
+        ('share/' + package_name, ['package.xml']),
+        # launch ファイルと設定ファイルもインストールする
+        (os.path.join('share', package_name, 'launch'),
+            glob('launch/*.launch.*')),
+        (os.path.join('share', package_name, 'config'),
+            glob('config/*.yaml')),
+    ],
+    ...
+\end{lstlisting}
+
+\cmd{data\_files} には、「インストール先のディレクトリ」と「インストールするファイルのリスト」の組を並べます。
+\cmd{glob('launch/*.launch.*')} は、\cmd{launch} ディレクトリの中の、名前に \cmd{.launch.} を含むファイル（\cmd{.launch.py} や、補章\ref{sup:launch-xml}の \cmd{.launch.xml}）のリストを作ります（\ref{sec:files-wildcard}節のワイルドカードと同じ考え方です）。
+\cmd{config} の行は、次の節で使う設定ファイルのためのものです。
+
+また、\cmd{package.xml} に、launch を使うためのパッケージを追加しておきます。
+
+\begin{lstlisting}[style=xml, caption={package.xml に追加する行}, label={lst:launch-depend}]
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+\end{lstlisting}
+
+ビルドして、launch ファイルを実行してみましょう。
+
+\begin{terminal}[はじめての launch ファイルを実行する]
+$ cd ~/ros2_ws
+$ colcon build --symlink-install --packages-select my_package
+$ source install/local_setup.bash
+$ ros2 launch my_package turtlesim_controller.launch.py
+\end{terminal}
+
+1 つのコマンドで、turtlesim が開き、カメが自動で動き始めます。
+
+\begin{caution}[launch ファイルを追加したらビルドし直す]
+  新しい launch ファイルを追加したときは、ビルドし直さないと \cmd{install} にコピーされず、\cmd{ros2 launch} で見つかりません。
+  \cmd{--symlink-install} でビルドしていれば、すでにある launch ファイルの中身を書き換えたときは、ビルドし直さなくても反映されます。
+\end{caution}
 
 \section{YAML によるパラメータ設定}
+\label{sec:launch-yaml}
 
-TODO
+\subsection{パラメータのファイル}
+
+ノードのパラメータ（\ref{sec:ros2-concepts-param}節、\ref{sec:rclpy-param}節）は、\textbf{YAML}（ヤムル）という形式のファイルにまとめて書いておけます。
+YAML は、「キー: 値」をインデントで階層にして書く、人間が読み書きしやすい形式です。
+\cmd{my\_package} の中に \cmd{config} ディレクトリを作り、\cmd{turtlesim.yaml} というファイルを作ります。
+
+\lstinputlisting[caption={パラメータのファイル（config/turtlesim.yaml）}, label={lst:launch-yaml}]{samples/rclpy/my_package/config/turtlesim.yaml}
+
+1 段目にノードの名前、2 段目に \cmd{ros\_\_parameters}（アンダースコア 2 つ）、3 段目にパラメータの名前と値を書きます。
+1 つのファイルに、複数のノードのパラメータを書けます。
+
+\begin{caution}[YAML のインデント]
+  YAML では、インデントで階層を表します（Python と同じです）。
+  インデントには、タブではなく半角スペースを使い、同じ階層はそろえて書きましょう。
+  インデントがずれていると、パラメータが読み込まれなかったり、エラーになったりします。
+\end{caution}
+
+ノードの名前の代わりに \cmd{/**} と書くと、すべてのノードに同じパラメータを設定できます。
+シミュレーションの時刻を使うかどうかを決める \cmd{use\_sim\_time}（\ref{chap:simulation}章）のような、すべてのノードに共通のパラメータに便利です。
+
+\subsection{launch ファイルからパラメータを設定する}
+
+launch ファイルの \cmd{Node} に \cmd{parameters} を書くと、パラメータを設定して起動できます。
+
+\lstinputlisting[style=python, caption={パラメータを設定する launch ファイル（launch/param.launch.py）}, label={lst:launch-param}]{samples/rclpy/my_package/launch/param.launch.py}
+
+\begin{description}
+  \item[\cmd{get\_package\_share\_directory()}] パッケージがインストールされた場所（\cmd{install/my\_package/}\allowbreak\cmd{share/my\_package}）を調べます。そこに \cmd{config/turtlesim.yaml} をつなげて、設定ファイルの場所にしています。
+  \item[\cmd{parameters}] YAML ファイルの場所や、\cmd{\{'名前': 値\}} の辞書（\ref{sec:python-basics-list}節）を、リストにして渡します。同じパラメータが複数あるときは、リストの後ろに書いたものが優先されます。
+\end{description}
+
+\cmd{src} の中の設定ファイルを直接指定するのではなく、インストールされた設定ファイルを使うのがポイントです。
+こうしておけば、ワークスペースの場所が変わっても、ほかの人のコンピュータでも、同じ launch ファイルが動きます。
+
+\begin{terminal}[パラメータを設定する launch ファイルを実行する]
+$ ros2 launch my_package param.launch.py
+...
+[param_node-2] [INFO] [...] [param_node]: robo の最高速度は 0.8 m/s です
+\end{terminal}
+
+turtlesim の背景が紺色になり、\cmd{param\_node} は YAML ファイルの \cmd{robot\_name}（\cmd{robo}）と、launch ファイルの \cmd{max\_speed}（\cmd{0.8}）を使っていることがわかります。
+
+\cmd{ros2 run} で起動するときも、\cmd{--params-file} で YAML ファイルを指定できます（\ref{sec:ros2-concepts-param}節）。
+
+\begin{terminal}[ros2 run で YAML ファイルを読み込む]
+$ ros2 run my_package param_node --ros-args --params-file ~/ros2_ws/src/my_package/config/turtlesim.yaml
+\end{terminal}
 
 \section{名前空間とリマップ}
+\label{sec:launch-namespace}
 
-TODO
+\subsection{名前空間}
+
+同じロボットを 2 台動かすときのように、同じノードを複数起動したいことがあります。
+しかし、そのまま起動すると、ノードの名前もトピックの名前も同じになってしまい、どちらのロボットのデータなのか区別できません。
+そこで、\textbf{名前空間}（ネームスペース）を使います。
+名前空間は、ノードやトピックの名前の前に付ける、ディレクトリのようなものです。
+たとえば、名前空間 \cmd{robot1} で起動したノードは、\cmd{/robot1/sim} という名前になり、トピックも \cmd{/robot1/turtle1/pose} のようになります。
+
+turtlesim と \cmd{turtle\_controller} の組を、名前空間を変えて 2 組起動する launch ファイルを書いてみましょう。
+
+\lstinputlisting[style=python, caption={名前空間を使う launch ファイル（launch/multi\_turtles.launch.py）}, label={lst:launch-multi}]{samples/rclpy/my_package/launch/multi_turtles.launch.py}
+
+\cmd{Node} に \cmd{namespace} を書くと、そのノードを名前空間の中で起動します。
+launch ファイルは Python のプログラムなので、for 文で同じノードを繰り返し作ることもできます。
+
+\begin{terminal}[名前空間を使う launch ファイルを実行する]
+$ ros2 launch my_package multi_turtles.launch.py
+$ ros2 topic list      # 別のターミナルで
+/parameter_events
+/robot1/turtle1/cmd_vel
+/robot1/turtle1/color_sensor
+/robot1/turtle1/pose
+/robot2/turtle1/cmd_vel
+...
+\end{terminal}
+
+2 つのウィンドウで、それぞれのカメが自動で動きます。
+\cmd{robot1} の \cmd{turtle\_controller} は \cmd{/robot1/turtle1/pose} を受け取って \cmd{/robot1/turtle1/cmd\_vel} に指令を送るので、2 組がお互いに混ざることはありません。
+
+\begin{point}[相対名と絶対名]
+  これがうまくいくのは、\cmd{turtle\_controller} の中で、トピック名を \cmd{'turtle1/pose'} のように \cmd{/} を付けずに書いているからです（リスト\ref{lst:rclpy-turtle-controller}）。
+  \cmd{/} で始まらない名前を\textbf{相対名}といい、名前空間が前に付け足されます。
+  一方、\cmd{'/turtle1/pose'} のように \cmd{/} で始まる名前を\textbf{絶対名}といい、名前空間を指定しても変わりません。
+  自分でノードを書くときは、特別な理由がなければ、トピック名を相対名で書いておきましょう。
+  そうすれば、後から名前空間を使って、同じノードを何台分も起動できます。
+\end{point}
+
+\subsection{リマップ}
+
+\textbf{リマップ}は、ノードが使うトピックなどの名前を、起動するときに付け替えるしくみです。
+たとえば、あるノードが \cmd{/scan} というトピックを受け取るように書かれているのに、センサのノードが \cmd{/lidar/scan} にパブリッシュしている、といったときに、プログラムを書き換えずにつなげられます。
+
+turtlesim には、\cmd{/input/pose} を受け取り、同じ動きをするように \cmd{/output/cmd\_vel} に指令を送る、\cmd{mimic}（まねをする）というノードがあります。
+リマップを使って、1 匹目のカメの位置を受け取り、2 匹目のカメに同じ動きをさせてみましょう。
+
+\lstinputlisting[style=python, caption={リマップを使う launch ファイル（launch/mimic.launch.py）}, label={lst:launch-mimic}]{samples/rclpy/my_package/launch/mimic.launch.py}
+
+\cmd{remappings} に、\cmd{(元の名前, 新しい名前)} のタプル（\ref{sec:python-basics-list}節）を並べます。
+起動したら、1 匹目のカメに速度の指令を送ってみましょう。
+
+\begin{terminal}[1 匹目のカメを動かす]
+$ ros2 launch my_package mimic.launch.py
+$ ros2 topic pub --rate 1 /turtlesim1/turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0}, angular: {z: -1.8}}"
+\end{terminal}
+
+指令を送っていない 2 匹目のカメも、1 匹目と同じように円を描いて動きます。
+\cmd{rqt\_graph}（\ref{sec:ros2-concepts-rqt}節）で、ノードとトピックのつながりを確かめてみましょう。
+
+\subsection{ros2 run での名前の付け替え}
+
+名前空間やリマップは、\cmd{ros2 run} で起動するときも、\cmd{--ros-args} の後ろに \cmd{-r}（\cmd{--remap} の略）で指定できます。
+
+\begin{terminal}[ros2 run で名前空間とリマップを指定する]
+$ ros2 run turtlesim turtlesim_node --ros-args -r __ns:=/robot1
+$ ros2 run my_package listener --ros-args -r chatter:=my_chatter
+\end{terminal}
+
+\cmd{\_\_ns:=} で名前空間を、\cmd{元の名前:=新しい名前} でリマップを指定します。
+\ref{sec:ros2-concepts-node}節で使った \cmd{\_\_node:=} も、同じしくみでノードの名前を付け替えていました。
 
 \section{複数ノードをまとめて起動する}
+\label{sec:launch-bringup}
 
-TODO
+\subsection{launch 引数}
+
+launch ファイルを実行するときに、値を外から指定できるようにしておくと便利です。
+たとえば、ロボットの名前や、シミュレーションを使うかどうかを、launch ファイルを書き換えずに切り替えられます。
+このための引数を \textbf{launch 引数}といいます。
+
+\subsection{launch ファイルを組み合わせる}
+
+ロボットの launch ファイルは、「センサを起動する launch ファイル」「地図を作る launch ファイル」のように、機能ごとに分けて作り、それらをまとめて読み込む launch ファイルを作る、という形にするのが一般的です。
+ほかの launch ファイルを読み込むことを\textbf{インクルード}といいます。
+ロボット全体を起動する launch ファイルは、\cmd{bringup.launch.py} という名前にすることがよくあります。
+
+launch 引数とインクルードを使って、この章と前の章で作ったノードをまとめて起動する launch ファイルを書いてみましょう。
+
+\lstinputlisting[style=python, caption={launch 引数とインクルードを使う launch ファイル（launch/bringup.launch.py）}, label={lst:launch-bringup}]{samples/rclpy/my_package/launch/bringup.launch.py}
+
+\begin{description}
+  \item[\cmd{DeclareLaunchArgument}] launch 引数を宣言します。引数の名前、省略したときの値（\cmd{default\_value}）、説明（\cmd{description}）を書きます。
+  \item[\cmd{LaunchConfiguration}] launch 引数の値を使います。ここでは、\cmd{param\_node} の \cmd{robot\_name} パラメータに渡しています。
+  \item[\cmd{IncludeLaunchDescription}] ほかの launch ファイルを読み込みます。ここでは、\ref{sec:launch-python}節で作った \cmd{turtlesim\_controller.launch.py} を読み込んでいます。
+\end{description}
+
+launch 引数は、\cmd{ros2 launch} の後ろに \cmd{名前:=値} の形で指定します。
+\cmd{-s}（\cmd{--show-args}）を付けると、その launch ファイルで指定できる引数の一覧が表示されます。
+
+\begin{terminal}[launch 引数を指定して実行する]
+$ ros2 launch my_package bringup.launch.py -s
+Arguments (pass arguments as '<name>:=<value>'):
+
+    'robot_name':
+        ロボットの名前
+        (default: 'turtle')
+$ ros2 launch my_package bringup.launch.py robot_name:=erasers
+...
+[param_node-3] [INFO] [...] [param_node]: erasers の最高速度は 0.5 m/s です
+[listener-5] [INFO] [...] [listener]: I heard: "Hello, ROS 2! 0"
+...
+\end{terminal}
+
+turtlesim・\cmd{turtle\_controller}・\cmd{param\_node}・talker・listener の 5 つのノードが、1 つのコマンドで起動しました。
+\cmd{output='screen'} を付けたノードのログが、どのノードの出力かがわかるように、\cmd{[param\_node-3]} のような名前付きで表示されています。
+
+\begin{point}[launch ファイルを読むことから]
+  Navigation2 や、ロボットのメーカが公開しているパッケージには、たくさんの launch ファイルが入っています。
+  \cmd{ros2 launch パッケージ名 ファイル名 -s} で引数を調べたり、\cmd{/opt/ros/jazzy/share/パッケージ名/launch/} にある launch ファイルを読んだりすると、そのパッケージが何を起動しているのかがわかります。
+  ほかの人の launch ファイルを読むことは、launch ファイルの書き方を覚える近道にもなります。
+\end{point}
+
+\begin{column}{XML の launch ファイル}
+  launch ファイルは、XML の形式でも書けます。
+  次は、\ref{sec:launch-python}節の \cmd{turtlesim\_controller.launch.py} と同じ内容を XML で書いたものです。
+\begin{lstlisting}[style=xml, numbers=none, xleftmargin=0pt, framexleftmargin=0pt]
+<launch>
+  <node pkg="turtlesim" exec="turtlesim_node" name="sim"/>
+  <node pkg="my_package" exec="turtle_controller" output="screen"/>
+</launch>
+\end{lstlisting}
+  ファイルの名前は \cmd{〇〇.launch.xml} とします。
+  XML の形式は短く書けるので、単純な launch ファイルでは XML を使う人もいます。
+  この章の 5 つの launch ファイルを XML で書き直したものを、補章\ref{sup:launch-xml}で解説しています。
+  ROS 1 の launch ファイルも XML だったので、ROS 1 から移ってきた人にもなじみがあります。
+\end{column}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item launch ファイルを使うと、複数のノードを、決まった名前と設定でまとめて起動できます。\cmd{ros2 launch パッケージ名 ファイル名} で実行します。
+  \item Python の launch ファイルでは、\cmd{generate\_launch\_description()} の中で、起動する \cmd{Node} を \cmd{LaunchDescription} に並べます。launch ファイルは \cmd{setup.py} の \cmd{data\_files} でインストールします。
+  \item パラメータは YAML ファイルにまとめて書き、launch ファイルの \cmd{parameters} や \cmd{--params-file} で読み込めます。
+  \item 名前空間を使うと、同じノードを区別して複数起動できます。リマップを使うと、プログラムを書き換えずにトピックの名前を付け替えられます。ノードの中のトピック名は相対名で書いておきましょう。
+  \item launch 引数で起動時に値を指定でき、インクルードで launch ファイルを組み合わせられます。
+\end{itemize}

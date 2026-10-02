@@ -6,7 +6,7 @@ $out_dir = 'build';
 # \include したファイルの .aux を書けるよう build/ 以下にサブディレクトリを作る
 use File::Path qw(make_path);
 make_path(map { "$out_dir/$_" } qw(
-  frontmatter appendix
+  frontmatter appendix supplement
   chapters/linux chapters/commandline
   chapters/tools chapters/python chapters/ros2
 ));

@@ -171,8 +171,8 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 18.1 数値と計算（四則演算、コメント）
 - 18.2 変数とデータ型（文字列、型の変換、f 文字列、input）
 - 18.3 リスト・タプル・辞書
-- 18.4 条件分岐（if 文、比較演算子、論理演算子）
-- 18.5 繰り返し（for 文、while 文、break / continue、乱数）
+- 18.4 条件分岐（if 文、比較演算子、論理演算子、None）
+- 18.5 繰り返し（for 文、while 文、break / continue、リスト内包表記、乱数）
 - 18.6 関数
 - 18.7 練習問題の解答例
 
@@ -182,7 +182,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 19.3 関数を渡す（コールバック）
 - 19.4 モジュールと import（`if __name__ == "__main__":`）
 - 19.5 例外処理（try / except / finally、Ctrl+C）
-- 19.6 読みやすいコードを書く（PEP 8・フォーマッタ）
+- 19.6 読みやすいコードを書く（PEP 8・フォーマッタ・型ヒント）
 - 19.7 デバッグの基本（最終課題：自由製作）
 - 19.8 練習問題の解答例
 
@@ -224,14 +224,15 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 24.5 アクションサーバとクライアント
 - 24.6 パラメータの宣言と利用
 - 24.7 カスタムメッセージ・サービスの定義
-- 24.8 （コラム）C++ で書く場合（`rclcpp`）
+- 24.8 （コラム）C++ で書く場合（`rclcpp`）（詳しくは補章1）
 
 #### 第25章 launch と設定ファイル
 - 25.1 launch ファイルとは
 - 25.2 Python launch ファイルの書き方
 - 25.3 YAML によるパラメータ設定
 - 25.4 名前空間とリマップ
-- 25.5 複数ノードをまとめて起動する
+- 25.5 複数ノードをまとめて起動する（launch 引数、インクルード）
+- 25.6 （コラム）XML の launch ファイル（詳しくは補章2）
 
 #### 第26章 座標変換と可視化
 - 26.1 ロボットにおける座標系
@@ -258,6 +259,13 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 29.3 SLAM による地図作成の体験（`slam_toolbox`）
 - 29.4 Navigation2 による自律移動の体験
 - 29.5 次のステップへ
+
+### 補章
+
+本編の章の内容を、別の書き方などで補う章です（付録は早見表・用語集などの資料）。
+
+- 補章1 C++ でノードを書く（rclcpp）（第24章のノードを C++ で書き直す）
+- 補章2 XML による launch ファイルの書き方（第25章の launch ファイルを XML で書き直す）
 
 ### 付録
 
@@ -294,6 +302,7 @@ Linux とは何かというところから始め、コマンドラインの基�
     │   ├── tools/         # 第III部 開発のための周辺ツール
     │   ├── python/        # 第IV部 Python 入門
     │   └── ros2/          # 第V部 ROS 2 入門
+    ├── supplement/        # 補章
     ├── appendix/          # 付録
     ├── samples/           # 各章のサンプルコード・ROS 2 パッケージ（章ごとにサブディレクトリ）
     └── images/            # 図版（章ごとにサブディレクトリ）
@@ -407,6 +416,8 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | 27 | シミュレーション | `chapters/ros2/simulation.tex` |
 | 28 | データの記録とデバッグ | `chapters/ros2/debug.tex` |
 | 29 | 実践：移動ロボットを動かす | `chapters/ros2/practice.tex` |
+| 補章1 | C++ でノードを書く（rclcpp） | `supplement/rclcpp.tex` |
+| 補章2 | XML による launch ファイルの書き方 | `supplement/launch_xml.tex` |
 | 付録A | コマンド早見表 | `appendix/cheatsheet.tex` |
 | 付録B | よく使うキーボードショートカット | `appendix/shortcuts.tex` |
 | 付録C | トラブルシューティング集 | `appendix/troubleshooting.tex` |
@@ -505,7 +516,10 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | 図 | `fig:` | `\label{fig:rqt-graph}` |
 | 表 | `tab:` | `\label{tab:apt-commands}` |
 | コード | `lst:` | `\label{lst:minimal-node}` |
+| 補章 | `sup:` | `\label{sup:launch-xml}` |
 | 付録 | `app:` | `\label{app:cheatsheet}` |
+
+補章は `main.tex` の `\hoshou` の後に `\include` します。見出しは「補章1」、節・図・表・コードの番号は「補1.1」のようになり、本文からは `補章\ref{sup:launch-xml}` のように参照します。
 
 ラベルは本全体で一意になるよう、節以下のラベルには章を表す語を含めてください（例：`sec:rclpy-publisher`）。
 

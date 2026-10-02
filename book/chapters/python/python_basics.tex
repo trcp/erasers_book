@@ -155,6 +155,8 @@ print(count)        # 2 と表示される
 <class 'str'>
 \end{terminal}
 
+このほかに、「値がない」ことを表す \cmd{None} という特別な値もあります（\ref{sec:python-basics-none}節）。
+
 \subsection{文字列}
 
 文字列は、\cmd{"}（ダブルクォート）か \cmd{'}（シングルクォート）で囲んで書きます。
@@ -491,6 +493,36 @@ False
   正しくは \cmd{x \% 5 == 2 or x \% 5 == 3} と書きます。
 \end{caution}
 
+\subsection{値がないことを表す None}
+\label{sec:python-basics-none}
+
+プログラムでは、「まだ値が決まっていない」「結果がない」ことを表したい場面がよくあります。
+たとえば、センサのデータを受け取るプログラムでは、最初のデータが届くまでは、使える値がありません。
+このようなときは、\textbf{None} という特別な値を使います。
+\cmd{None} は \cmd{0} や空の文字列 \cmd{""} とは違い、「何もない」ことを表す値で、型は \cmd{NoneType} です。
+
+変数が \cmd{None} かどうかを調べるときは、\cmd{==} ではなく \cmd{is} を使って、\cmd{x is None}（\cmd{None} である）、\cmd{x is not None}（\cmd{None} でない）と書きます。
+
+\begin{lstlisting}[style=python, caption={None で「まだ値がない」ことを表す}, label={lst:python-basics-none}]
+distance = None   # まだ距離を測っていない
+
+if distance is None:
+    print("まだ距離のデータがありません")
+else:
+    print(f"距離は {distance} m です")
+\end{lstlisting}
+
+\begin{terminal}[None を使ったプログラムの実行結果]
+まだ距離のデータがありません
+\end{terminal}
+
+1 行目を \cmd{distance = 0.8} に変えて実行すると、「距離は 0.8 m です」と表示されます。
+ここで \cmd{distance = 0} として「まだ測っていない」を表すと、本当に距離が 0 m だったときと区別できなくなります。
+\cmd{None} を使えば、その心配がありません。
+
+\cmd{None} は、\ref{sec:python-basics-function}節で学ぶ関数で、結果を返せないときの戻り値としてもよく使われます。
+\ref{chap:rclpy}章で ROS 2 のノードを書くときも、「まだメッセージが届いていない」ことを \cmd{None} で表します。
+
 \begin{exercise}
 \begin{enumerate}
   \item \cmd{input( )} で 2 つの数値 a, b を入力し、「a の方が大きい」「b の方が大きい」「a と b は同じ」のいずれかを表示してください。
@@ -584,6 +616,38 @@ print(f"入力された値は {num} です")
   条件を間違えると、繰り返しが永遠に終わらない\textbf{無限ループ}になってしまいます。
   プログラムが止まらなくなったら、\key{Ctrl}+\key{C} で強制終了しましょう（\ref{sec:process-kill}節）。
 \end{caution}
+
+\subsection{リスト内包表記}
+\label{sec:python-basics-comprehension}
+
+リストの要素を 1 つずつ処理して、新しいリストを作りたいことがあります。
+for 文で書くと、次のようになります。
+
+\begin{lstlisting}[style=python, caption={for 文で新しいリストを作る}, label={lst:python-basics-for-list}]
+distances = [1.2, -1.0, 0.8, 0.2, 1.5]   # [m]、-1.0 は測定に失敗した値
+distances_cm = []
+for d in distances:
+    distances_cm.append(d * 100)
+print(distances_cm)   # [120.0, -100.0, 80.0, 20.0, 150.0]
+\end{lstlisting}
+
+Python には、これを 1 行で書ける\textbf{リスト内包表記}という書き方があります。
+\cmd{[式 for 変数 in リスト]} と書くと、リストの要素を 1 つずつ変数に入れて式を計算し、その結果を並べた新しいリストができます。
+後ろに \cmd{if 条件} を付けると、条件が成り立つ要素だけを取り出せます。
+
+\begin{lstlisting}[style=python, caption={リスト内包表記}, label={lst:python-basics-comprehension}]
+distances = [1.2, -1.0, 0.8, 0.2, 1.5]
+
+distances_cm = [d * 100 for d in distances]
+print(distances_cm)   # [120.0, -100.0, 80.0, 20.0, 150.0]
+
+valid = [d for d in distances if d >= 0]   # 正しく測れた値だけ
+print(valid)          # [1.2, 0.8, 0.2, 1.5]
+print(min(valid))     # 一番近い障害物までの距離 0.2
+\end{lstlisting}
+
+LiDAR（レーザで周りの物までの距離を測るセンサ）の距離のデータのように、たくさんの値の中から必要なものだけを取り出す処理は、ロボットのプログラムでよく出てきます。
+最初は for 文で書いても構いませんが、ほかの人のコードを読むときのために、この書き方も覚えておきましょう。
 
 \subsection{乱数を使う}
 

@@ -1,0 +1,12 @@
+# turtlesim のノード（名前は sim）のパラメータ
+sim:
+  ros__parameters:
+    background_r: 30
+    background_g: 30
+    background_b: 80
+
+# param_node のパラメータ
+param_node:
+  ros__parameters:
+    robot_name: robo
+    max_speed: 1.0

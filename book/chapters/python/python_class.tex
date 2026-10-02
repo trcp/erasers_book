@@ -568,6 +568,41 @@ All checks passed!
 
 VS Code（\ref{sec:editor-vscode}節）でも、拡張機能を入れておくと、保存するたびに自動でコードを整えたり、問題のある箇所に波線を表示したりできます。
 
+\subsection{型ヒント}
+\label{sec:python-class-typehint}
+
+Python では、変数や引数の型を書く必要はありません（\ref{sec:python-features}節）。
+しかし、型を書いておいたほうが、その関数に何を渡せばよいのかがわかりやすくなります。
+そこで、Python では、変数や引数・戻り値に、\textbf{型ヒント}として型を書き添えられます。
+引数は \cmd{名前: 型}、戻り値は \cmd{) -> 型:} の形で書きます。
+
+\begin{lstlisting}[style=python, caption={型ヒントを書いた関数}, label={lst:python-class-typehint}]
+import math
+
+
+def wheel_speed(rps: float, radius: float = 0.033) -> float:
+    return 2 * math.pi * radius * rps
+
+
+def valid_average(distances: list[float]) -> float | None:
+    valid = [d for d in distances if d >= 0]
+    if len(valid) == 0:
+        return None
+    return sum(valid) / len(valid)
+\end{lstlisting}
+
+\cmd{list[float]} は「小数のリスト」、\cmd{float | None} は「小数か \cmd{None}」（\ref{sec:python-basics-none}節）という意味です。
+型ヒントは、あくまで読む人やツールのための「ヒント」で、違う型の値を渡しても、Python はそのまま実行します。
+ただし、VS Code の拡張機能などのツールは、型ヒントをもとに入力の候補を出したり、型の間違いを指摘したりしてくれます。
+
+ROS 2 の公式のサンプルや、公開されているパッケージのコードでも、次のような型ヒントがよく使われています。
+自分で書くかどうかは自由ですが、読めるようにしておきましょう。
+
+\begin{lstlisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt, caption={ROS 2 のノードでの型ヒントの例}, label={lst:python-class-typehint-ros}]
+    def listener_callback(self, msg: String) -> None:
+        self.get_logger().info(f'I heard: "{msg.data}"')
+\end{lstlisting}
+
 \section{デバッグの基本}
 \label{sec:python-class-debug}
 

@@ -138,3 +138,24 @@
 \newcommand{\cmd}[1]{\texttt{#1}}          % インラインのコマンド・ファイル名
 \newcommand{\key}[1]{\fbox{\small\texttt{#1}}} % キー入力 例: \key{Ctrl}+\key{C}
 \newcommand{\todo}[1]{{\color{red}[TODO: #1]}}
+
+%% ---------- 補章 ----------
+% 補章：本編の章の内容を、別の書き方などで補う章（付録は早見表・用語集などの資料）
+% main.tex で \hoshou と書くと、その後の \chapter が「補章1」「補章2」……になる。
+% 節・図・表・リストの番号は「補1.1」のようにして、本編の章（1.1 など）と区別する。
+% 本文から参照するときは「補章\ref{sup:...}」と書く。
+\newcommand{\chapprefix}{}
+\renewcommand{\thesection}{\chapprefix\thechapter.\arabic{section}}
+\renewcommand{\thefigure}{\chapprefix\thechapter.\arabic{figure}}
+\renewcommand{\thetable}{\chapprefix\thechapter.\arabic{table}}
+\AtBeginDocument{\renewcommand{\thelstlisting}{\chapprefix\thechapter.\arabic{lstlisting}}}
+\newcommand{\hoshou}{%
+  \clearpage
+  \setcounter{chapter}{0}%
+  \renewcommand{\thechapter}{\arabic{chapter}}%
+  \renewcommand{\chapprefix}{補}%
+  \ModifyHeading{chapter}{label_format={補章\thechapter}}%
+  \def\chaptermark##1{\markboth{補章\thechapter\quad ##1}{}}%
+}
+% \appendix で、番号の付け方を本編と同じ形に戻す
+\jlreqsetup{appendix_precode={\renewcommand{\chapprefix}{}}}

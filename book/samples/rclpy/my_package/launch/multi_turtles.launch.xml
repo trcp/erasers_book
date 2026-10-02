@@ -1,0 +1,13 @@
+<launch>
+  <!-- 同じノードを、名前空間を変えて 2 組起動する -->
+  <group>
+    <push_ros_namespace namespace="robot1"/>
+    <node pkg="turtlesim" exec="turtlesim_node" name="sim"/>
+    <node pkg="my_package" exec="turtle_controller"/>
+  </group>
+  <group>
+    <push_ros_namespace namespace="robot2"/>
+    <node pkg="turtlesim" exec="turtlesim_node" name="sim"/>
+    <node pkg="my_package" exec="turtle_controller"/>
+  </group>
+</launch>

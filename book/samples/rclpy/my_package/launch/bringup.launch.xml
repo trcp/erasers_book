@@ -1,0 +1,16 @@
+<launch>
+  <!-- 起動するときに指定できる引数（launch 引数）を宣言する -->
+  <arg name="robot_name" default="turtle" description="ロボットの名前"/>
+  <arg name="use_chatter" default="true" description="talker と listener を起動するか"/>
+
+  <!-- ほかの launch ファイルを読み込む -->
+  <include file="$(find-pkg-share my_package)/launch/turtlesim_controller.launch.xml"/>
+
+  <node pkg="my_package" exec="param_node" output="screen">
+    <param name="robot_name" value="$(var robot_name)"/>
+  </node>
+
+  <!-- use_chatter が true のときだけ起動する -->
+  <node pkg="my_package" exec="talker" if="$(var use_chatter)"/>
+  <node pkg="my_package" exec="listener" output="screen" if="$(var use_chatter)"/>
+</launch>

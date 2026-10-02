@@ -1,0 +1,11 @@
+<launch>
+  <node pkg="turtlesim" exec="turtlesim_node" name="sim">
+    <!-- YAML ファイルから読み込む -->
+    <param from="$(find-pkg-share my_package)/config/turtlesim.yaml"/>
+  </node>
+  <node pkg="my_package" exec="param_node" output="screen">
+    <param from="$(find-pkg-share my_package)/config/turtlesim.yaml"/>
+    <!-- 後に書いたほうが優先 -->
+    <param name="max_speed" value="0.8"/>
+  </node>
+</launch>

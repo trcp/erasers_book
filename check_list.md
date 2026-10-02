@@ -181,6 +181,36 @@
 - [ ] `turtlesim/src/turtle_frame.cpp` に `setWindowTitle("TurtleSim");` があり、書き換えるとウィンドウのタイトルが変わること
 - [ ] `setup.bash` と `local_setup.bash` の違いの説明が正確か
 
+### 第25章 launch と設定ファイル（`chapters/ros2/launch.tex`、`book/samples/rclpy/my_package/launch/`・`config/`）
+
+- [ ] `ros2 launch turtlesim multisim.launch.py` のノード名（`/turtlesim1/sim`・`/turtlesim2/sim`）と出力
+- [ ] サンプルの 5 つの launch ファイル（`turtlesim_controller`・`param`・`multi_turtles`・`mimic`・`bringup`）が Jazzy で動くこと
+- [ ] `param.launch.py` で、`parameters=[config, {'max_speed': 0.8}]` の後ろの値が優先されること
+- [ ] `turtlesim` の `mimic` ノードのトピック名（`/input/pose`・`/output/cmd_vel`）とリマップの結果
+- [ ] `ros2 launch ... -s` の出力の形式、`[param_node-3]` のようなログの接頭辞の番号
+- [ ] 第24章の `turtle_controller` のトピック名を相対名（`turtle1/pose`）に変更したので、第24章の動作に影響がないこと
+- [ ] コラムの XML の launch ファイルが動くこと
+- [ ] 補章2 の 5 つの XML の launch ファイル（`launch/*.launch.xml`）が Jazzy で動くこと。特に `<push_ros_namespace>`（`<push-ros-namespace>` との違い）、`<param from=...>`、`if="$(var use_chatter)"` の動作
+- [ ] 補章2 の YAML の launch ファイルの例が正しいこと
+
+### 第24章 Python でノードを書く（`chapters/ros2/rclpy.tex`、`book/samples/rclpy/`）
+
+- [ ] `book/samples/rclpy/` の `my_package` と `my_interfaces` を Jazzy の環境で `colcon build` し、すべてのノード（`hello_node`・`talker`・`listener`・`turtle_controller`・`add_two_ints_server`・`add_two_ints_client`・`rotate_client`・`fibonacci_server`・`param_node`・`status_publisher`）が本文どおりに動くこと（本書を書いた環境では Python の文法チェックのみ実施）
+- [ ] `turtle_controller` でカメが壁にぶつからずに走り回ること（壁の判定の値 1.5 / 9.5 と速度が適切か）
+- [ ] ログの出力の形式（`[INFO] [時刻] [ノード名]: ...`）と、`ros2 action send_goal` の Fibonacci の出力
+- [ ] `my_package` の `package.xml` に `my_interfaces` への依存を書いたまま、`my_interfaces` より先にビルドしようとしてもエラーにならない（colcon が順番を決める）こと
+- [ ] `--ros-args -p max_speed:=1` が型の違いでエラーになること
+- [ ] コラムの rclcpp のコード片（`create_wall_timer(500ms, ...)` には `using namespace std::chrono_literals;` が必要）
+
+### 補章1 C++ でノードを書く（`supplement/rclcpp.tex`、`book/samples/rclcpp/my_cpp_package/`）
+
+- [ ] `my_cpp_package` を Jazzy で `colcon build` し、6 つのノード（`hello_node`・`talker`・`listener`・`turtle_controller`・`add_two_ints_server`・`param_node`）が本文どおりに動くこと（本書を書いた環境には C++ のコンパイラがないため、コンパイルも未確認）
+- [ ] `ament_target_dependencies` は Jazzy では使えるが、新しいディストリビューション（Kilted 以降）では非推奨。`target_link_libraries(... ${std_msgs_TARGETS} rclcpp::rclcpp)` の書き方に変えるか
+- [ ] `declare_parameter("robot_name", "turtle")` が文字列のパラメータとしてコンパイルできること
+- [ ] サブスクライバのコールバックを `const MessageT &` で受け取る書き方が Jazzy で使えること
+- [ ] `RCLCPP_INFO` の `%ld`（`int64_t`）で警告が出ないか
+- [ ] `ros2 pkg create --build-type ament_cmake ... --dependencies ...` で作られるファイル（`include/`、`src/`）と、ビルドにかかる時間の目安
+
 ### 第20章 ROS とは（`chapters/ros2/what_is_ros.tex`）
 
 - [ ] ROS の歴史の記述（2007 年ごろスタンフォード大学、Willow Garage、2010 年に最初の正式版、PR2、現在は OSRF を中心にコミュニティで開発）
@@ -244,6 +274,10 @@
   - 第21章：ros2-apt-source、ros-jazzy-desktop、ros-dev-tools、setup.bash、turtlesim、ros2 run、ROS_DOMAIN_ID、ROS_AUTOMATIC_DISCOVERY_RANGE、マルチキャスト
   - 第22章：パブリッシャ、サブスクライバ、パブリッシュ、サブスクライブ、メッセージ型、Twist、サービスのサーバとクライアント、リクエスト、レスポンス、ゴール、フィードバック、リザルト、パラメータ、YAML、rqt、rqt_graph
   - 第23章：ワークスペース、colcon、ament_python、ament_cmake、package.xml、setup.py、entry_points、CMakeLists.txt、依存関係、rosdep、アンダーレイ、オーバーレイ、local_setup.bash
+  - 第18章・第19章（追加分）：None、リスト内包表記、型ヒント
+  - 第25章：launch ファイル、LaunchDescription、YAML、ros__parameters、名前空間、相対名、絶対名、リマップ、launch 引数、インクルード、bringup
+  - 補章1：rclcpp、コンストラクタ、メンバ変数、スマートポインタ（shared_ptr）、std::bind、std::optional、CMakeLists.txt、add_executable
+  - 第24章：rclpy、rclcpp、ログ、spin、コールバック、タイマ、QoS、future、デッドロック、エントリポイント、インタフェース、rosidl
   - 第4章：GUI、CUI、CLI、ターミナル、シェル、bash、プロンプト、ビルトインコマンド、man ページ、Tab 補完
   - 第5章：テキストエディタ、テキストエディター（GNOME Text Editor）、カレントディレクトリ、ホームディレクトリ、隠しファイル、パス、絶対パス、相対パス、ワイルドカード、ブレース展開
 - [ ] 付録A コマンド早見表に、第4章・第5章のコマンドを追加する
@@ -295,6 +329,7 @@
 - [ ] TIPS 用の `tips` 環境（青緑の囲み・ページをまたげる）を追加した。共同執筆者に共有する
 - [ ] 練習問題用の `exercise` 環境（章ごとの番号付き・ページをまたげる囲み）を追加した。共同執筆者に共有する
 - [ ] `column` 環境（コラム）はページをまたげないため、長いコラムは版面からはみ出す。`preamble.tex` の `column` の定義に `breakable` を付けて、ページをまたげるようにするか
+- [ ] 補章のための `\hoshou` コマンドを追加した（見出しを「補章1」、節・図・表・コードの番号を「補1.1」にする。`\appendix` で元に戻る）。表のキャプションが「表補1.1」とつながって表示されるので、「表 補1.1」のように空けるか検討する。共同執筆者に共有する
 - [ ] 図のために `\usepackage{tikz}`、`\usetikzlibrary{...}`、共通スタイル（`figbox` など）を追加した。共同執筆者に共有する
 - [ ] `terminal` 環境の見た目を Ubuntu のターミナル風（濃い灰色のタイトルバー、右上にウィンドウのボタン、明るい本文、入力行を太字）に変更した。共同執筆者に共有する
 - [ ] タイトルを省略した `terminal` 環境で、1 行目に日本語があるとビルドエラーになる。現在は README に注意書きを入れ、タイトルを付けて回避している。環境の定義を直すか検討する

@@ -1,0 +1,6 @@
+# リクエスト：設定したい速度 [m/s]
+float64 speed
+---
+# レスポンス：設定できたかどうかと、そのメッセージ
+bool success
+string message

@@ -1,0 +1,200 @@
+\chapter{XML による launch ファイルの書き方}
+\label{sup:launch-xml}
+
+\ref{chap:launch}章では、Python で launch ファイルを書きました。
+launch ファイルは、XML の形式でも書けます。
+この補章では、\ref{chap:launch}章で作った 5 つの launch ファイルを XML で書き直しながら、XML の launch ファイルの書き方を説明します。
+\ref{chap:launch}章の各節と見比べながら読んでください。
+ここで紹介するファイルは、\cmd{book/samples/rclpy/}\allowbreak\cmd{my\_package/launch/} に、Python のファイルと並べて置いてあります。
+
+\section{XML の launch ファイルの特徴}
+\label{sec:launch-xml-feature}
+
+\subsection{Python と XML の比べ方}
+
+XML は、\cmd{<タグ>} で囲んで情報を書く形式です。
+\cmd{package.xml}（\ref{sec:workspace-files}節）も XML で書かれていました。
+XML の launch ファイルには、Python の launch ファイルと比べて、次のような特徴があります。
+
+\begin{tablebox}[Python と XML の launch ファイルの比較][tab:launch-xml-compare]
+  \begin{tabular}{lp{0.36\linewidth}p{0.36\linewidth}}
+    \toprule
+     & Python & XML \\
+    \midrule
+    ファイル名 & \cmd{〇〇.launch.py} & \cmd{〇〇.launch.xml} \\
+    書く量 & \cmd{import} などが必要で、長くなりがち & 短く書ける \\
+    読みやすさ & Python を知っていれば読める & 何を起動するかが一目でわかる \\
+    柔軟さ & for 文や if 文など、プログラムとして自由に書ける & 決まったタグの組み合わせで書く \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+ノードを並べて起動するだけの単純な launch ファイルなら、XML のほうが短く、読みやすく書けます。
+一方、起動するノードを計算で決めるなど、複雑なことをしたい場合は、Python のほうが向いています。
+ROS 2 では、どちらの形式も同じように使え、Python の launch ファイルから XML の launch ファイルを読み込む（あるいはその逆の）こともできます。
+
+\subsection{インストールの設定}
+
+XML の launch ファイルも、Python の launch ファイルと同じく、パッケージの \cmd{launch} ディレクトリに置き、\cmd{setup.py} の \cmd{data\_files} でインストールします（\ref{sec:launch-python}節）。
+\cmd{glob('launch/*.launch.*')} と書いておけば、\cmd{.launch.py} と \cmd{.launch.xml} の両方がインストールされます。
+実行の仕方も同じで、\cmd{ros2 launch パッケージ名 ファイル名} で実行します。
+
+\begin{terminal}[XML の launch ファイルを実行する]
+$ ros2 launch my_package turtlesim_controller.launch.xml
+\end{terminal}
+
+\section{ノードを起動する}
+\label{sec:launch-xml-node}
+
+\subsection{node タグ}
+
+\ref{sec:launch-python}節の \cmd{turtlesim\_controller.launch.py} を XML で書くと、次のようになります。
+
+\lstinputlisting[style=xml, caption={launch/turtlesim\_controller.launch.xml}, label={lst:launch-xml-first}]{samples/rclpy/my_package/launch/turtlesim_controller.launch.xml}
+
+全体を \cmd{<launch>} と \cmd{</launch>} で囲み、その中に、起動するノードを \cmd{<node>} タグで 1 つずつ書きます。
+中身のないタグは、\cmd{<node ... />} のように、最後を \cmd{/>} で閉じます。
+\cmd{<!-{}- -{}->} で囲んだ部分は、XML のコメントです。
+
+\cmd{<node>} タグの属性（\cmd{名前="値"} の部分）は、Python の \cmd{Node} の引数に対応しています。
+名前が少し違うものがあるので注意しましょう。
+
+\begin{tablebox}[node タグの主な属性][tab:launch-xml-node]
+  \begin{tabular}{llp{0.42\linewidth}}
+    \toprule
+    XML の属性 & Python の引数 & 意味 \\
+    \midrule
+    \cmd{pkg} & \cmd{package} & パッケージ名 \\
+    \cmd{exec} & \cmd{executable} & 実行ファイルの名前 \\
+    \cmd{name} & \cmd{name} & ノードの名前の付け替え \\
+    \cmd{namespace} & \cmd{namespace} & 名前空間 \\
+    \cmd{output} & \cmd{output} & \cmd{screen} でログをターミナルに表示 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\section{パラメータを設定する}
+\label{sec:launch-xml-param}
+
+\subsection{param タグ}
+
+\ref{sec:launch-yaml}節の \cmd{param.launch.py} を XML で書くと、次のようになります。
+
+\lstinputlisting[style=xml, caption={launch/param.launch.xml}, label={lst:launch-xml-param}]{samples/rclpy/my_package/launch/param.launch.xml}
+
+パラメータは、\cmd{<node>} と \cmd{</node>} の間に、\cmd{<param>} タグで書きます。
+
+\begin{itemize}
+  \item \cmd{<param name="名前" value="値"/>}：パラメータを 1 つ設定します。
+  \item \cmd{<param from="YAML ファイル"/>}：YAML ファイルからまとめて読み込みます。
+\end{itemize}
+
+Python と同じく、後に書いたものが優先されるので、\cmd{max\_speed} は \cmd{0.8} になります。
+
+\subsection{置換式}
+
+\cmd{\$(find-pkg-share my\_package)} の部分は、\textbf{置換式}といいます。
+\cmd{ros2 launch} がファイルを読むときに、\cmd{\$( )} の部分を、計算した値に置き換えます。
+\cmd{find-pkg-share} は、Python の \cmd{get\_package\_share\_directory()} と同じく、パッケージがインストールされた場所に置き換わります。
+よく使う置換式は、次のとおりです。
+
+\begin{tablebox}[よく使う置換式][tab:launch-xml-subst]
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    置換式 & 置き換わる値 \\
+    \midrule
+    \cmd{\$(find-pkg-share パッケージ名)} & パッケージの \cmd{share} ディレクトリの場所 \\
+    \cmd{\$(var 名前)} & launch 引数の値（\ref{sec:launch-xml-bringup}節） \\
+    \cmd{\$(env 名前)} & 環境変数（\ref{chap:env}章）の値 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\section{名前空間とリマップ}
+\label{sec:launch-xml-namespace}
+
+\subsection{名前空間}
+
+\ref{sec:launch-namespace}節の \cmd{multi\_turtles.launch.py} を XML で書くと、次のようになります。
+
+\lstinputlisting[style=xml, caption={launch/multi\_turtles.launch.xml}, label={lst:launch-xml-multi}]{samples/rclpy/my_package/launch/multi_turtles.launch.xml}
+
+\cmd{<group>} タグは、ノードをまとめるためのタグです。
+\cmd{<group>} の中に \cmd{<push\_ros\_namespace>} を書くと、そのグループの中のすべてのノードが、指定した名前空間で起動します。
+1 つのノードだけなら、\cmd{<node>} タグに \cmd{namespace} 属性を書いても構いません（次のリスト\ref{lst:launch-xml-mimic}）。
+
+XML には for 文がないので、Python のように繰り返しを使って書くことはできず、2 組分をそのまま並べて書いています。
+このように、同じものを何度も書く必要がある場合は、Python の launch ファイルのほうが便利です。
+
+\subsection{リマップ}
+
+\ref{sec:launch-namespace}節の \cmd{mimic.launch.py} を XML で書くと、次のようになります。
+
+\lstinputlisting[style=xml, caption={launch/mimic.launch.xml}, label={lst:launch-xml-mimic}]{samples/rclpy/my_package/launch/mimic.launch.xml}
+
+リマップは、\cmd{<node>} の中に \cmd{<remap from="元の名前" to="新しい名前"/>} と書きます。
+
+\section{launch 引数とインクルード}
+\label{sec:launch-xml-bringup}
+
+\subsection{arg タグと include タグ}
+
+\ref{sec:launch-bringup}節の \cmd{bringup.launch.py} を XML で書くと、次のようになります。
+ここでは、XML の便利な機能を紹介するために、talker と listener を起動するかどうかを決める launch 引数 \cmd{use\_chatter} を追加しています。
+
+\lstinputlisting[style=xml, caption={launch/bringup.launch.xml}, label={lst:launch-xml-bringup}]{samples/rclpy/my_package/launch/bringup.launch.xml}
+
+\begin{description}
+  \item[\cmd{<arg>}] launch 引数を宣言します。Python の \cmd{DeclareLaunchArgument} にあたります。\cmd{default} に省略したときの値、\cmd{description} に説明を書きます。
+  \item[\cmd{\$(var 名前)}] launch 引数の値に置き換わります。Python の \cmd{LaunchConfiguration} にあたります。
+  \item[\cmd{<include>}] ほかの launch ファイルを読み込みます。Python の \cmd{IncludeLaunchDescription} にあたります。読み込む launch ファイルは、Python・XML のどちらの形式でも構いません。
+\end{description}
+
+\subsection{条件によって起動する}
+
+\cmd{<node>} タグや \cmd{<include>} タグ、\cmd{<group>} タグに \cmd{if="値"} を書くと、値が \cmd{true} のときだけ起動します。
+反対に、\cmd{unless="値"} を書くと、値が \cmd{false} のときだけ起動します。
+launch 引数と組み合わせると、起動するときに、起動するノードを切り替えられます。
+
+\begin{terminal}[launch 引数で起動するノードを切り替える]
+$ ros2 launch my_package bringup.launch.xml robot_name:=erasers use_chatter:=false
+\end{terminal}
+
+このように実行すると、talker と listener は起動しません。
+Python の launch ファイルでも、\cmd{IfCondition} を使えば同じことができますが、XML のほうが短く書けます。
+
+\section{XML の launch ファイルのまとめ}
+\label{sec:launch-xml-summary}
+
+この補章で使ったタグと、Python の launch ファイルとの対応をまとめておきます。
+
+\begin{tablebox}[XML のタグと Python の launch ファイルの対応][tab:launch-xml-summary]
+  \begin{tabular}{ll}
+    \toprule
+    XML & Python \\
+    \midrule
+    \cmd{<launch>} & \cmd{LaunchDescription} \\
+    \cmd{<node>} & \cmd{Node} \\
+    \cmd{<param name=... value=...>} & \cmd{parameters=[\{'名前': 値\}]} \\
+    \cmd{<param from=...>} & \cmd{parameters=[YAML ファイル]} \\
+    \cmd{<remap from=... to=...>} & \cmd{remappings=[(元, 新)]} \\
+    \cmd{<group>} と \cmd{<push\_ros\_namespace>} & \cmd{GroupAction} と \cmd{PushRosNamespace} \\
+    \cmd{<arg>} & \cmd{DeclareLaunchArgument} \\
+    \cmd{\$(var 名前)} & \cmd{LaunchConfiguration('名前')} \\
+    \cmd{<include>} & \cmd{IncludeLaunchDescription} \\
+    \cmd{if="..."}, \cmd{unless="..."} & \cmd{IfCondition}, \cmd{UnlessCondition} \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{point}[YAML の launch ファイル]
+  launch ファイルは、YAML の形式（\cmd{〇〇.launch.yaml}）でも書けます。
+  使えるタグ（キー）は XML とほぼ同じで、たとえば \cmd{<node pkg="turtlesim" exec="turtlesim\_node"/>} は、次のように書きます。
+\begin{lstlisting}[numbers=none, xleftmargin=0pt, framexleftmargin=0pt]
+launch:
+  - node:
+      pkg: turtlesim
+      exec: turtlesim_node
+\end{lstlisting}
+  公開されているパッケージでは、Python と XML の launch ファイルがよく使われ、YAML の launch ファイルはあまり見かけません。
+\end{point}
