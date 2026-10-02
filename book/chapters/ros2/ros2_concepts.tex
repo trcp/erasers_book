@@ -4,34 +4,490 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item ROS 2 のプログラムの単位であるノード
+    \item ノードどうしの通信の方法（トピック・サービス・アクション）と、その使い分け
+    \item やり取りするデータの型（メッセージ型）の調べ方
+    \item ノードの設定値であるパラメータ
+    \item \cmd{ros2} コマンドと rqt を使って、動いている ROS 2 のシステムを調べる方法
   \end{itemize}
 \end{goalbox}
 
+\ref{chap:ros2_install}章では、turtlesim を動かして、ROS 2 のノードどうしが通信する様子を少しだけ見ました。
+この章では、ROS 2 の基本となる考え方を、turtlesim を使いながら 1 つずつ学びます。
+あわせて、動いている ROS 2 のシステムの中をのぞくための \cmd{ros2} コマンドの使い方を身につけます。
+これらのコマンドは、自分でノードを書くようになってからも、動作の確認やトラブルの調査で毎日のように使います。
+
+この章では、次の 2 つのノードを起動した状態で進めます。
+それぞれ別のターミナル（またはタブ）で起動し、そのままにしておいてください。
+
+\begin{terminal}[1 つ目のターミナル：turtlesim]
+$ ros2 run turtlesim turtlesim_node
+\end{terminal}
+
+\begin{terminal}[2 つ目のターミナル：キーボード操作]
+$ ros2 run turtlesim turtle_teleop_key
+\end{terminal}
+
+以降のコマンドは、3 つ目のターミナルで実行します。
+
 \section{ノード}
+\label{sec:ros2-concepts-node}
 
-TODO
+\subsection{ノードとは}
 
-\section{トピックとメッセージ型}
+\textbf{ノード}は、ROS 2 のプログラムの単位です。
+\ref{sec:what-is-ros-components}節で見たように、ロボットのソフトウェアは、「センサのデータを読む」「地図を作る」「モータを動かす」といった、1 つの役割を持つノードの集まりとして作ります。
+基本的には、1 つのノードが 1 つのプロセス（\ref{sec:linux-internals-process}節）として動きます。
 
-TODO
+\subsection{ノードを調べる}
+
+動いているノードの一覧は、\cmd{ros2 node list} で表示できます。
+
+\begin{terminal}[ノードの一覧を表示する]
+$ ros2 node list
+/teleop_turtle
+/turtlesim
+\end{terminal}
+
+ノードの名前は \cmd{/} から始まります。
+\cmd{ros2 node info} を使うと、そのノードがどのトピックやサービスを使っているかがわかります。
+
+\begin{terminal}[ノードの詳しい情報を表示する]
+$ ros2 node info /turtlesim
+/turtlesim
+  Subscribers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /turtle1/cmd_vel: geometry_msgs/msg/Twist
+  Publishers:
+    /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /rosout: rcl_interfaces/msg/Log
+    /turtle1/color_sensor: turtlesim/msg/Color
+    /turtle1/pose: turtlesim/msg/Pose
+  Service Servers:
+    /clear: std_srvs/srv/Empty
+    /kill: turtlesim/srv/Kill
+    /reset: std_srvs/srv/Empty
+    /spawn: turtlesim/srv/Spawn
+    ...
+  Action Servers:
+    /turtle1/rotate_absolute: turtlesim/action/RotateAbsolute
+  ...
+\end{terminal}
+
+\cmd{Subscribers} や \cmd{Publishers} などの意味は、この後の節で順に説明します。
+
+\subsection{ノードの名前を変えて起動する}
+
+同じノードを、別の名前で起動することもできます。
+\cmd{ros2 run} の後ろに \cmd{--ros-args --remap \_\_node:=名前} を付けると、ノードの名前を変えられます。
+
+\begin{terminal}[ノードの名前を変えて起動する]
+$ ros2 run turtlesim turtlesim_node --ros-args --remap __node:=my_turtle
+\end{terminal}
+
+別のターミナルで \cmd{ros2 node list} を実行すると、\cmd{/my\_turtle} というノードが増えていることがわかります。
+このように、起動するときの名前や設定を変える方法は、\ref{chap:launch}章で詳しく学びます。
+確認したら、\key{Ctrl}+\key{C} で止めておきましょう。
+
+\section{トピック}
+\label{sec:ros2-concepts-topic}
+
+\subsection{ノードどうしの 3 つの通信方法}
+
+ROS 2 のノードどうしは、主に\textbf{トピック}・\textbf{サービス}・\textbf{アクション}の 3 つの方法で通信します（図\ref{fig:ros2-concepts-communication}）。
+それぞれ得意な場面が違うので、目的に合わせて使い分けます。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/ros2_concepts/communication}
+  \caption{トピック・サービス・アクションの通信の違い}
+  \label{fig:ros2-concepts-communication}
+\end{figure}
+
+\subsection{トピックとは}
+
+\textbf{トピック}は、データを流すための名前の付いた通り道です。
+データを送るノードを\textbf{パブリッシャ}（出版者）、受け取るノードを\textbf{サブスクライバ}（購読者）といいます。
+パブリッシャがトピックにデータを\textbf{パブリッシュ}（出版）すると、そのトピックを\textbf{サブスクライブ}（購読）しているすべてのノードにデータが届きます。
+
+雑誌の出版と購読にたとえるとわかりやすいでしょう。
+出版社は、誰が読んでいるかを気にせずに雑誌を出版し続け、購読者は、購読している雑誌が届くのを待ちます。
+同じように、パブリッシャとサブスクライバは、お互いのことを知らなくても、トピックの名前さえ同じなら通信できます。
+1 つのトピックに、複数のパブリッシャやサブスクライバがいても構いません。
+
+トピックは、センサのデータやロボットへの速度の指令のように、\textbf{次々と流れ続けるデータ}を送るのに向いています。
+ROS 2 の通信の中で、最もよく使われる方法です。
+
+\subsection{トピックを調べる}
+
+トピックの一覧は、\cmd{ros2 topic list} で表示できます。
+\cmd{-t} を付けると、トピックに流れるデータの型（メッセージ型）も表示されます。
+
+\begin{terminal}[トピックの一覧を表示する]
+$ ros2 topic list -t
+/parameter_events [rcl_interfaces/msg/ParameterEvent]
+/rosout [rcl_interfaces/msg/Log]
+/turtle1/cmd_vel [geometry_msgs/msg/Twist]
+/turtle1/color_sensor [turtlesim/msg/Color]
+/turtle1/pose [turtlesim/msg/Pose]
+\end{terminal}
+
+\cmd{/turtle1/cmd\_vel} はカメへの速度の指令、\cmd{/turtle1/pose} はカメの今の位置と向きを流すトピックです。
+\cmd{/parameter\_events} と \cmd{/rosout} は、ROS 2 が自動で用意するトピックです。
+
+\cmd{ros2 topic echo} を使うと、トピックに流れているデータをそのまま表示できます。
+
+\begin{terminal}[トピックに流れるデータを表示する]
+$ ros2 topic echo /turtle1/pose
+x: 5.544444561004639
+y: 5.544444561004639
+theta: 0.0
+linear_velocity: 0.0
+angular_velocity: 0.0
+---
+...
+\end{terminal}
+
+2 つ目のターミナル（\cmd{turtle\_teleop\_key}）で矢印キーを押してカメを動かすと、表示される値が変わることがわかります。
+止めるときは \key{Ctrl}+\key{C} を押します。
+
+\cmd{ros2 topic info} でそのトピックのパブリッシャとサブスクライバの数を、\cmd{ros2 topic hz} でデータが 1 秒間に何回届いているかを調べられます。
+
+\begin{terminal}[トピックの情報と頻度を調べる]
+$ ros2 topic info /turtle1/cmd_vel
+Type: geometry_msgs/msg/Twist
+Publisher count: 1
+Subscription count: 1
+$ ros2 topic hz /turtle1/pose
+average rate: 62.502
+	min: 0.015s max: 0.017s std dev: 0.00041s window: 64
+...
+\end{terminal}
+
+\subsection{メッセージ型}
+
+トピックに流れるデータには、決まった形があります。
+これを\textbf{メッセージ型}といい、\cmd{パッケージ名/msg/型の名前} の形で表します。
+たとえば、\cmd{/turtle1/cmd\_vel} のメッセージ型は \cmd{geometry\_msgs/msg/Twist} です。
+メッセージ型の中身は、\cmd{ros2 interface show} で確かめられます。
+
+\begin{terminal}[メッセージ型の中身を表示する]
+$ ros2 interface show geometry_msgs/msg/Twist
+# This expresses velocity in free space broken into its linear and angular parts.
+
+Vector3  linear
+        float64 x
+        float64 y
+        float64 z
+Vector3  angular
+        float64 x
+        float64 y
+        float64 z
+\end{terminal}
+
+\cmd{Twist} は、並進の速度（\cmd{linear}）と回転の速度（\cmd{angular}）を、それぞれ x・y・z の 3 つの値で表すメッセージ型です。
+平面を移動するロボットでは、\cmd{linear.x}（前後の速度 [m/s]）と \cmd{angular.z}（その場での回転の速度 [rad/s]）を主に使います。
+\cmd{float64} は 64 ビットの小数を表す型です。
+
+ロボット開発では、次のようなメッセージ型がよく使われます。
+
+\begin{tablebox}[ロボット開発でよく使うメッセージ型][tab:ros2-concepts-msgs]
+  \begin{tabular}{lp{0.5\linewidth}}
+    \toprule
+    メッセージ型 & 内容 \\
+    \midrule
+    \cmd{std\_msgs/msg/String} & 文字列 \\
+    \cmd{geometry\_msgs/msg/Twist} & 速度（移動ロボットへの指令など） \\
+    \cmd{sensor\_msgs/msg/LaserScan} & LiDAR で測った距離のデータ \\
+    \cmd{sensor\_msgs/msg/Image} & カメラの画像 \\
+    \cmd{sensor\_msgs/msg/Imu} & IMU の加速度・角速度 \\
+    \cmd{nav\_msgs/msg/Odometry} & 車輪の回転などから推定したロボットの位置と速度 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\subsection{コマンドからトピックにパブリッシュする}
+
+\cmd{ros2 topic pub} を使うと、コマンドからトピックにデータをパブリッシュできます。
+自分でノードを書かなくても、ほかのノードの動作を試せるので便利です。
+データの中身は、YAML という形式（\cmd{\{キー: 値\}}）で書きます。
+
+\begin{terminal}[カメに速度の指令を 1 回送る]
+$ ros2 topic pub --once /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
+publisher: beginning loop
+publishing #1: geometry_msgs.msg.Twist(linear=geometry_msgs.msg.Vector3(x=2.0, y=0.0, z=0.0), angular=geometry_msgs.msg.Vector3(x=0.0, y=0.0, z=1.8))
+\end{terminal}
+
+カメが少しだけ前に進みながら曲がります。
+\cmd{--once} の代わりに \cmd{--rate 1} を付けると、1 秒に 1 回、止めるまで送り続けるので、カメは円を描いて動き続けます。
+
+\begin{terminal}[カメに速度の指令を送り続ける]
+$ ros2 topic pub --rate 1 /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0}, angular: {z: 1.8}}"
+\end{terminal}
+
+省略した値は 0 になるので、このように必要な値だけを書いても構いません。
+確認したら、\key{Ctrl}+\key{C} で止めましょう。
 
 \section{サービス}
+\label{sec:ros2-concepts-service}
 
-TODO
+\subsection{サービスとは}
+
+\textbf{サービス}は、\textbf{要求（リクエスト）を送ると、応答（レスポンス）が 1 回返ってくる}通信の方法です。
+サービスを提供するノードを\textbf{サーバ}、サービスを呼び出すノードを\textbf{クライアント}といいます。
+お店での注文にたとえると、注文（リクエスト）をすると、品物（レスポンス）が渡されるような関係です。
+
+トピックが「流れ続けるデータ」に向いているのに対して、サービスは「この処理をしてほしい」「この値を教えてほしい」といった、\textbf{1 回で終わるやり取り}に向いています。
+ただし、クライアントは応答が返ってくるまで待つことになるので、時間のかかる処理には向いていません（その場合は、次の節のアクションを使います）。
+
+\subsection{サービスを調べて呼び出す}
+
+サービスの一覧は、\cmd{ros2 service list} で表示できます。
+\cmd{-t} を付けると、サービスの型も表示されます。
+
+\begin{terminal}[サービスの一覧を表示する]
+$ ros2 service list -t
+/clear [std_srvs/srv/Empty]
+/kill [turtlesim/srv/Kill]
+/reset [std_srvs/srv/Empty]
+/spawn [turtlesim/srv/Spawn]
+/turtle1/set_pen [turtlesim/srv/SetPen]
+/turtle1/teleport_absolute [turtlesim/srv/TeleportAbsolute]
+...
+\end{terminal}
+
+サービスの型の中身も、\cmd{ros2 interface show} で確かめられます。
+\cmd{---} の上がリクエスト、下がレスポンスの形です。
+
+\begin{terminal}[サービスの型の中身を表示する]
+$ ros2 interface show turtlesim/srv/Spawn
+float32 x
+float32 y
+float32 theta
+string name # Optional.  A unique name will be created and returned if this is empty
+---
+string name
+\end{terminal}
+
+\cmd{/spawn} は、指定した位置に新しいカメを出すサービスです。
+\cmd{ros2 service call} で、コマンドからサービスを呼び出してみましょう。
+
+\begin{terminal}[新しいカメを出すサービスを呼び出す]
+$ ros2 service call /spawn turtlesim/srv/Spawn "{x: 2.0, y: 2.0, theta: 0.2, name: ''}"
+requester: making request: turtlesim.srv.Spawn_Request(x=2.0, y=2.0, theta=0.2, name='')
+
+response:
+turtlesim.srv.Spawn_Response(name='turtle2')
+\end{terminal}
+
+turtlesim のウィンドウに、2 匹目のカメが現れます。
+レスポンスとして、新しいカメの名前（\cmd{turtle2}）が返ってきています。
+ほかにも、\cmd{/clear}（カメの軌跡を消す）などのサービスを試してみましょう。
+
+\begin{terminal}[カメの軌跡を消すサービスを呼び出す]
+$ ros2 service call /clear std_srvs/srv/Empty
+\end{terminal}
 
 \section{アクション}
+\label{sec:ros2-concepts-action}
 
-TODO
+\subsection{アクションとは}
+
+\textbf{アクション}は、\textbf{時間のかかる処理}を頼むための通信の方法です。
+クライアントがサーバに\textbf{目標（ゴール）}を送ると、サーバは処理を進めながら\textbf{途中経過（フィードバック）}を何度も送り返し、処理が終わったら\textbf{結果（リザルト）}を返します。
+また、処理の途中で\textbf{キャンセル}することもできます。
+
+たとえば、「目的地まで移動して」という指示を出すと、ロボットは移動しながら「残りあと 3 m」のように途中経過を知らせ、着いたら「到着した」と結果を返す、といった使い方です。
+\ref{chap:practice}章で使う Navigation2 の自律移動も、アクションで指示を出します。
+
+\subsection{アクションを調べて呼び出す}
+
+アクションの一覧は、\cmd{ros2 action list} で表示できます。
+
+\begin{terminal}[アクションの一覧を表示する]
+$ ros2 action list -t
+/turtle1/rotate_absolute [turtlesim/action/RotateAbsolute]
+\end{terminal}
+
+\cmd{/turtle1/rotate\_absolute} は、カメを指定した向きまで回転させるアクションです。
+アクションの型は、\cmd{---} で区切られた 3 つの部分（ゴール・リザルト・フィードバック）でできています。
+
+\begin{terminal}[アクションの型の中身を表示する]
+$ ros2 interface show turtlesim/action/RotateAbsolute
+# The desired heading in radians
+float32 theta
+---
+# The angular displacement in radians to the starting position
+float32 delta
+---
+# The remaining rotation in radians
+float32 remaining
+\end{terminal}
+
+\cmd{ros2 action send\_goal} でゴールを送ってみましょう。
+\cmd{--feedback} を付けると、途中経過も表示されます。
+向き（\cmd{theta}）はラジアンで指定します（1.57 ラジアンは約 90 度です）。
+
+\begin{terminal}[カメを回転させるアクションのゴールを送る]
+$ ros2 action send_goal /turtle1/rotate_absolute turtlesim/action/RotateAbsolute "{theta: 1.57}" --feedback
+Waiting for an action server to become available...
+Sending goal:
+     theta: 1.57
+
+Goal accepted with ID: f8db8f44410849eaa93d3feb747dd444
+
+Feedback:
+    remaining: -1.5520000457763672
+...
+Result:
+    delta: -1.5679999589920044
+
+Goal finished with status: SUCCEEDED
+\end{terminal}
+
+カメがゆっくり回転し、その間、残りの回転量（\cmd{remaining}）がフィードバックとして届き、最後に結果が表示されます。
+実は、\cmd{turtle\_teleop\_key} の \key{G} \key{B} \key{V} \key{C} \key{D} \key{E} \key{R} \key{T} キーも、このアクションを使ってカメの向きを変えています。
+
+\subsection{通信の方法の使い分け}
+
+3 つの通信の方法の違いを、表にまとめておきます。
+
+\begin{tablebox}[トピック・サービス・アクションの使い分け][tab:ros2-concepts-compare]
+  \begin{tabular}{lp{0.28\linewidth}p{0.4\linewidth}}
+    \toprule
+    方法 & やり取り & 向いている場面 \\
+    \midrule
+    トピック & 一方向に流し続ける & センサのデータ、速度の指令など、次々と流れるデータ \\
+    サービス & 要求に対して 1 回応答する & 設定の変更や値の問い合わせなど、すぐに終わる処理 \\
+    アクション & 目標・途中経過・結果。キャンセルもできる & 目的地への移動やアームの動作など、時間のかかる処理 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
 
 \section{パラメータ}
+\label{sec:ros2-concepts-param}
 
-TODO
+\subsection{パラメータとは}
+
+\textbf{パラメータ}は、ノードが持っている設定値です。
+たとえば、ロボットの最高速度や、センサのデバイスファイルの名前（\cmd{/dev/ttyUSB0} など）を、プログラムに直接書き込むのではなくパラメータにしておけば、プログラムを書き換えずに、起動するときや実行中に設定を変えられます。
+turtlesim のノードは、背景の色をパラメータとして持っています。
+
+\subsection{パラメータを調べて変更する}
+
+パラメータの一覧は、\cmd{ros2 param list} で表示できます。
+
+\begin{terminal}[パラメータの一覧を表示する]
+$ ros2 param list
+/teleop_turtle:
+  qos_overrides./parameter_events.publisher.depth
+  ...
+  scale_angular
+  scale_linear
+  use_sim_time
+/turtlesim:
+  background_b
+  background_g
+  background_r
+  ...
+  use_sim_time
+\end{terminal}
+
+\cmd{ros2 param get} でパラメータの値を表示し、\cmd{ros2 param set} で値を変更できます。
+
+\begin{terminal}[パラメータの値を表示・変更する]
+$ ros2 param get /turtlesim background_r
+Integer value is: 69
+$ ros2 param set /turtlesim background_r 150
+Set parameter successful
+\end{terminal}
+
+turtlesim のウィンドウの背景の色が変わります。
+
+\subsection{パラメータをファイルに保存する}
+
+\cmd{ros2 param dump} を使うと、ノードのパラメータを YAML 形式で表示できます。
+リダイレクト（\ref{sec:text-pipe-redirect}節）でファイルに保存しておけば、次にノードを起動するときに \cmd{--params-file} で読み込んで、同じ設定で起動できます。
+
+\begin{terminal}[パラメータをファイルに保存して、起動時に読み込む]
+$ ros2 param dump /turtlesim > turtlesim.yaml
+$ ros2 run turtlesim turtlesim_node --ros-args --params-file turtlesim.yaml
+\end{terminal}
+
+パラメータをファイルで管理する方法は、\ref{chap:launch}章で詳しく学びます。
 
 \section{rqt と rqt\_graph による可視化}
+\label{sec:ros2-concepts-rqt}
 
-TODO
+\subsection{rqt\_graph}
+
+ノードとトピックの数が増えてくると、コマンドの出力だけでは、全体のつながりがわかりにくくなります。
+\textbf{rqt\_graph} を使うと、動いているノードとトピックのつながりを図で表示できます。
+
+\begin{terminal}[rqt\_graph を起動する]
+$ rqt_graph
+\end{terminal}
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：turtlesim_node と turtle_teleop_key を起動した状態で rqt_graph を開き、/teleop_turtle → /turtle1/cmd_vel → /turtlesim のつながりが表示されたスクリーンショット
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.8\linewidth]{ros2_concepts/rqt_graph.png}
+  \caption{rqt\_graph でノードとトピックのつながりを表示した例}
+  \label{fig:ros2-concepts-rqt-graph}
+\end{figure}
+
+図\ref{fig:ros2-concepts-rqt-graph}のように、楕円がノード、矢印がトピックを表します。
+\cmd{/teleop\_turtle} から \cmd{/turtlesim} へ、\cmd{/turtle1/cmd\_vel} トピックでデータが流れていることが一目でわかります。
+自分で作ったノードが思ったとおりにつながっているかを確かめるときに、とても便利です。
+表示が更新されないときは、左上の更新ボタンを押します。
+
+\subsection{rqt}
+
+\textbf{rqt} は、ROS 2 のさまざまな GUI のツールを、プラグインとしてまとめて使える道具です。
+\cmd{rqt} コマンドで起動し、メニューの「Plugins」から使いたいツールを選びます。
+rqt\_graph も、rqt のプラグインの 1 つです。
+
+\begin{tablebox}[rqt のよく使うプラグイン][tab:ros2-concepts-rqt]
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    プラグイン & できること \\
+    \midrule
+    Node Graph & ノードとトピックのつながりを表示する（rqt\_graph と同じ） \\
+    Topic Monitor & トピックに流れているデータを一覧で表示する \\
+    Message Publisher & GUI でトピックにデータをパブリッシュする \\
+    Service Caller & GUI でサービスを呼び出す \\
+    Plot & トピックの数値をグラフにする \\
+    Console & ノードが出力したログを表示する（\ref{chap:debug}章） \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\begin{point}[ros2 コマンドのまとめ]
+  この章で使った \cmd{ros2} コマンドは、\cmd{ros2 対象 操作} という共通の形をしています。
+  \begin{itemize}
+    \item 対象：\cmd{node}, \cmd{topic}, \cmd{service}, \cmd{action}, \cmd{param}, \cmd{interface}
+    \item 操作：\cmd{list}（一覧）、\cmd{info}（詳細）、\cmd{echo}（表示）、\cmd{pub}（送る）、\cmd{call}（呼び出す）、\cmd{get} / \cmd{set}（取得・変更）など
+  \end{itemize}
+  使い方を忘れたら、\cmd{ros2 topic --help} のように \cmd{--help} を付けて調べましょう（\ref{sec:terminal-help}節）。
+\end{point}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item ノードは ROS 2 のプログラムの単位です。\cmd{ros2 node list} と \cmd{ros2 node info} で調べられます。
+  \item トピックは、パブリッシャからサブスクライバへデータを流し続ける通信の方法です。\cmd{ros2 topic list} / \cmd{echo} / \cmd{pub} で調べたり、データを送ったりできます。データの形はメッセージ型で決まっていて、\cmd{ros2 interface show} で確かめられます。
+  \item サービスは要求に対して 1 回応答する通信、アクションは時間のかかる処理を頼み、途中経過と結果を受け取る通信です。
+  \item パラメータはノードの設定値で、\cmd{ros2 param get} / \cmd{set} で表示・変更できます。
+  \item rqt\_graph でノードとトピックのつながりを図で確かめられます。rqt には、ほかにも便利なプラグインがあります。
+\end{itemize}

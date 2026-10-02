@@ -4,26 +4,334 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item Ubuntu 24.04 に ROS 2 Jazzy をインストールする方法
+    \item \cmd{source /opt/ros/jazzy/setup.bash} の意味と、\cmd{.bashrc} への設定
+    \item turtlesim を使った ROS 2 の動作確認
+    \item \cmd{ROS\_DOMAIN\_ID} を使った通信の分け方と、ネットワークの設定
   \end{itemize}
 \end{goalbox}
 
-\section{ROS 2 Jazzy のインストール}
+この章では、Ubuntu 24.04 に ROS 2 Jazzy をインストールし、実際に動かしてみます。
+ここまでの章で学んできた、パッケージ管理（\ref{chap:package}章）、環境変数と \cmd{source}（\ref{chap:env}章）、ネットワーク（\ref{chap:network}章）の知識が、さっそく役に立ちます。
 
-TODO
+\section{ROS 2 Jazzy のインストール}
+\label{sec:ros2-install-install}
+
+ROS 2 は、Ubuntu の公式リポジトリではなく、ROS 2 の開発元が用意しているリポジトリから、apt でインストールします（\ref{sec:package-repository}節）。
+手順は変わることがあるので、実際にインストールするときは、公式ドキュメント（\url{https://docs.ros.org/en/jazzy/}）の「Installation」の「Ubuntu (deb packages)」のページも確認してください。
+本書の執筆時点では、次のような手順です。
+
+\subsection{文字コードの設定を確認する}
+
+ROS 2 は、文字コードが UTF-8 の環境で動かすことを前提にしています。
+\cmd{locale} コマンドで、今の設定を確かめましょう。
+
+\begin{terminal}[文字コードの設定を確認する]
+$ locale
+LANG=ja_JP.UTF-8
+LANGUAGE=ja:en
+LC_CTYPE="ja_JP.UTF-8"
+...
+\end{terminal}
+
+\cmd{UTF-8} が含まれていれば、そのままで構いません。
+Ubuntu を日本語や英語で普通にインストールした場合は、UTF-8 になっているはずです。
+
+\subsection{ROS 2 のリポジトリを追加する}
+
+まず、Ubuntu の \cmd{universe} リポジトリ（\ref{sec:package-repository}節）が有効になっていることを確かめます。
+
+\begin{terminal}[universe リポジトリを有効にする]
+$ sudo apt install software-properties-common
+$ sudo add-apt-repository universe
+\end{terminal}
+
+次に、ROS 2 のリポジトリの設定と GPG 鍵をまとめてインストールしてくれる \cmd{ros2-apt-source} というパッケージをダウンロードして、インストールします。
+
+\begin{terminal}[ROS 2 のリポジトリを追加する]
+$ sudo apt update && sudo apt install curl -y
+$ export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
+$ curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo $VERSION_CODENAME)_all.deb"
+$ sudo dpkg -i /tmp/ros2-apt-source.deb
+\end{terminal}
+
+長いコマンドですが、これまでの章で学んだことの組み合わせです。
+
+\begin{itemize}
+  \item 2 行目では、\cmd{curl}（Web からデータを取得するコマンド）で \cmd{ros2-apt-source} の最新版の情報を取得し、パイプ（\ref{sec:text-pipe-pipe}節）でつないだ \cmd{grep} と \cmd{awk}（\ref{sec:text-pipe-tools}節）でバージョン番号だけを取り出して、環境変数 \cmd{ROS\_APT\_SOURCE\_VERSION} に入れています。\cmd{\$(コマンド)} は、コマンドの実行結果を使う書き方です（\ref{sec:shellscript-variable}節）。
+  \item 3 行目では、そのバージョンの \cmd{.deb} ファイルを \cmd{/tmp} にダウンロードしています。\cmd{\$(. /etc/os-release \&\& echo \$VERSION\_CODENAME)} の部分は、Ubuntu のコードネーム（\cmd{noble}）に置き換わります。
+  \item 4 行目の \cmd{dpkg -i} は、ダウンロードした \cmd{.deb} ファイルをインストールするコマンドです。これで、ROS 2 のリポジトリの設定ファイルと GPG 鍵が登録されます。
+\end{itemize}
+
+\subsection{ROS 2 をインストールする}
+
+リポジトリを追加したら、パッケージの一覧を更新し、インストール済みのパッケージを最新にしてから、ROS 2 をインストールします。
+
+\begin{terminal}[ROS 2 Jazzy をインストールする]
+$ sudo apt update
+$ sudo apt upgrade
+$ sudo apt install ros-jazzy-desktop
+$ sudo apt install ros-dev-tools
+\end{terminal}
+
+\cmd{ros-jazzy-desktop} は、ROS 2 の本体に加えて、RViz などの GUI のツールや、デモ・チュートリアル用のパッケージをまとめたものです。
+ダウンロードするデータが大きいので、インストールには時間がかかります。
+\cmd{ros-dev-tools} には、パッケージをビルドするための \cmd{colcon} や、依存関係を解決する \cmd{rosdep}（\ref{chap:workspace}章）など、開発に使う道具が含まれています。
+
+\begin{tablebox}[ROS 2 Jazzy の主なインストール用パッケージ][tab:ros2-install-packages]
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    パッケージ & 内容 \\
+    \midrule
+    \cmd{ros-jazzy-desktop} & ROS 2 本体・GUI のツール（RViz など）・デモ。本書ではこれを使う \\
+    \cmd{ros-jazzy-ros-base} & GUI のツールを含まない最小限の構成。ロボットに載せる PC など向け \\
+    \cmd{ros-dev-tools} & colcon・rosdep などの開発用の道具 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+ROS 2 の個々のパッケージは、\cmd{ros-jazzy-パッケージ名}（パッケージ名のアンダースコアはハイフンに変える）という名前で apt からインストールできます。
+たとえば、\ref{chap:practice}章で使う \cmd{teleop\_twist\_keyboard} は \cmd{ros-jazzy-teleop-twist-keyboard} です。
+
+\begin{point}[仮想マシンのスナップショット]
+  ROS 2 のインストールが終わったら、VirtualBox のスナップショット（\ref{sec:linux-setup}節）をとっておきましょう。
+  この後の章でいろいろ試して環境がおかしくなっても、この時点にすぐ戻れます。
+\end{point}
 
 \section{環境のセットアップ}
+\label{sec:ros2-install-setup}
 
-TODO
+\subsection{ROS 2 の設定を読み込む}
+
+ROS 2 は \cmd{/opt/ros/jazzy} にインストールされます（\ref{sec:linux-internals-fs}節）。
+ところが、インストールしただけでは、まだ \cmd{ros2} コマンドは使えません。
+
+\begin{terminal}[インストールしただけでは ros2 コマンドは使えない]
+$ ros2 --help
+ros2: command not found
+\end{terminal}
+
+\cmd{ros2} コマンドが置かれているディレクトリが、\cmd{PATH}（\ref{sec:env-variable}節）に含まれていないからです。
+ROS 2 を使うには、ターミナルを開くたびに、次のコマンドで ROS 2 の設定を読み込む必要があります。
+
+\begin{terminal}[ROS 2 の設定を読み込む]
+$ source /opt/ros/jazzy/setup.bash
+$ ros2 --help
+usage: ros2 [-h] [--use-python-default-buffering] Call `ros2 <command> -h` for more detailed usage. ...
+...
+\end{terminal}
+
+\cmd{setup.bash} は、ROS 2 を使うための環境変数を設定するシェルスクリプトです。
+\ref{sec:env-export-source}節で学んだように、環境変数の設定を今のシェルに反映させるために、\cmd{bash} ではなく \cmd{source} で読み込みます。
+読み込んだ後は、ROS 2 に関係する環境変数が設定されていることを確かめられます。
+
+\begin{terminal}[ROS 2 の環境変数を確認する]
+$ printenv | grep -i ros
+ROS_VERSION=2
+ROS_PYTHON_VERSION=3
+ROS_DISTRO=jazzy
+...
+\end{terminal}
+
+\subsection{\cmd{.bashrc} に設定を追加する}
+
+毎回 \cmd{source /opt/ros/jazzy/setup.bash} を入力するのは面倒なので、\cmd{.bashrc}（\ref{sec:env-bashrc}節）に追加して、ターミナルを開くたびに自動で読み込まれるようにしておきます。
+同じ行が何度も追加されないように、\cmd{grep} ですでに書かれていないかを確かめてから追加します。
+
+\begin{terminal}[.bashrc に ROS 2 の設定を追加する]
+$ grep "source /opt/ros/jazzy/setup.bash" ~/.bashrc
+$ echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+$ source ~/.bashrc
+\end{terminal}
+
+1 行目で何も表示されなければ、まだ書かれていないので、2 行目で追加します（\cmd{>>} を \cmd{>} と間違えないように注意しましょう）。
+テキストエディター（\ref{sec:files-edit}節）で \cmd{\textasciitilde/.bashrc} を開いて、末尾に書き足しても構いません。
+新しく開いたターミナルで \cmd{ros2 --help} が実行できれば、設定は完了です。
+
+\begin{point}[ros2 コマンドの補完]
+  ROS 2 の設定を読み込むと、\cmd{ros2} コマンドでも Tab 補完（\ref{sec:terminal-keys}節）が使えるようになります。
+  \cmd{ros2 r} まで入力して \key{Tab} を押すと \cmd{ros2 run} に、さらにパッケージ名やノード名の途中まで入力して \key{Tab} を押すと、残りが補完されます。
+  ROS 2 のコマンドは長いものが多いので、積極的に使いましょう。
+\end{point}
 
 \section{turtlesim で動作確認}
+\label{sec:ros2-install-turtlesim}
 
-TODO
+\subsection{turtlesim を起動する}
+
+ROS 2 が正しくインストールできたかを、\textbf{turtlesim} というシミュレータで確かめましょう。
+turtlesim は、画面の中のカメを ROS 2 で動かす、学習用のシンプルなシミュレータです。
+\cmd{ros-jazzy-desktop} に含まれていますが、入っていない場合は \cmd{sudo apt install ros-jazzy-turtlesim} でインストールします。
+
+ノードを起動するには、\cmd{ros2 run パッケージ名 実行ファイル名} を使います。
+次のコマンドで、turtlesim のノードを起動します。
+
+\begin{terminal}[turtlesim のノードを起動する]
+$ ros2 run turtlesim turtlesim_node
+[INFO] [1727930000.123456789] [turtlesim]: Starting turtlesim with node name /turtlesim
+[INFO] [1727930000.234567890] [turtlesim]: Spawning turtle [turtle1] at x=[5.544445], y=[5.544445], theta=[0.000000]
+\end{terminal}
+
+青い背景の中にカメが 1 匹いるウィンドウが開けば成功です（図\ref{fig:ros2-install-turtlesim}）。
+ノードは止めるまで動き続けるので、このターミナルはそのままにしておきます。
+
+\begin{figure}[tb]
+  \centering
+  \large
+  \begin{tikzpicture}
+    \draw rectangle++(4.5,3);
+    \clip rectangle++(4.5,3);
+    \foreach\x in{0,1,2,3,4}{
+      \foreach\y in{0,1,2,3,4,5,6}{
+        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
+      }
+    }
+  \end{tikzpicture}
+  %% 入れる画像：turtlesim を起動し、turtle_teleop_key でカメを少し動かして軌跡が描かれた状態のウィンドウのスクリーンショット
+  % eps 画像を貼る場合は includegraphics をお使いください。
+  % \includegraphics[width=0.6\linewidth]{ros2_install/turtlesim.png}
+  \caption{turtlesim のウィンドウ}
+  \label{fig:ros2-install-turtlesim}
+\end{figure}
+
+\subsection{キーボードでカメを動かす}
+
+\key{Ctrl}+\key{Shift}+\key{T} で、ターミナルに新しいタブを開きます（\key{Ctrl}+\key{Alt}+\key{T} で新しいウィンドウを開いても構いません）。
+新しいタブで、キーボードの入力を受け付けるノードを起動します。
+
+\begin{terminal}[キーボードで操作するノードを起動する]
+$ ros2 run turtlesim turtle_teleop_key
+Reading from keyboard
+---------------------------
+Use arrow keys to move the turtle.
+...
+'Q' to quit.
+\end{terminal}
+
+このターミナルを選んだ状態で矢印キーを押すと、turtlesim のウィンドウの中のカメが動き、通った跡に線が描かれます。
+カメが動かないときは、このターミナルのウィンドウがアクティブになっている（クリックして選ばれている）かを確かめてください。
+
+\subsection{何が起きているのか}
+
+このとき、2 つのノードが、ROS 2 の通信を使ってデータをやり取りしています（図\ref{fig:ros2-install-graph}）。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/ros2_install/turtlesim_graph}
+  \caption{turtlesim を動かしているときのノードとトピック}
+  \label{fig:ros2-install-graph}
+\end{figure}
+
+キーボードの入力を受け付ける \cmd{/teleop\_turtle} というノードが、押されたキーに応じた速度の指令を、\cmd{/turtle1/cmd\_vel} という名前の\textbf{トピック}に送っています。
+カメの画面を表示する \cmd{/turtlesim} というノードが、そのトピックから指令を受け取って、カメを動かしています。
+さらに別のタブを開いて、動いているノードとトピックの一覧を確かめてみましょう。
+
+\begin{terminal}[ノードとトピックの一覧を確認する]
+$ ros2 node list
+/teleop_turtle
+/turtlesim
+$ ros2 topic list
+/parameter_events
+/rosout
+/turtle1/cmd_vel
+/turtle1/color_sensor
+/turtle1/pose
+\end{terminal}
+
+ノードやトピックについては、次の\ref{chap:ros2_concepts}章で詳しく学びます。
+確認が終わったら、それぞれのターミナルで \key{Ctrl}+\key{C} を押してノードを止めます（\cmd{turtle\_teleop\_key} は \key{q} でも終了できます）。
+
+\subsection{デモのノードで通信を確かめる}
+
+もう 1 つ、メッセージを送るノードと受け取るノードのデモでも試してみましょう。
+2 つのターミナルで、それぞれ次のコマンドを実行します。
+
+\begin{terminal}[1 つ目のターミナル：メッセージを送るノード]
+$ ros2 run demo_nodes_cpp talker
+[INFO] [1727930100.123456789] [talker]: Publishing: 'Hello World: 1'
+[INFO] [1727930101.123456789] [talker]: Publishing: 'Hello World: 2'
+...
+\end{terminal}
+
+\begin{terminal}[2 つ目のターミナル：メッセージを受け取るノード]
+$ ros2 run demo_nodes_py listener
+[INFO] [1727930102.234567890] [listener]: I heard: [Hello World: 3]
+...
+\end{terminal}
+
+\cmd{talker} は C++ で、\cmd{listener} は Python で書かれたノードです。
+書かれた言語が違っても、ROS 2 のノードどうしは同じように通信できることがわかります（\ref{sec:python-pros-cons}節のポイント）。
 
 \section{ROS\_DOMAIN\_ID とネットワーク設定}
+\label{sec:ros2-install-network}
 
-TODO
+\subsection{同じネットワークのノードは自動でつながる}
+
+\ref{sec:what-is-ros-architecture}節で説明したように、ROS 2 では、同じネットワークにつながっているコンピュータのノードどうしが、自動でお互いを見つけて通信します。
+これは便利な反面、研究室や競技会場のように、同じネットワークに複数の人のロボットや PC がある環境では困ったことになります。
+自分のノードが、隣の人のロボットのトピックを受け取ってしまったり、自分の指令で隣の人のロボットが動いてしまったりするからです。
+
+\subsection{ROS\_DOMAIN\_ID で通信を分ける}
+
+このような混乱を防ぐのが、\textbf{\cmd{ROS\_DOMAIN\_ID}} という環境変数です。
+\cmd{ROS\_DOMAIN\_ID} には 0 から 101 までの番号を設定でき、\textbf{同じ番号のノードどうしだけが通信します}。
+番号を設定しなかった場合は 0 が使われます。
+
+\begin{terminal}[ROS\_DOMAIN\_ID を設定する]
+$ export ROS_DOMAIN_ID=12
+\end{terminal}
+
+\cmd{export} で設定した値は、そのターミナルだけで有効です（\ref{sec:env-export-source}節）。
+いつも同じ番号を使うなら、\cmd{.bashrc} に追加しておきます。
+
+\begin{terminal}[.bashrc に ROS\_DOMAIN\_ID を追加する]
+$ echo "export ROS_DOMAIN_ID=12" >> ~/.bashrc
+\end{terminal}
+
+\begin{point}[ROS\_DOMAIN\_ID の決め方]
+  研究室やチームの中で、人やロボットごとに重ならない番号を割り当てておきましょう。
+  開発用 PC とロボットの PC で通信させたいときは、両方に同じ番号を設定します。
+  「ノードが見えない」「トピックが届かない」というトラブルの原因として、\cmd{ROS\_DOMAIN\_ID} の設定の食い違いはとてもよくあります（\ref{chap:debug}章）。
+  うまく通信できないときは、まず両方のターミナルで \cmd{echo \$ROS\_DOMAIN\_ID} を実行して、番号が同じかを確かめましょう。
+\end{point}
+
+\subsection{自分のコンピュータの中だけで通信する}
+
+ほかのコンピュータとは一切通信せず、自分のコンピュータの中のノードどうしだけで通信したいときは、\cmd{ROS\_AUTOMATIC\_DISCOVERY\_RANGE} という環境変数に \cmd{LOCALHOST} を設定します。
+シミュレータだけで学習しているときなどに便利です。
+
+\begin{terminal}[自分のコンピュータの中だけで通信する]
+$ export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+\end{terminal}
+
+古い資料には \cmd{ROS\_LOCALHOST\_ONLY=1} という設定が書かれていることがありますが、ROS 2 Jazzy では \cmd{ROS\_AUTOMATIC\_DISCOVERY\_RANGE} を使います。
+
+\subsection{別のコンピュータと通信するときの注意}
+
+開発用 PC とロボットの PC のように、別々のコンピュータのノードどうしを通信させるには、次の点を確かめておきましょう。
+
+\begin{itemize}
+  \item 2 台のコンピュータが同じネットワークにつながっていて、\cmd{ping}（\ref{sec:network-check}節）で通信できること
+  \item 両方の \cmd{ROS\_DOMAIN\_ID} が同じであること
+  \item VirtualBox の仮想マシンを使っている場合は、ネットワークの設定が「ブリッジアダプター」になっていること（\ref{sec:linux-setup}節）。標準の NAT のままでは、ほかのコンピュータのノードを見つけられません
+\end{itemize}
+
+準備ができたら、片方のコンピュータで \cmd{talker}、もう片方で \cmd{listener} を起動して、メッセージが届くかを確かめてみましょう。
+届かない場合は、ネットワークがノードを見つけるための通信（マルチキャスト）に対応しているかを、\cmd{ros2 multicast} コマンドで確かめられます。
+
+\begin{terminal}[2 台のコンピュータの間でマルチキャストを確かめる]
+$ ros2 multicast receive          # 1 台目：受信を待つ
+$ ros2 multicast send             # 2 台目：送信する
+\end{terminal}
+
+1 台目に \cmd{Received from ...} と表示されれば、マルチキャストで通信できています。
+Wi-Fi のルータによっては、マルチキャストの通信がうまく届かないことがあります。
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item ROS 2 Jazzy は、ROS 2 のリポジトリを追加してから、apt で \cmd{ros-jazzy-desktop} と \cmd{ros-dev-tools} をインストールします。手順は公式ドキュメントも確認しましょう。
+  \item ROS 2 を使うには、\cmd{source /opt/ros/jazzy/setup.bash} で設定を読み込みます。\cmd{.bashrc} に書いておくと、ターミナルを開くたびに自動で読み込まれます。
+  \item \cmd{ros2 run パッケージ名 実行ファイル名} でノードを起動します。turtlesim で、ノードどうしがトピックで通信する様子を確かめました。
+  \item 同じ \cmd{ROS\_DOMAIN\_ID} のノードどうしだけが通信します。人やロボットごとに番号を分け、通信させたいコンピュータどうしは同じ番号にそろえます。
+\end{itemize}

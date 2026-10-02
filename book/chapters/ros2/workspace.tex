@@ -4,34 +4,407 @@
 % この章で学ぶこと
 \begin{goalbox}
   \begin{itemize}
-    \item TODO
+    \item ROS 2 のワークスペースの構成（\cmd{src}, \cmd{build}, \cmd{install}, \cmd{log}）
+    \item colcon を使ったパッケージのビルド
+    \item \cmd{ros2 pkg create} による自分のパッケージの作成
+    \item \cmd{package.xml} と \cmd{setup.py}（\cmd{CMakeLists.txt}）の役割
+    \item rosdep による依存関係の解決
+    \item オーバーレイとアンダーレイの考え方
   \end{itemize}
 \end{goalbox}
 
-\section{ワークスペースの構成}
+ここまでは、apt でインストールした ROS 2 のパッケージ（turtlesim など）を使ってきました。
+自分でノードを書いたり、公開されているパッケージをソースコードからビルドしたりするには、\textbf{ワークスペース}という作業場所を用意します。
+この章では、ワークスペースの作り方と、パッケージの作り方・ビルドの仕方を学びます。
+次の\ref{chap:rclpy}章からは、ここで作ったワークスペースとパッケージを使って、Python でノードを書いていきます。
 
-TODO
+\section{ワークスペースの構成}
+\label{sec:workspace-structure}
+
+\subsection{パッケージとワークスペース}
+
+ROS 2 では、ノードのプログラムや設定ファイルなどを、\textbf{パッケージ}という単位でまとめます（\ref{sec:what-is-ros-components}節）。
+turtlesim も、\cmd{turtlesim} という名前のパッケージです。
+1 つのパッケージには、関係する複数のノードや、ノードの設定ファイル、起動用のファイル（\ref{chap:launch}章）などを入れられます。
+
+\textbf{ワークスペース}は、パッケージのソースコードを置き、ビルドするためのディレクトリです。
+ワークスペースの名前は自由ですが、\cmd{\textasciitilde/ros2\_ws} とするのが一般的です。
+
+\subsection{ワークスペースを作る}
+
+ワークスペースを作るには、ワークスペースのディレクトリと、その中に \cmd{src} ディレクトリを作るだけです（\ref{sec:files-manipulate}節の \cmd{mkdir -p}）。
+
+\begin{terminal}[ワークスペースを作る]
+$ mkdir -p ~/ros2_ws/src
+$ cd ~/ros2_ws
+\end{terminal}
+
+パッケージのソースコードは、すべて \cmd{src} ディレクトリの中に置きます。
+ワークスペースでビルドを行うと、\cmd{src} と同じ階層に、自動で 3 つのディレクトリが作られます。
+
+\begin{tablebox}[ワークスペースのディレクトリ][tab:workspace-dirs]
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    ディレクトリ & 役割 \\
+    \midrule
+    \cmd{src} & パッケージのソースコードを置く。自分で編集するのはここだけ \\
+    \cmd{build} & ビルドの途中で作られるファイルが置かれる \\
+    \cmd{install} & ビルドしてできたものがインストールされる。ノードはここから実行される \\
+    \cmd{log} & ビルドのログが置かれる \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\cmd{build}・\cmd{install}・\cmd{log} は、ビルドのたびに作り直されるディレクトリです。
+自分で編集する必要はなく、Git で管理するときも含めません（\ref{sec:git-basic}節の \cmd{.gitignore}）。
+ビルドがおかしくなったときは、この 3 つのディレクトリを \cmd{rm -r} で削除してから、ビルドし直すと直ることがあります。
 
 \section{colcon によるビルド}
+\label{sec:workspace-colcon}
 
-TODO
+\subsection{colcon}
+
+ROS 2 では、\textbf{colcon}（コルコン）というツールで、ワークスペースの中のパッケージをまとめてビルドします。
+colcon は、\ref{sec:ros2-install-install}節でインストールした \cmd{ros-dev-tools} に含まれています。
+colcon は、パッケージどうしの依存関係を調べて、正しい順番でビルドしてくれます。
+C++ のパッケージは、内部で CMake（\ref{sec:package-build}節）を使ってビルドされます。
+
+\subsection{公開されているパッケージをビルドする}
+
+試しに、turtlesim のソースコードをダウンロードして、自分のワークスペースでビルドしてみましょう。
+turtlesim のソースコードは、\cmd{ros\_tutorials} というリポジトリで公開されています。
+\cmd{git clone}（\ref{sec:git-github}節）で、Jazzy 用のブランチ（\cmd{-b jazzy}）をダウンロードします。
+
+\begin{terminal}[turtlesim のソースコードをダウンロードする]
+$ cd ~/ros2_ws/src
+$ git clone https://github.com/ros/ros_tutorials.git -b jazzy
+\end{terminal}
+
+ビルドする前に、パッケージが必要としている依存パッケージをインストールしておきます（詳しくは\ref{sec:workspace-rosdep}節で説明します）。
+
+\begin{terminal}[依存パッケージをインストールする]
+$ cd ~/ros2_ws
+$ sudo rosdep init        # 最初の 1 回だけ
+$ rosdep update
+$ rosdep install -i --from-path src --rosdistro jazzy -y
+#All required rosdeps installed successfully
+\end{terminal}
+
+準備ができたら、\textbf{ワークスペースのディレクトリ}（\cmd{\textasciitilde/ros2\_ws}）で \cmd{colcon build} を実行します。
+
+\begin{terminal}[ワークスペースをビルドする]
+$ cd ~/ros2_ws
+$ colcon build
+Starting >>> turtlesim
+Finished <<< turtlesim [25.2s]
+
+Summary: 1 package finished [25.6s]
+\end{terminal}
+
+\cmd{Summary} に、ビルドに成功したパッケージの数が表示されます。
+ワークスペースの中を見ると、\cmd{build}・\cmd{install}・\cmd{log} ができています。
+
+\begin{terminal}[ビルド後のワークスペース]
+$ ls
+build  install  log  src
+\end{terminal}
+
+\begin{caution}[colcon build はワークスペースのディレクトリで]
+  \cmd{colcon build} は、必ずワークスペースのディレクトリ（\cmd{src} の 1 つ上）で実行します。
+  \cmd{src} の中や、パッケージのディレクトリの中で実行すると、その場所に \cmd{build} などのディレクトリが作られてしまい、混乱の原因になります。
+  間違えて作ってしまったら、そのディレクトリを削除しましょう。
+\end{caution}
+
+\subsection{colcon build のよく使うオプション}
+
+\begin{tablebox}[\cmd{colcon build} のよく使うオプション][tab:workspace-colcon-options]
+  \begin{tabular}{p{0.42\linewidth}p{0.5\linewidth}}
+    \toprule
+    オプション & 意味 \\
+    \midrule
+    \cmd{--packages-select パッケージ名} & 指定したパッケージだけをビルドする \\
+    \cmd{--packages-up-to パッケージ名} & 指定したパッケージと、それが依存するパッケージをビルドする \\
+    \cmd{--symlink-install} & ファイルをコピーせずにリンクでインストールする。Python のファイルなどを書き換えたとき、ビルドし直さずに反映される \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+パッケージが増えてくると、ビルドに時間がかかるようになります。
+変更したパッケージだけを \cmd{--packages-select} でビルドすると、時間を短くできます。
+Python のノードを書くときは、\cmd{--symlink-install} を付けておくと便利です（\ref{chap:rclpy}章）。
+よく使うので、\ref{sec:env-alias}節で紹介したように、エイリアスを作っておくのもよいでしょう。
 
 \section{パッケージの作成}
+\label{sec:workspace-create}
 
-TODO
+\subsection{ros2 pkg create}
+
+自分のパッケージは、\cmd{ros2 pkg create} コマンドで作ります。
+パッケージのひな形となるディレクトリやファイルを、自動で作ってくれます。
+パッケージは、ワークスペースの \cmd{src} ディレクトリの中に作ります。
+
+\begin{terminal}[Python のパッケージを作る]
+$ cd ~/ros2_ws/src
+$ ros2 pkg create --build-type ament_python --license Apache-2.0 --node-name my_node my_package
+going to create a new package
+package name: my_package
+destination directory: /home/user/ros2_ws/src
+...
+\end{terminal}
+
+\begin{description}
+  \item[\cmd{--build-type ament\_python}] Python でノードを書くパッケージを作ります。C++ の場合は \cmd{ament\_cmake} を指定します。
+  \item[\cmd{--license Apache-2.0}] パッケージのライセンスを指定します（\ref{sec:linux-oss}節）。
+  \item[\cmd{--node-name my\_node}] 指定した名前で、ノードのひな形のファイルも作ります。
+  \item[\cmd{my\_package}] パッケージの名前です。パッケージ名には、小文字の英数字とアンダースコアを使います。
+\end{description}
+
+ほかのパッケージを使うノードを書く場合は、\cmd{--dependencies rclpy std\_msgs} のように、依存するパッケージも指定できます。
+
+\subsection{パッケージの中身}
+
+作られたパッケージの中を、\cmd{tree} コマンド（\ref{sec:package-apt}節）で見てみましょう。
+
+\begin{terminal}[Python のパッケージの中身]
+$ tree my_package
+my_package
+├── my_package
+│   ├── __init__.py
+│   └── my_node.py
+├── package.xml
+├── resource
+│   └── my_package
+├── setup.cfg
+├── setup.py
+└── test
+    ├── test_copyright.py
+    ├── test_flake8.py
+    └── test_pep257.py
+\end{terminal}
+
+\begin{description}
+  \item[\cmd{my\_package/}] パッケージと同じ名前のディレクトリで、ここに Python のノードのファイルを置きます。\cmd{\_\_init\_\_.py} は、このディレクトリを Python のモジュール（\ref{sec:python-class-module}節）として扱うための空のファイルです。
+  \item[\cmd{package.xml}] パッケージの情報を書くファイルです（\ref{sec:workspace-files}節）。
+  \item[\cmd{setup.py}, \cmd{setup.cfg}] Python のパッケージのインストール方法を書くファイルです。
+  \item[\cmd{resource/}] ROS 2 がパッケージを見つけるための目印のファイルが入っています。
+  \item[\cmd{test/}] コードの書き方を自動で確かめるテストが入っています。
+\end{description}
+
+\cmd{my\_node.py} には、次のようなひな形が書かれています。
+\ref{sec:python-class-module}節で学んだ \cmd{if \_\_name\_\_ == '\_\_main\_\_':} が使われていることがわかります。
+
+\begin{lstlisting}[style=python, caption={ノードのひな形（my\_package/my\_package/my\_node.py）}, label={lst:workspace-my-node}]
+def main():
+    print('Hi from my_package.')
+
+
+if __name__ == '__main__':
+    main()
+\end{lstlisting}
+
+\subsection{ビルドして実行する}
+
+作ったパッケージをビルドして、実行してみましょう。
+ビルドしたパッケージを使うには、ワークスペースの \cmd{install/local\_setup.bash} を \cmd{source} で読み込む必要があります（\ref{sec:workspace-overlay}節）。
+
+\begin{terminal}[パッケージをビルドして実行する]
+$ cd ~/ros2_ws
+$ colcon build --packages-select my_package
+Starting >>> my_package
+Finished <<< my_package [1.21s]
+
+Summary: 1 package finished [1.52s]
+$ source install/local_setup.bash
+$ ros2 run my_package my_node
+Hi from my_package.
+\end{terminal}
+
+自分で作ったパッケージのノードを、\cmd{ros2 run} で実行できました。
+まだ ROS 2 の通信は使っていませんが、次の\ref{chap:rclpy}章で、このパッケージにノードを書いていきます。
 
 \section{package.xml と setup.py / CMakeLists.txt}
+\label{sec:workspace-files}
 
-TODO
+\subsection{package.xml}
+
+\cmd{package.xml} は、パッケージの名前・バージョン・説明・管理者・ライセンス、そして\textbf{依存するパッケージ}を書くファイルです。
+XML（タグで囲んで書く形式）で書かれています。
+
+\begin{lstlisting}[style=xml, caption={package.xml}, label={lst:workspace-package-xml}]
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>my_package</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="user@todo.todo">user</maintainer>
+  <license>Apache-2.0</license>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
+\end{lstlisting}
+
+\cmd{description} や \cmd{maintainer} は、自分のパッケージの説明や、自分の名前とメールアドレスに書き換えておきましょう。
+\cmd{license} には、\ref{sec:linux-oss}節で学んだライセンスを書きます。
+パッケージを公開するときに、ほかの人が安心して使えるように、必ずライセンスを明記しておきましょう。
+
+ほかのパッケージを使う場合は、そのパッケージ名を \cmd{<depend>} タグで書きます。
+たとえば、\cmd{rclpy} と \cmd{std\_msgs} を使うノードを書くなら、次の 2 行を追加します。
+
+\begin{lstlisting}[style=xml, caption={package.xml に依存するパッケージを追加する}, label={lst:workspace-depend}]
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+\end{lstlisting}
+
+ここに書いた依存関係をもとに、colcon はビルドの順番を決め、rosdep は必要なパッケージをインストールします（\ref{sec:workspace-rosdep}節）。
+
+\subsection{setup.py}
+
+Python のパッケージ（\cmd{ament\_python}）では、\cmd{setup.py} に、パッケージをどのようにインストールするかを書きます。
+特に大切なのは、最後の \cmd{entry\_points} の部分です。
+
+\begin{lstlisting}[style=python, caption={setup.py（一部）}, label={lst:workspace-setup-py}]
+setup(
+    name=package_name,
+    ...
+    license='Apache-2.0',
+    entry_points={
+        'console_scripts': [
+            'my_node = my_package.my_node:main'
+        ],
+    },
+)
+\end{lstlisting}
+
+\cmd{'my\_node = my\_package.my\_node:main'} は、「\cmd{ros2 run my\_package my\_node} と実行されたら、\cmd{my\_package} ディレクトリの \cmd{my\_node.py} の \cmd{main} 関数を呼び出す」という意味です。
+新しいノードのファイルを追加したときは、ここに 1 行追加して、ビルドし直します（\ref{chap:rclpy}章）。
+
+\subsection{CMakeLists.txt}
+
+C++ のパッケージ（\cmd{ament\_cmake}）では、\cmd{setup.py} の代わりに \cmd{CMakeLists.txt}（\ref{sec:package-build}節）にビルドの方法を書きます。
+C++ でノードを書く場合のほか、自分でメッセージ型を定義するパッケージ（\ref{chap:rclpy}章）でも使います。
 
 \section{依存関係の解決}
+\label{sec:workspace-rosdep}
 
-TODO
+\subsection{rosdep}
+
+公開されているパッケージをソースコードからビルドするときは、そのパッケージが必要とするほかのパッケージ（依存パッケージ）を、先にインストールしておく必要があります。
+一つ一つ調べて \cmd{apt install} するのは大変なので、ROS 2 では \textbf{rosdep} というツールを使います。
+
+rosdep は、ワークスペースの中のパッケージの \cmd{package.xml} を読み、そこに書かれた依存パッケージを、apt のパッケージ名（\cmd{ros-jazzy-...} や \cmd{python3-...} など）に変換して、まとめてインストールしてくれます。
+\ref{sec:python-pep668}節で説明したように、ROS 2 のノードで使う Python のパッケージも、rosdep を通じて apt でインストールされます。
+
+\subsection{rosdep の使い方}
+
+rosdep を初めて使うときは、最初に 1 回だけ \cmd{sudo rosdep init} を実行して、初期設定をします。
+その後、\cmd{rosdep update} で、依存パッケージの対応表を最新にします。
+
+\begin{terminal}[rosdep の初期設定と更新]
+$ sudo rosdep init
+$ rosdep update
+\end{terminal}
+
+依存パッケージをインストールするには、ワークスペースのディレクトリで次のコマンドを実行します。
+
+\begin{terminal}[依存パッケージをインストールする]
+$ cd ~/ros2_ws
+$ rosdep install -i --from-path src --rosdistro jazzy -y
+\end{terminal}
+
+\begin{description}
+  \item[\cmd{--from-path src}] \cmd{src} の中のすべてのパッケージの依存関係を調べる
+  \item[\cmd{-i}] ワークスペースの中にあるパッケージは、インストールの対象から外す
+  \item[\cmd{--rosdistro jazzy}] ROS 2 のディストリビューションを指定する
+  \item[\cmd{-y}] インストールの確認に、自動で「はい」と答える
+\end{description}
+
+\begin{point}[ソースからビルドするときの手順]
+  公開されているパッケージをソースコードからビルドするときは、次の流れが基本です。
+  \begin{enumerate}
+    \item \cmd{src} の中に \cmd{git clone} する
+    \item ワークスペースのディレクトリで \cmd{rosdep install} を実行する
+    \item \cmd{colcon build} でビルドする
+    \item \cmd{source install/local\_setup.bash} で読み込む
+  \end{enumerate}
+  ただし、apt でインストールできるパッケージ（\cmd{ros-jazzy-...}）は、まず apt で入れることを考えましょう（\ref{sec:package-build}節の注意）。
+\end{point}
 
 \section{オーバーレイとアンダーレイ}
+\label{sec:workspace-overlay}
 
-TODO
+\subsection{ワークスペースを重ねる}
+
+ROS 2 では、ワークスペースを重ねて使います（図\ref{fig:workspace-overlay}）。
+apt でインストールした ROS 2（\cmd{/opt/ros/jazzy}）の上に、自分のワークスペース（\cmd{\textasciitilde/ros2\_ws}）を重ねる、というイメージです。
+下になる環境を\textbf{アンダーレイ}、上に重ねる環境を\textbf{オーバーレイ}といいます。
+
+\begin{figure}[tb]
+  \centering
+  \input{images/workspace/overlay}
+  \caption{アンダーレイとオーバーレイ}
+  \label{fig:workspace-overlay}
+\end{figure}
+
+ワークスペースを使うときは、まずアンダーレイ（ROS 2 本体）の設定を読み込み、その後にオーバーレイ（自分のワークスペース）の設定を読み込みます。
+
+\begin{terminal}[アンダーレイとオーバーレイを読み込む]
+$ source /opt/ros/jazzy/setup.bash          # アンダーレイ
+$ source ~/ros2_ws/install/local_setup.bash # オーバーレイ
+\end{terminal}
+
+1 行目は、\ref{sec:ros2-install-setup}節で \cmd{.bashrc} に書いたので、ターミナルを開いたときに自動で実行されています。
+オーバーレイを読み込むと、自分のワークスペースのパッケージも \cmd{ros2 run} などで使えるようになります。
+
+\begin{point}[setup.bash と local\_setup.bash]
+  ワークスペースの \cmd{install} には、\cmd{setup.bash} と \cmd{local\_setup.bash} の 2 つがあります。
+  \cmd{local\_setup.bash} はそのワークスペースのパッケージだけを読み込み、\cmd{setup.bash} はそのワークスペースをビルドしたときのアンダーレイもまとめて読み込みます。
+  アンダーレイをすでに読み込んでいる場合は、どちらを使っても同じ結果になります。
+\end{point}
+
+\subsection{オーバーレイが優先される}
+
+アンダーレイとオーバーレイに同じ名前のパッケージがあるときは、\textbf{オーバーレイのほうが使われます}。
+これを確かめるために、\ref{sec:workspace-colcon}節で自分のワークスペースにダウンロードした turtlesim を、少しだけ改造してみましょう。
+turtlesim のウィンドウのタイトルを決めているのは、\cmd{turtlesim/src/turtle\_frame.cpp} の中の、次の行です。
+
+\begin{lstlisting}[style=cpp, numbers=none, xleftmargin=0pt, framexleftmargin=0pt, caption={ros\_tutorials/turtlesim/src/turtle\_frame.cpp（一部）}, label={lst:workspace-turtle-frame}]
+  setWindowTitle("TurtleSim");
+\end{lstlisting}
+
+テキストエディターや VS Code でこのファイルを開き、\cmd{"TurtleSim"} を \cmd{"MyTurtleSim"} に書き換えて保存してから、ビルドし直します。
+
+\begin{terminal}[改造した turtlesim をビルドして起動する]
+$ cd ~/ros2_ws
+$ colcon build --packages-select turtlesim
+$ source install/local_setup.bash
+$ ros2 run turtlesim turtlesim_node
+\end{terminal}
+
+ウィンドウのタイトルが「MyTurtleSim」になっていれば、オーバーレイ（自分のワークスペース）の turtlesim が使われています。
+一方、オーバーレイを読み込んでいない新しいターミナルで同じコマンドを実行すると、アンダーレイ（apt でインストールした）の turtlesim が起動し、タイトルは「TurtleSim」のままです。
+
+このしくみを使うと、apt でインストールしたパッケージを壊すことなく、そのパッケージを自分のワークスペースで改造して試すことができます。
+
+\begin{caution}[source を忘れずに]
+  ビルドした後に \cmd{source install/local\_setup.bash} を忘れると、自分のパッケージが見つからない（\cmd{Package 'my\_package' not found}）、改造したはずなのに動作が変わらない、といったことが起こります。
+  新しいターミナルを開いたときや、新しいパッケージを追加してビルドしたときは、必ず読み込み直しましょう。
+  毎回入力するのが面倒なら、\cmd{.bashrc} に \cmd{source \textasciitilde/ros2\_ws/install/local\_setup.bash} を追加しておく方法もあります（ただし、ワークスペースを一度もビルドしていないとエラーになります）。
+\end{caution}
 
 \section*{この章のまとめ}
 
-TODO
+\begin{itemize}
+  \item ワークスペースは、パッケージのソースコードを \cmd{src} に置いてビルドするためのディレクトリです。ビルドすると \cmd{build}・\cmd{install}・\cmd{log} が作られます。
+  \item \cmd{colcon build} でワークスペースのパッケージをビルドします。必ずワークスペースのディレクトリで実行します。
+  \item \cmd{ros2 pkg create} でパッケージのひな形を作れます。パッケージの情報と依存関係は \cmd{package.xml} に、Python のノードの登録は \cmd{setup.py} に書きます。
+  \item rosdep を使うと、\cmd{package.xml} に書かれた依存パッケージを apt でまとめてインストールできます。
+  \item apt でインストールした ROS 2（アンダーレイ）の上に、自分のワークスペース（オーバーレイ）を重ねて使います。同じ名前のパッケージは、オーバーレイが優先されます。ビルドしたら \cmd{source install/local\_setup.bash} を忘れずに。
+\end{itemize}

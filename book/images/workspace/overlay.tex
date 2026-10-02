@@ -1,0 +1,7 @@
+% 図：アンダーレイとオーバーレイ（chapters/ros2/workspace.tex）
+\begin{tikzpicture}[ws/.style={draw, rounded corners=2pt, align=left, font=\small, text width=80mm, minimum height=14mm, inner sep=4pt, anchor=west}]
+  \node[ws, fill=blue!8] (under) at (0,0) {\textbf{アンダーレイ}：\texttt{/opt/ros/jazzy}\\{\footnotesize apt でインストールした ROS 2（turtlesim、rclpy など）}};
+  \node[ws, fill=green!10] (over) at (0,1.75) {\textbf{オーバーレイ}：\texttt{\textasciitilde/ros2\_ws/install}\\{\footnotesize 自分でビルドしたパッケージ（my\_package、改造した turtlesim など）}};
+  \draw[figarrow] (8.9,-0.4) -- node[figlabel, right, align=left]{後から\\読み込む} (8.9,2.2);
+  \node[figlabel, anchor=west, align=left, text=black!70] at (0,3.15) {同じ名前のパッケージがあるときは、オーバーレイ（上）のほうが使われる};
+\end{tikzpicture}

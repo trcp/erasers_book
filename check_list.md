@@ -153,6 +153,34 @@
 - [ ] `rsync -av` の出力の形式、`tmux ls` の出力の形式
 - [ ] コラム「ターミナルマルチプレクサのいろいろ」：herdr と cmux の説明（各リポジトリの README をもとに執筆。herdr は状態の表示・複数マシンの管理・Linux 対応、cmux は macOS 専用の GUI アプリで通知が特徴）が、出版時点の情報と合っているか
 
+### 第21章 ROS 2 のインストールと環境構築（`chapters/ros2/ros2_install.tex`）
+
+- [ ] インストールの手順（universe の有効化、`ros2-apt-source` パッケージによるリポジトリの追加、`ros-jazzy-desktop` と `ros-dev-tools`）が、出版時点の公式ドキュメントと合っているか
+- [ ] `locale`、`ros2 --help`、`printenv | grep -i ros` の出力
+- [ ] `turtlesim_node` と `turtle_teleop_key` の出力、`ros2 node list` / `ros2 topic list` の結果
+- [ ] `ros-jazzy-desktop` に turtlesim と `demo_nodes_cpp` / `demo_nodes_py` が含まれていること
+- [ ] `ROS_DOMAIN_ID` の範囲（0〜101）、`ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` が Jazzy で使えること、`ROS_LOCALHOST_ONLY` が非推奨であること
+- [ ] `ros2 multicast receive` / `send` の使い方と出力（`Received from ...`）
+- [ ] VirtualBox の仮想マシン（ブリッジアダプター）と別の PC の間で、talker / listener が通信できること
+
+### 第22章 ROS 2 の基本概念とコマンドラインツール（`chapters/ros2/ros2_concepts.tex`）
+
+- [ ] `ros2 node info /turtlesim`、`ros2 topic list -t`、`ros2 topic echo`、`ros2 topic info`、`ros2 topic hz` の出力（turtlesim の pose の頻度 約 62.5 Hz など）
+- [ ] `ros2 interface show` の出力（`Twist`・`Spawn`・`RotateAbsolute`）
+- [ ] `ros2 topic pub` と `ros2 service call` と `ros2 action send_goal --feedback` の出力の形式（Jazzy での表示）
+- [ ] `ros2 param list` に表示される turtlesim のパラメータと、`background_r` の初期値（69）、`ros2 param dump` の使い方
+- [ ] `--ros-args --remap __node:=名前` でノードの名前を変えられること
+- [ ] rqt のプラグインの名前（Node Graph、Topic Monitor、Message Publisher、Service Caller、Plot、Console）
+
+### 第23章 ワークスペースとパッケージ（`chapters/ros2/workspace.tex`）
+
+- [ ] `ros_tutorials` リポジトリに `jazzy` ブランチがあり、`git clone ... -b jazzy` でビルドできること（ビルドにかかる時間の目安も）
+- [ ] `sudo rosdep init` / `rosdep update` / `rosdep install` の出力
+- [ ] `colcon build` の出力の形式（`Starting >>>`、`Finished <<<`、`Summary`）
+- [ ] `ros2 pkg create --build-type ament_python --license Apache-2.0 --node-name my_node my_package` の出力と、作られるファイル（`package.xml`・`setup.py`・`my_node.py` の中身、`test/` の 3 つのファイル）
+- [ ] `turtlesim/src/turtle_frame.cpp` に `setWindowTitle("TurtleSim");` があり、書き換えるとウィンドウのタイトルが変わること
+- [ ] `setup.bash` と `local_setup.bash` の違いの説明が正確か
+
 ### 第20章 ROS とは（`chapters/ros2/what_is_ros.tex`）
 
 - [ ] ROS の歴史の記述（2007 年ごろスタンフォード大学、Willow Garage、2010 年に最初の正式版、PR2、現在は OSRF を中心にコミュニティで開発）
@@ -190,15 +218,15 @@
   - [x] 第11章 パッケージ管理：`apt` で入れるソフトウェアの多くは OSS で、ディストリビューションが配布している（11.1 節に記載済み）
   - [x] 第13章 Git：GitHub が OSS 開発の中心の場であること、Issue / Pull Request での貢献（13.4 節に記載済み）
   - [x] 第20章 ROS とは：ROS 2 自体が Apache 2.0 ライセンスの OSS であること（20.2 節に記載済み）
-  - [ ] 第23章 ワークスペースとパッケージ：`package.xml` の `<license>` タグ
+  - [x] 第23章 ワークスペースとパッケージ：`package.xml` の `<license>` タグ（23.3・23.4 節に記載済み）
   - [ ] 第29章 次のステップへ：使う側から貢献する側へ
 - [x] 第10章 シェルスクリプト入門の「実践：開発環境セットアップスクリプトを書く」は、`apt` を扱う第11章より前にある → 題材はそのままで、`apt-get` について断り書きを入れた
 - [ ] 付録D 用語集（`appendix/glossary.tex`）に、これまでの章で導入した用語を追加する
-  - 第1章：CPU、コア、クロック周波数、メモリ（RAM）、ストレージ、GPU、VRAM、入出力装置、ハードウェア、ソフトウェア、機械語、OS、デバイスドライバ、マイコン
+  - 第1章：プログラミング、アルゴリズム、流れ図（フローチャート）、順次・分岐・繰り返し、バグ、デバッグ、CPU、コア、クロック周波数、メモリ（RAM）、ストレージ、GPU、VRAM、入出力装置、ハードウェア、ソフトウェア、機械語、OS、デバイスドライバ、マイコン
   - 第2章：カーネル、UNIX、GNU、UNIX 哲学、OSS、フリーソフトウェア、ライセンス、コピーレフト、パーミッシブ、ディストリビューション、LTS
   - 第3章：ユーザ空間、カーネル空間、システムコール、ファイルシステム、ルートディレクトリ、マウント、FHS、ユーザ、UID、グループ、GID、root、sudo、プロセス、PID、親プロセス・子プロセス、systemd、スケジューラ、デバイスファイル
   - 第15章：コンテナ、Docker、仮想マシン、ハイパーバイザ、イメージ、タグ、レジストリ、Docker Hub、Dockerfile、ボリューム（`-v`）、Docker Compose、Dev Containers、Docker Desktop
-  - 第16章：プログラム、プログラミング、アルゴリズム、流れ図（フローチャート）、順次・分岐・繰り返し、バグ、デバッグ、インタプリタ、コンパイラ、コンパイル、ソースコード、静的型付け、動的型付け、ガベージコレクション、ライブラリ
+  - 第16章：インタプリタ、コンパイラ、コンパイル、ソースコード、静的型付け、動的型付け、ガベージコレクション、ライブラリ
   - 第17章：対話モード、スクリプト、shebang、標準ライブラリ、パッケージ、PyPI、pip、仮想環境、venv、PEP 668、pipx
   - 第2章（追加）：VirtualBox、仮想化ソフトウェア、ホスト OS、ゲスト OS、スナップショット、Guest Additions、ブリッジアダプター、仮想化支援機能、タッチタイピング、ホームポジション、デュアルブート、仮想マシン、WSL2、ISO イメージ、GNOME、デスクトップ環境、Dock、ワークスペース、Super キー、Mozc
   - 第6章：パーミッション、所有者、chmod、chown、sudoers、tee、dialout、udev、ルールファイル、ベンダ ID、プロダクト ID
@@ -213,6 +241,9 @@
   - 第18章：演算子、コメント、変数、代入、データ型（int, float, str, bool）、エスケープシーケンス、f 文字列、リスト、インデックス、スライス、メソッド、タプル、辞書、if 文、比較演算子、論理演算子、インデント、for 文、range、while 文、無限ループ、乱数、関数、引数、戻り値、デフォルト値、キーワード引数
   - 第19章：オブジェクト、クラス、インスタンス、属性、self、__init__、継承、親クラス、子クラス、オーバーライド、super、コールバック関数、lambda 式、モジュール、標準ライブラリ、import、docstring、例外、try / except / finally、PEP 8、フォーマッタ、リンタ、Ruff、バグ、デバッグ、トレースバック、デバッガ、pdb
   - 第20章：ROS、ROS 2、ミドルウェア、ノード、トピック、サービス、アクション、パッケージ、マスタ、DDS、QoS、rclpy、rclcpp、rcl、rmw、ディストリビューション、LTS
+  - 第21章：ros2-apt-source、ros-jazzy-desktop、ros-dev-tools、setup.bash、turtlesim、ros2 run、ROS_DOMAIN_ID、ROS_AUTOMATIC_DISCOVERY_RANGE、マルチキャスト
+  - 第22章：パブリッシャ、サブスクライバ、パブリッシュ、サブスクライブ、メッセージ型、Twist、サービスのサーバとクライアント、リクエスト、レスポンス、ゴール、フィードバック、リザルト、パラメータ、YAML、rqt、rqt_graph
+  - 第23章：ワークスペース、colcon、ament_python、ament_cmake、package.xml、setup.py、entry_points、CMakeLists.txt、依存関係、rosdep、アンダーレイ、オーバーレイ、local_setup.bash
   - 第4章：GUI、CUI、CLI、ターミナル、シェル、bash、プロンプト、ビルトインコマンド、man ページ、Tab 補完
   - 第5章：テキストエディタ、テキストエディター（GNOME Text Editor）、カレントディレクトリ、ホームディレクトリ、隠しファイル、パス、絶対パス、相対パス、ワイルドカード、ブレース展開
 - [ ] 付録A コマンド早見表に、第4章・第5章のコマンドを追加する
@@ -221,8 +252,8 @@
 
 ## 4. 図版
 
-図は TikZ で描いて `images/<章のファイル名>/` に置いています（35 点）。
-残りの 7 か所はスクリーンショットが必要なため、プレースホルダのままです。
+図は TikZ で描いて `images/<章のファイル名>/` に置いています（38 点）。
+残りの 9 か所はスクリーンショットが必要なため、プレースホルダのままです。
 残っている箇所は `grep -rn '入れる画像' book/` で一覧できます。
 
 | 章 | ラベル | 内容 | 状態 |
@@ -231,12 +262,14 @@
 | 第2章 | `fig:linux-desktop` | Ubuntu 24.04 のデスクトップ | 要スクリーンショット |
 | 第2章 | `fig:linux-virtualbox-new` | VirtualBox で仮想マシンを作る画面 | 要スクリーンショット |
 | 第5章 | `fig:files-text-editor` | Ubuntu のテキストエディター | 要スクリーンショット |
+| 第21章 | `fig:ros2-install-turtlesim` | turtlesim のウィンドウ | 要スクリーンショット |
+| 第22章 | `fig:ros2-concepts-rqt-graph` | rqt_graph の表示 | 要スクリーンショット |
 | 第4章 | `fig:terminal-gui-cli` | 同じディレクトリを GUI と CLI で表示した例 | 要スクリーンショット |
 | 第4章 | `fig:terminal-window` | Ubuntu のターミナル | 要スクリーンショット |
 | 第4章 | `fig:terminal-man` | `man ls` の表示画面 | 要スクリーンショット |
 
-- [ ] 上の 7 点のスクリーンショットを撮影する（VirtualBox の画面はホスト OS で、それ以外は Ubuntu 24.04 で）
-- [ ] TikZ で描いた 35 点の図の内容・見た目を確認する（第1章 5 点、第2章 4 点、第3章 3 点、第4章 2 点、第5章 2 点、第6章 1 点、第7章 2 点、第8章 1 点、第9章 1 点、第11章 1 点、第12章 1 点、第13章 2 点、第14章 3 点、第15章 2 点、第16章 2 点、第17章 1 点、第20章 2 点）
+- [ ] 上の 9 点のスクリーンショットを撮影する（VirtualBox の画面はホスト OS で、それ以外は Ubuntu 24.04 で）
+- [ ] TikZ で描いた 38 点の図の内容・見た目を確認する（第1章 6 点、第2章 4 点、第3章 3 点、第4章 2 点、第5章 2 点、第6章 1 点、第7章 2 点、第8章 1 点、第9章 1 点、第11章 1 点、第12章 1 点、第13章 2 点、第14章 3 点、第15章 2 点、第16章 1 点、第17章 1 点、第20章 2 点、第21章 1 点、第22章 1 点、第23章 1 点）
 - [ ] 第5章のコラム「ホームディレクトリの中のディレクトリ名」に `xdg-user-dirs-gtk-update` のダイアログの画像を入れるか（コラムの囲みの中には `figure` を置けないため、入れる場合はコラムの外に出すか、囲みの中に `\includegraphics` を直接書く）
 
 ---

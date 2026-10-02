@@ -1,0 +1,28 @@
+% 図：トピック・サービス・アクションの通信の違い（chapters/ros2/ros2_concepts.tex）
+\begin{tikzpicture}[
+    node/.style={draw, ellipse, font=\footnotesize, fill=blue!8, minimum width=20mm, minimum height=8mm, inner sep=1pt},
+    lab/.style={font=\small\bfseries, anchor=west},
+    msg/.style={font=\scriptsize, midway, fill=white, inner sep=1pt}]
+  % トピック
+  \node[lab] at (-1.2,0.9) {トピック（出版・購読）};
+  \node[node] (p) at (0,0) {パブリッシャ};
+  \node[draw, fill=orange!10, font=\scriptsize\ttfamily, inner sep=3pt] (t) at (4.4,0) {/scan};
+  \node[node] (s1) at (7.4,0.45) {サブスクライバ};
+  \node[node] (s2) at (7.4,-0.45) {サブスクライバ};
+  \draw[figarrow] (p) -- node[msg, above=1pt]{データを送り続ける} (t);
+  \draw[figarrow] (t) -- (s1.west);
+  \draw[figarrow] (t) -- (s2.west);
+  % サービス
+  \node[lab] at (-1.2,-1.5) {サービス（要求・応答）};
+  \node[node] (c) at (0,-2.4) {クライアント};
+  \node[node] (sv) at (7.4,-2.4) {サーバ};
+  \draw[figarrow] ([yshift=1.5mm]c.east) -- node[msg, above=1pt]{要求（リクエスト）} ([yshift=1.5mm]sv.west);
+  \draw[figarrow] ([yshift=-1.5mm]sv.west) -- node[msg, below=1pt]{応答（レスポンス）を 1 回返す} ([yshift=-1.5mm]c.east);
+  % アクション
+  \node[lab] at (-1.2,-3.9) {アクション（目標・途中経過・結果）};
+  \node[node] (ac) at (0,-5.1) {クライアント};
+  \node[node] (as) at (7.4,-5.1) {サーバ};
+  \draw[figarrow] ([yshift=3mm]ac.east) -- node[msg, above=1pt]{目標（ゴール）} ([yshift=3mm]as.west);
+  \draw[figarrow, dashed] (as.west) -- node[msg]{途中経過（フィードバック）を何度も} (ac.east);
+  \draw[figarrow] ([yshift=-3mm]as.west) -- node[msg, below=1pt]{結果（リザルト）} ([yshift=-3mm]ac.east);
+\end{tikzpicture}

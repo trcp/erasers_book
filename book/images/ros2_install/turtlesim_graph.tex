@@ -1,0 +1,12 @@
+% 図：turtlesim のノードとトピック（chapters/ros2/ros2_install.tex）
+\begin{tikzpicture}[
+    node/.style={draw, ellipse, align=center, font=\small, fill=blue!8, minimum height=10mm, inner sep=2pt},
+    topic/.style={draw, rectangle, font=\footnotesize\ttfamily, fill=orange!10, inner sep=3pt}]
+  \node[node] (teleop) at (0,0) {\texttt{/teleop\_turtle}\\{\footnotesize キー入力}};
+  \node[topic] (cmd) at (4.9,0) {/turtle1/cmd\_vel};
+  \node[node] (sim) at (9.2,0) {\texttt{/turtlesim}\\{\footnotesize カメの画面}};
+  \draw[figarrow] (teleop) -- node[figlabel, above]{速度の指令} (cmd);
+  \draw[figarrow] (cmd) -- (sim);
+  \node[figlabel, text=black!60, below=3mm of teleop] {ノード（楕円）};
+  \node[figlabel, text=black!60, below=3mm of cmd] {トピック（四角）};
+\end{tikzpicture}
