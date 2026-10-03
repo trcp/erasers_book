@@ -38,20 +38,8 @@
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：カチャカの本体の写真（LiDAR が入っている前面上部のリングと、前のカメラの位置がわかるもの）
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.6\linewidth]{kachaka/kachaka.png}
-  \caption{カチャカ}
+  \includegraphics[width=0.55\linewidth, trim=110 260 70 160, clip]{kachaka/kachaka.png}
+  \caption{カチャカ（矢印のリングの中に LiDAR が入っている）}
   \label{fig:kachaka-robot}
 \end{figure}
 
@@ -193,24 +181,12 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp    # 通信に使う DDS
 $ ros2 launch erasers_kachaka_bringup bringup.launch.py use_rviz:=True
 \end{terminal}
 
-しばらく待つと、カチャカが「スタート」と話し、RViz2 にカチャカのモデルと、LiDAR の点、カメラの画像などが表示されます（図\ref{fig:kachaka-rviz}）。
+しばらく待つと、カチャカが「スタート」と話し、RViz2 にカチャカのモデルと、LiDAR で測った点などが表示されます（図\ref{fig:kachaka-rviz}）。
 RViz2 の表示が重くて作業しにくいときは、\cmd{use\_rviz:=False} にして起動し、必要なときだけ RViz2 を別に起動しましょう。
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：bringup.launch.py use_rviz:=True で起動したときの RViz2 の画面（カチャカのモデル、LiDAR の点、カメラの画像）のスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{kachaka/rviz.png}
+  \includegraphics[width=0.9\linewidth]{kachaka/rviz.png}
   \caption{erasers\_kachaka を起動したときの RViz2 の画面}
   \label{fig:kachaka-rviz}
 \end{figure}
