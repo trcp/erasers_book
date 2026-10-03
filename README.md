@@ -38,6 +38,12 @@ Linux とは何かというところから始め、コマンドラインの基�
 
 ---
 
+## サンプルコード
+
+本書に出てくるプログラム（Python のプログラム、シェルスクリプト、ROS 2 のワークスペースなど）は、別のリポジトリで公開しています。
+
+- https://github.com/trcp/erasers_book_code
+
 ## 章立て
 
 ### 第I部 Linux 入門
@@ -299,6 +305,11 @@ Linux とは何かというところから始め、コマンドラインの基�
 ├── .github/
 │   └── workflows/
 │       └── build-pdf.yml  # PDF の自動ビルドと Releases への公開
+│   ├── python/            # 第IV部の Python のプログラムと練習問題の解答例
+│   ├── shellscript/       # シェルスクリプト
+│   ├── cmake_hello/       # CMake の例
+│   ├── docker/            # Docker の例
+│   └── ros2_ws/           # ROS 2 のワークスペース（src/ に my_package・my_interfaces・my_cpp_package）
 └── book/                  # 原稿一式
     ├── main.tex           # 本全体の構成（部・章の読み込み順）
     ├── preamble.tex       # パッケージ読み込み・囲み環境・共通マクロ
@@ -314,7 +325,7 @@ Linux とは何かというところから始め、コマンドラインの基�
     │   └── ros2/          # 第V部 ROS 2 入門
     ├── supplement/        # 補章
     ├── appendix/          # 付録
-    ├── samples/           # 各章のサンプルコード・ROS 2 パッケージ（章ごとにサブディレクトリ）
+    ├── samples/           # \lstinputlisting で読み込むサンプル（ROS 2 のパッケージ・スクリプト）
     └── images/            # 図版（章ごとにサブディレクトリ）
 ```
 
@@ -438,7 +449,7 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | — | はじめに / おわりに | `frontmatter/preface.tex` / `frontmatter/afterword.tex` |
 
 章の追加・削除・順番の入れ替えは `main.tex` の `\include` を編集して行います。
-章番号は LaTeX が自動で振るので、ファイル名やディレクトリ名（`images/`, `samples/` のサブディレクトリを含む）には章番号を付けず、章の内容を表す名前を使ってください。
+章番号は LaTeX が自動で振るので、ファイル名やディレクトリ名（`images/` のサブディレクトリを含む）には章番号を付けず、章の内容を表す名前を使ってください。
 こうしておけば、章の順番を入れ替えてもファイル名を変更する必要がありません。
 本文中で章や図を参照するときも、番号を直接書かずに `\ref` を使います。
 
@@ -446,191 +457,7 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 
 ## 執筆ルール
 
-複数人で執筆するため、以下のルールに従ってください。迷ったときは `chapters/_template.tex` を参照してください。
-
-### 作業の進め方（Git）
-
-1. 担当する章を決めたら、Issue を立てて自分をアサインします（同じ章を複数人が同時に編集しないため）。
-2. `master` から作業用ブランチを切ります。ブランチ名は `<章のファイル名>-<内容>` とします（例：`rclpy-publisher`, `cheatsheet-git`）。
-3. `make` でエラーなくビルドできることを確認してからコミットします。
-4. Pull Request を作成し、**最低 1 人のレビュー**を受けてから `master` にマージします。
-5. コミットメッセージの先頭に対象の章を書きます（例：`rclpy: パブリッシャの節を執筆`）。
-
-次のファイルは全員に影響するため、変更する場合は事前に Issue で相談してください。
-
-- `preamble.tex`（パッケージ・環境・マクロの追加や変更）
-- `main.tex`（章構成の変更）
-- `.latexmkrc`, `Makefile`
-- `.github/workflows/build-pdf.yml`（リポジトリ直下）
-
-### ファイルの書き方
-
-- **1 文ごとに改行**してください。差分が見やすくなり、レビューやコンフリクト解消が楽になります（LaTeX では空行を入れない限り段落は分かれません）。
-- 段落を分けるときは空行を 1 行入れます。`\\` による改行は使いません。
-- 各章の冒頭には `goalbox`（この章で学ぶこと）を、末尾には「この章のまとめ」を必ず書きます。
-- 書きかけの箇所には `\todo{内容}` を残してください。PDF 上で赤字表示されるので未完成箇所がすぐわかります。
-- 見出しは `\chapter` / `\section` / `\subsection` までとし、`\subsubsection` 以下はなるべく使いません。
-
-### 使用する環境・マクロ
-
-`preamble.tex` で定義している以下の環境・マクロを使い、独自の装飾（`\textcolor` や `\fbox` の直書きなど）は避けてください。
-
-| 用途 | 書き方 |
-| --- | --- |
-| ターミナル操作例 | `\begin{terminal}[タイトル] ... \end{terminal}` |
-| ソースコード | `\begin{lstlisting}[style=python, caption={...}, label={lst:...}] ... \end{lstlisting}` |
-| 外部ファイルのコード | `\lstinputlisting[style=python]{samples/rclpy/foo.py}` |
-| この章で学ぶこと | `\begin{goalbox} ... \end{goalbox}` |
-| ポイント | `\begin{point}[タイトル] ... \end{point}`（タイトル省略時は「ポイント」） |
-| 注意 | `\begin{caution}[タイトル] ... \end{caution}`（タイトル省略時は「注意」） |
-| コラム | `\begin{column}{タイトル} ... \end{column}` |
-| TIPS | `\begin{tips}{タイトル} ... \end{tips}`（本筋とは別の、すぐに役立つ実践的なアドバイス。コラムは読み物・背景知識に使う） |
-| 本文中の表 | `\begin{tablebox}[キャプション][tab:ラベル] \begin{tabular}{ll} ... \end{tabular} \end{tablebox}`（前後に余白が空き、表の上に「表 5.1 キャプション」が付く。キャプションと表は同じページに置かれる） |
-| 練習問題 | `\begin{exercise} \begin{enumerate} \item ... \end{enumerate} \end{exercise}`（章ごとに「練習問題 18.1」と番号が付き、中の問題は (1), (2), ... になる。解答例は付録「Python の練習問題の解答例」（`appendix/python_answers.tex`）に章ごとの節としてまとめ、「練習問題 18.1 (2)」のように参照する） |
-| 文中のコマンド・ファイル名 | `\cmd{ls -l}` |
-| キー入力 | `\key{Ctrl}+\key{C}` |
-| 未完成箇所 | `\todo{あとで図を追加}` |
-
-`lstlisting` の `style` には `python`, `bash`, `cpp`, `xml` が使えます。
-
-> **注意：見出しの直後の表**
-> `\section` や `\subsection` の直後に、文章を挟まずに表（`tabular`）を置くとビルドエラーになります。見出しと表の間には、必ず 1 文以上の本文を入れてください。
-
-> **注意：`terminal` 環境のタイトル**
-> タイトルを省略した `terminal` 環境で、1 行目に日本語が含まれているとビルドエラーになります。
-> 1 行目に日本語を書くときは、`\begin{terminal}[コマンドの基本形]` のように必ずタイトルを付けてください。
-> また、タイトルが長すぎると右上のボタンと重なります。タイトルは全角 20 文字程度までにしてください。
-> タイトルの中の `_` `&` `%` `#` などの記号は、`\cmd{}` と同じようにエスケープしてください（例：`[ROS\_DOMAIN\_ID を設定する]`）。
-
-> **注意：`\cmd{}` 内の特殊文字**
-> `\cmd{}` の中では `_ # $ % & { } ~` をエスケープする必要があります（例：`\cmd{ros2\_ws}`）。
-> 本文中でエスケープが面倒な場合は `\lstinline|ros2_ws|` を使えます。ただし `\lstinline` は見出し（`\section` など）の中では使えないので、見出しでは `\cmd{}` とエスケープを使ってください。
-
-### コマンド例の書き方
-
-- `terminal` 環境の中では、一般ユーザで実行するコマンドの先頭に `$ `、root 権限で実行するコマンドの先頭に `# ` を付けます。
-- `terminal` 環境は Ubuntu のターミナル風の枠で表示され、`$` から行末まで（入力するコマンド）が自動で太字になります。実行結果の行に `$` が含まれると、そこから行末までも太字になるので注意してください。
-- 実行結果は `$` を付けずにそのまま書きます。長い出力は途中を `...` で省略して構いません。
-- 読者が自分の環境に合わせて置き換える部分は `<ファイル名>` のように山括弧で囲みます。
-- コマンドに説明を添えるときは、行末に `# 説明` の形でコメントを書きます（例：`$ cd ~/Documents     # ホームの Documents に移動`）。
-- 実行結果とエラーメッセージは英語の表示で掲載します（日本語環境では日本語で表示されることを、第4章で断っています）。
-- プロンプトを含めて書く必要があるときは、ユーザ名を `user`、ホスト名を `robot` とします（例：`user@robot:~$`）。
-- 掲載するコマンドとコードは、必ず**動作環境（Ubuntu 24.04 + ROS 2 Jazzy）で実際に実行して確認**してください。
-
-### ラベルと相互参照
-
-ラベルには種類を表す接頭辞を付け、`\ref` で参照します。「上の図」「次のリスト」のような位置に依存した書き方は避けてください。
-
-| 対象 | 接頭辞 | 例 |
-| --- | --- | --- |
-| 章 | `chap:` | `\label{chap:rclpy}` |
-| 節 | `sec:` | `\label{sec:rclpy-publisher}` |
-| 図 | `fig:` | `\label{fig:rqt-graph}` |
-| 表 | `tab:` | `\label{tab:apt-commands}` |
-| コード | `lst:` | `\label{lst:minimal-node}` |
-| 補章 | `sup:` | `\label{sup:launch-xml}` |
-| 付録 | `app:` | `\label{app:cheatsheet}` |
-
-補章は `main.tex` の `\hoshou` の後に `\include` します（補章と付録は、第V部の中に入らないように、それぞれ番号なしの部「補章」「付録」の後に置いています）。見出しは「補章1」、節・図・表・コードの番号は「補1.1」のようになり、本文からは `補章\ref{sup:launch-xml}` のように参照します。
-
-ラベルは本全体で一意になるよう、節以下のラベルには章を表す語を含めてください（例：`sec:rclpy-publisher`）。
-
-### 図版
-
-- 画像は、章のファイル名と同じ名前のディレクトリ `images/<章のファイル名>/` に置きます（例：`ros2_concepts.tex` の図なら `images/ros2_concepts/rqt_graph.png`）。`\includegraphics{ros2_concepts/rqt_graph.png}` のように `images/` を省略して参照できます。
-- ファイル名は半角英数字・ハイフン・アンダースコアのみとし、日本語や空白は使いません。
-- スクリーンショットは PNG を使います。
-- 図（ブロック図・流れ図・状態遷移図・木構造など）は、なるべく TikZ で描きます（次の「TikZ で描く図」を参照）。TikZ で描きにくい図は、PDF か、SVG から変換した PDF を使います。
-- 図には必ず `\caption` と `\label` を付け、本文から `\ref` で参照します。
-- 外部から引用する図は出典とライセンスを確認し、キャプションに出典を明記してください。
-
-#### TikZ で描く図
-
-TikZ で描く図は、図ごとに `images/<章のファイル名>/<図の名前>.tex` というファイルに `tikzpicture` 環境だけを書き、本文からは `\input` で読み込みます。
-図の中身を別ファイルにすることで、本文の差分が読みやすくなり、図だけを修正・レビューしやすくなります。
-
-```latex
-\begin{figure}[tb]
-  \centering
-  \input{images/terminal_shell/terminal_shell_command}
-  \caption{ターミナル・シェル・コマンドの関係}
-  \label{fig:terminal-shell-command}
-\end{figure}
-```
-
-- `\input` では `\includegraphics` と違って `images/` を省略できないので、`images/` から書きます。
-- 図の幅は本文の幅（A4 で約 155 mm）に収めます。これまでの図は横幅 10 cm 程度で描いているので、それに合わせると見た目がそろいます。
-- 見た目をそろえるため、`preamble.tex` で定義している次のスタイルを使います。
-
-| スタイル | 用途 |
-| --- | --- |
-| `figbox` | 枠付きの箱（白地） |
-| `figpart` | 主役となる箱（薄い青地） |
-| `figarrow` | 矢印 |
-| `figlabel` | 矢印や箱に添える小さな説明文 |
-| `fignum` | 丸囲みの番号（`\tikz\node[fignum]{1};` のように使う） |
-
-- 状態遷移図には `automata` ライブラリ、配置には `positioning` ライブラリなどが使えます（`preamble.tex` で読み込み済み）。
-- 既存の図（`images/computer/flow.tex` など）を参考にしてください。
-
-#### 画像がまだないときのプレースホルダ
-
-画像を入れたい場所が決まっていても、まだ画像が用意できていないときは、次の形式でプレースホルダを入れておきます。
-PDF 上には「Sample」と書かれた枠が表示されます（TikZ は `preamble.tex` で読み込み済みです）。
-
-```latex
-\begin{figure}[tb]
-  \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：ターミナルを起動した直後のウィンドウのスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{terminal_shell/terminal_window.png}
-  \caption{Ubuntu のターミナル}
-  \label{fig:terminal-window}
-\end{figure}
-```
-
-- `%% 入れる画像：` の行に、どのような画像が必要かを具体的に書きます。
-- `\includegraphics` の行には、置く予定のファイル名を書いておきます。
-- プレースホルダの段階でも `\caption` と `\label` を付け、本文から `\ref` で参照しておきます。
-- 画像ができたら `images/<章のファイル名>/` に置き、`tikzpicture` 環境を削除して `\includegraphics` の行のコメントを外します。
-- TikZ で描く場合は、プレースホルダの `tikzpicture` 環境とコメントを消して、`\input{images/<章のファイル名>/<図の名前>}` に置き換えます。
-
-プレースホルダが残っている箇所は、`grep -rn '入れる画像' book/` で一覧できます。
-
-### サンプルコード
-
-- 本文で扱う ROS 2 パッケージやスクリプトは `samples/<章のファイル名>/` に置き、実際にビルド・実行できる状態に保ちます。
-- 長いコードは本文に直接書かず、`\lstinputlisting` で `samples/` から読み込みます。これにより本文とサンプルコードの食い違いを防ぎます。
-- Python コードは PEP 8 に従ってください。
-
-### 文体と用語
-
-- 文体は「です・ます」調で統一します。
-- 句読点は「、」「。」を使います（「，」「．」は使いません）。
-- 和文と半角英数字の間には半角スペースを入れます（例：「Linux の仕組み」「ROS 2 を使う」）。
-- 数字・英字・記号は半角を使います。
-- カタカナ語の語末の長音は省略します（例：ユーザ、サーバ、コンピュータ、パブリッシャ、サブスクライバ）。
-- 用語は以下のように統一します。新しい用語を導入したら付録E（用語集）にも追加してください。
-
-| 使う表記 | 使わない表記 |
-| --- | --- |
-| ディレクトリ | フォルダ |
-| ターミナル | 端末、コンソール（Ubuntu のアプリ名「端末」を指す場合を除く） |
-| CLI | CUI（第4章で両者を紹介する箇所を除く） |
-| ROS 2 | ROS2、ros2（コマンド名を除く） |
-| ノード / トピック / サービス / アクション | node / topic などの英語表記 |
-| パッケージ | pkg |
-| Ubuntu 24.04 | Ubuntu24.04、ubuntu |
+複数人で執筆するためのルール（作業の進め方、使用する環境・マクロ、図版、ラベル、文体と用語など）は [writing_rules.md](writing_rules.md) にまとめています。執筆を始める前に必ず読んでください。
 
 ## 誤りの報告
 

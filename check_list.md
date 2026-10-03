@@ -8,7 +8,7 @@
 
 ## 1. 動作確認（Ubuntu 24.04 + ROS 2 Jazzy の実機で）
 
-執筆ルールでは、掲載するコマンドと結果は実際の環境で確認することになっています。
+執筆ルール（[writing_rules.md](writing_rules.md)）では、掲載するコマンドと結果は実際の環境で確認することになっています。
 以下は執筆時に 24.04 で実行できておらず、想定で書いている箇所です。
 
 ### 第4章 ターミナルとシェル（`chapters/commandline/terminal_shell.tex`）
@@ -384,9 +384,17 @@
 
 ---
 
+## サンプルコード（https://github.com/trcp/erasers_book_code）
+
+- [x] `code/` を別のリポジトリとして作って公開し、本の「はじめに」の「サンプルコード」の節に URL を書く（https://github.com/trcp/erasers_book_code）
+- [ ] サンプルコードのリポジトリ（erasers_book_code）は `book/samples/` と本文の写し。原稿を直したらそちらも直す（`book/samples/rclpy/`・`rclcpp/` と、erasers_book_code の `ros2_ws/src/` が一致しているかを `diff -r` で確かめる）
+- [ ] erasers_book_code の `python/` の書き出したプログラムが、本文と食い違っていないか（構文のチェックだけ実施。`input()` を使うものは手で実行して確かめる）
+- [ ] erasers_book_code の `ros2_ws/` で `colcon build` が通ること
+- [ ] erasers_book_code にライセンスのファイル（`LICENSE`）を置くか（`package.xml` は Apache-2.0）
+
 ## 6. `preamble.tex` の変更・不具合（要 Issue での相談）
 
-- [ ] `\section` / `\subsection` の直後に文章を挟まずに表を置くとビルドエラーになる（jlreq と `tabular` の組み合わせで発生）。原因を調べて直すか、README の注意書きのままにするか
+- [ ] `\section` / `\subsection` の直後に文章を挟まずに表を置くとビルドエラーになる（jlreq と `tabular` の組み合わせで発生）。原因を調べて直すか、writing_rules.md の注意書きのままにするか
 - [ ] 流れ図のひし形のために、TikZ のライブラリ `shapes.geometric` を追加した。共同執筆者に共有する
 - [ ] 本文中の表用の `tablebox` 環境（前後の余白、表の上のキャプション）と、図の位置を制御する `flafter` パッケージを追加した。共同執筆者に共有する
 - [ ] TIPS 用の `tips` 環境（青緑の囲み・ページをまたげる）を追加した。共同執筆者に共有する
@@ -395,7 +403,7 @@
 - [ ] 補章のための `\hoshou` コマンドを追加した（見出しを「補章1」、節・図・表・コードの番号を「補1.1」にする。`\appendix` で元に戻る）。表のキャプションが「表補1.1」とつながって表示されるので、「表 補1.1」のように空けるか検討する。共同執筆者に共有する
 - [ ] 図のために `\usepackage{tikz}`、`\usetikzlibrary{...}`、共通スタイル（`figbox` など）を追加した。共同執筆者に共有する
 - [ ] `terminal` 環境の見た目を Ubuntu のターミナル風（濃い灰色のタイトルバー、右上にウィンドウのボタン、明るい本文、入力行を太字）に変更した。共同執筆者に共有する
-- [ ] タイトルを省略した `terminal` 環境で、1 行目に日本語があるとビルドエラーになる。現在は README に注意書きを入れ、タイトルを付けて回避している。環境の定義を直すか検討する
+- [ ] タイトルを省略した `terminal` 環境で、1 行目に日本語があるとビルドエラーになる。現在は writing_rules.md に注意書きを入れ、タイトルを付けて回避している。環境の定義を直すか検討する
 
 ---
 
