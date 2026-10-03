@@ -325,7 +325,7 @@ Linux とは何かというところから始め、コマンドラインの基�
     │   └── ros2/          # 第V部 ROS 2 入門
     ├── supplement/        # 補章
     ├── appendix/          # 付録
-    ├── samples/           # \lstinputlisting で読み込むサンプル（ROS 2 のパッケージ・スクリプト）
+    ├── samples/           # \codefile で読み込むサンプル（ROS 2 のパッケージ・スクリプト）
     └── images/            # 図版（章ごとにサブディレクトリ）
 ```
 

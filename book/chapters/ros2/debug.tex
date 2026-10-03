@@ -149,12 +149,12 @@ $ ros2 run my_package talker --ros-args --log-level debug
 タイマのコールバックの中で毎回ログを出すと、ログがあふれて読めなくなります。
 rclpy では、ログの出し方を制限するための引数が用意されています。
 
-\begin{lstlisting}[style=python, caption={ログの出し方を制限する}, label={lst:debug-log-throttle}]
+\begin{codelisting}[style=python]{ログの出し方を制限する}{lst:debug-log-throttle}
 # 1 秒に 1 回まで出力する
 self.get_logger().info(f'距離: {d:.2f} m', throttle_duration_sec=1.0)
 # 最初の 1 回だけ出力する
 self.get_logger().warn('LiDAR のデータが届いていません', once=True)
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{ログの行き先}
 
@@ -250,7 +250,7 @@ QoS に数字だけを指定すると、\cmd{RELIABLE}・\cmd{VOLATILE}・\cmd{K
 rclpy には、センサのデータ用の QoS の設定が、\cmd{qos\_profile\_sensor\_data} として用意されています。
 QoS を細かく決めるときは、\cmd{QoSProfile} を使います。
 
-\begin{lstlisting}[style=python, caption={QoS を指定してサブスクライバを作る}, label={lst:debug-qos}]
+\begin{codelisting}[style=python]{QoS を指定してサブスクライバを作る}{lst:debug-qos}
 from rclpy.qos import (QoSProfile, ReliabilityPolicy, DurabilityPolicy,
                        qos_profile_sensor_data)
 
@@ -263,7 +263,7 @@ map_qos = QoSProfile(depth=1,
                      reliability=ReliabilityPolicy.RELIABLE,
                      durability=DurabilityPolicy.TRANSIENT_LOCAL)
 self.create_subscription(OccupancyGrid, 'map', self.map_callback, map_qos)
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{QoS が合わないとき}
 

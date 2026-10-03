@@ -193,14 +193,14 @@ my_package
 \cmd{my\_node.py} には、次のようなひな形が書かれています。
 \ref{sec:python-class-module}節で学んだ \cmd{if \_\_name\_\_ == '\_\_main\_\_':} が使われていることがわかります。
 
-\begin{lstlisting}[style=python, caption={ノードのひな形（my\_package/my\_package/my\_node.py）}, label={lst:workspace-my-node}]
+\begin{codelisting}[style=python]{ノードのひな形（my\_package/my\_package/my\_node.py）}{lst:workspace-my-node}
 def main():
     print('Hi from my_package.')
 
 
 if __name__ == '__main__':
     main()
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{ビルドして実行する}
 
@@ -230,7 +230,7 @@ Hi from my_package.
 \cmd{package.xml} は、パッケージの名前・バージョン・説明・管理者・ライセンス、そして\textbf{依存するパッケージ}を書くファイルです。
 XML（タグで囲んで書く形式）で書かれています。
 
-\begin{lstlisting}[style=xml, caption={package.xml}, label={lst:workspace-package-xml}]
+\begin{codelisting}[style=xml]{package.xml}{lst:workspace-package-xml}
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
@@ -249,7 +249,7 @@ XML（タグで囲んで書く形式）で書かれています。
     <build_type>ament_python</build_type>
   </export>
 </package>
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{description} や \cmd{maintainer} は、自分のパッケージの説明や、自分の名前とメールアドレスに書き換えておきましょう。
 \cmd{license} には、\ref{sec:linux-oss}節で学んだライセンスを書きます。
@@ -258,10 +258,10 @@ XML（タグで囲んで書く形式）で書かれています。
 ほかのパッケージを使う場合は、そのパッケージ名を \cmd{<depend>} タグで書きます。
 たとえば、\cmd{rclpy} と \cmd{std\_msgs} を使うノードを書くなら、次の 2 行を追加します。
 
-\begin{lstlisting}[style=xml, caption={package.xml に依存するパッケージを追加する}, label={lst:workspace-depend}]
+\begin{codelisting}[style=xml]{package.xml に依存するパッケージを追加する}{lst:workspace-depend}
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
-\end{lstlisting}
+\end{codelisting}
 
 ここに書いた依存関係をもとに、colcon はビルドの順番を決め、rosdep は必要なパッケージをインストールします（\ref{sec:workspace-rosdep}節）。
 
@@ -270,7 +270,7 @@ XML（タグで囲んで書く形式）で書かれています。
 Python のパッケージ（\cmd{ament\_python}）では、\cmd{setup.py} に、パッケージをどのようにインストールするかを書きます。
 特に大切なのは、最後の \cmd{entry\_points} の部分です。
 
-\begin{lstlisting}[style=python, caption={setup.py（一部）}, label={lst:workspace-setup-py}]
+\begin{codelisting}[style=python]{setup.py（一部）}{lst:workspace-setup-py}
 setup(
     name=package_name,
     ...
@@ -281,7 +281,7 @@ setup(
         ],
     },
 )
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{'my\_node = my\_package.my\_node:main'} は、「\cmd{ros2 run my\_package my\_node} と実行されたら、\cmd{my\_package} ディレクトリの \cmd{my\_node.py} の \cmd{main} 関数を呼び出す」という意味です。
 新しいノードのファイルを追加したときは、ここに 1 行追加して、ビルドし直します（\ref{chap:rclpy}章）。
@@ -375,9 +375,9 @@ $ source ~/ros2_ws/install/local_setup.bash # オーバーレイ
 これを確かめるために、\ref{sec:workspace-colcon}節で自分のワークスペースにダウンロードした turtlesim を、少しだけ改造してみましょう。
 turtlesim のウィンドウのタイトルを決めているのは、\cmd{turtlesim/src/turtle\_frame.cpp} の中の、次の行です。
 
-\begin{lstlisting}[style=cpp, numbers=none, xleftmargin=0pt, framexleftmargin=0pt, caption={ros\_tutorials/turtlesim/src/turtle\_frame.cpp（一部）}, label={lst:workspace-turtle-frame}]
+\begin{codelisting}[style=cpp, numbers=none, xleftmargin=0pt, framexleftmargin=0pt]{ros\_tutorials/turtlesim/src/turtle\_frame.cpp（一部）}{lst:workspace-turtle-frame}
   setWindowTitle("TurtleSim");
-\end{lstlisting}
+\end{codelisting}
 
 テキストエディターや VS Code でこのファイルを開き、\cmd{"TurtleSim"} を \cmd{"MyTurtleSim"} に書き換えて保存してから、ビルドし直します。
 

@@ -76,11 +76,11 @@ Python では、数値と演算子を組み合わせて計算ができます。
 プログラムの中で \cmd{\#} を書くと、そこから行の終わりまでが\textbf{コメント}になり、実行されません。
 コメントは、プログラムの説明を書いたり、一時的にある行を実行しないようにしたり（\textbf{コメントアウト}）するのに使います。
 
-\begin{lstlisting}[style=python, caption={コメントの例}, label={lst:python-basics-comment}]
+\begin{codelisting}[style=python]{コメントの例}{lst:python-basics-comment}
 # 2 の 10 乗を計算する
 print(2 ** 10)   # 行の途中からコメントを書くこともできる
 # print(2 ** 12) この行はコメントアウトされているので実行されない
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{print( )} は、カッコの中の値を画面に表示する\textbf{関数}です（\ref{sec:python-basics-function}節）。
 スクリプトファイルで実行するときは、\cmd{print} を使わないと計算結果は表示されません。
@@ -101,12 +101,12 @@ print(2 ** 10)   # 行の途中からコメントを書くこともできる
 名前の付いた箱に値を入れておくイメージです。
 \cmd{変数名 = 値} と書くと、変数に値が入ります（\textbf{代入}）。
 
-\begin{lstlisting}[style=python, caption={変数を使う（speed.py）}, label={lst:python-basics-var}]
+\begin{codelisting}[style=python]{変数を使う（speed.py）}{lst:python-basics-var}
 distance = 12.0   # 走った距離 [m]
 time = 30.0       # かかった時間 [s]
 speed = distance / time
 print(speed)
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[変数を使うプログラムを実行する]
 $ python3 speed.py
@@ -120,12 +120,12 @@ Python では、単語をアンダースコアでつなぐ \cmd{max\_speed} の�
 そのため、変数の値を使って計算し、同じ変数に入れ直すこともできます。
 \cmd{+=} などの演算子を使うと、これを短く書けます。
 
-\begin{lstlisting}[style=python, caption={変数の値を更新する}, label={lst:python-basics-update}]
+\begin{codelisting}[style=python]{変数の値を更新する}{lst:python-basics-update}
 count = 0
 count = count + 1   # count の値に 1 を足して、count に入れ直す
 count += 1          # count = count + 1 と同じ意味
 print(count)        # 2 と表示される
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{データ型}
 
@@ -214,12 +214,12 @@ TypeError: unsupported operand type(s) for +: 'int' and 'str'
 数値も自動で文字列に変換されるので、\cmd{str( )} を使う必要がありません。
 \cmd{:.2f} のように書くと、小数点以下の桁数を指定できます。
 
-\begin{lstlisting}[style=python, caption={f 文字列を使う}, label={lst:python-basics-fstring}]
+\begin{codelisting}[style=python]{f 文字列を使う}{lst:python-basics-fstring}
 name = "turtle"
 speed = 0.4
 print(f"{name} の速度は {speed} m/s です")
 print(f"{name} の速度は {speed * 3.6:.2f} km/h です")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[f 文字列の実行結果]
 turtle の速度は 0.4 m/s です
@@ -233,10 +233,10 @@ ROS 2 のプログラムでログを表示するときにも、f 文字列をよ
 \cmd{input( )} 関数を使うと、キーボードから入力された文字列を受け取れます。
 カッコの中には、入力を促すメッセージを書きます。
 
-\begin{lstlisting}[style=python, caption={入力を受け取る（greet.py）}, label={lst:python-basics-input}]
+\begin{codelisting}[style=python]{入力を受け取る（greet.py）}{lst:python-basics-input}
 name = input("名前を入力してください=> ")
 print(f"こんにちは、{name}さん!")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[入力を受け取るプログラムを実行する]
 $ python3 greet.py
@@ -247,10 +247,10 @@ $ python3 greet.py
 \cmd{input( )} で受け取った値は、数字を入力しても\textbf{文字列}になることに注意しましょう。
 計算に使うときは、\cmd{int( )} や \cmd{float( )} で数値に変換します。
 
-\begin{lstlisting}[style=python, caption={入力を数値に変換する}, label={lst:python-basics-input-num}]
+\begin{codelisting}[style=python]{入力を数値に変換する}{lst:python-basics-input-num}
 radius = float(input("半径 [m] => "))
 print(f"面積は {radius * radius * 3.14} m^2 です")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{column}{小数の計算の誤差}
   コンピュータは、小数を 2 進数で近似して扱っています。
@@ -277,11 +277,11 @@ print(f"面積は {radius * radius * 3.14} m^2 です")
 リストの中の 1 つ 1 つの値を\textbf{要素}といいます。
 たとえば、センサで測った 1 週間分の距離のデータを、7 個の変数ではなく 1 つのリストで扱えます。
 
-\begin{lstlisting}[style=python, caption={リストを作る}, label={lst:python-basics-list}]
+\begin{codelisting}[style=python]{リストを作る}{lst:python-basics-list}
 distances = [1.2, 0.8, 0.5, 0.9, 1.5]   # センサで測った距離 [m]
 print(distances)
 print(len(distances))   # 要素の数
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[リストの実行結果]
 [1.2, 0.8, 0.5, 0.9, 1.5]
@@ -380,13 +380,13 @@ print(len(distances))   # 要素の数
 \cmd{\{キー: 値, キー: 値\}} の形で書きます。
 ロボットの設定値（パラメータ）のように、名前で値を管理したいときに便利です。
 
-\begin{lstlisting}[style=python, caption={辞書を使う}, label={lst:python-basics-dict}]
+\begin{codelisting}[style=python]{辞書を使う}{lst:python-basics-dict}
 params = {"name": "turtle", "max_speed": 0.5, "wheel_radius": 0.033}
 print(params["max_speed"])     # キーで値を取り出す
 params["max_speed"] = 0.3      # 値を変更する
 params["use_lidar"] = True     # 新しいキーと値を追加する
 print(params)
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[辞書の実行結果]
 0.5
@@ -412,21 +412,21 @@ print(params)
 
 \textbf{if 文}を使うと、条件によって実行する処理を変えられます。
 
-\begin{lstlisting}[style=python, caption={if 文の書き方}, label={lst:python-basics-if-syntax}]
+\begin{codelisting}[style=python]{if 文の書き方}{lst:python-basics-if-syntax}
 if 条件A:
     条件A が成り立つときの処理
 elif 条件B:
     条件A が成り立たず、条件B が成り立つときの処理
 else:
     どの条件も成り立たないときの処理
-\end{lstlisting}
+\end{codelisting}
 
 条件の後ろには \cmd{:}（コロン）を付け、その下の処理は\textbf{インデント}（行頭の字下げ）をして書きます。
 Python では、インデントによって「どこからどこまでが if 文の中の処理か」を表します（\ref{sec:python-features}節）。
 インデントは半角スペース 4 つが標準です。
 \cmd{elif} はいくつでも書くことができ、\cmd{elif} と \cmd{else} は必要なければ省略できます。
 
-\begin{lstlisting}[style=python, caption={障害物までの距離で動作を変える（obstacle.py）}, label={lst:python-basics-if}]
+\begin{codelisting}[style=python]{障害物までの距離で動作を変える（obstacle.py）}{lst:python-basics-if}
 distance = float(input("障害物までの距離 [m] => "))
 
 if distance < 0.3:
@@ -435,7 +435,7 @@ elif distance < 1.0:
     print("減速します")
 else:
     print("そのまま進みます")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[if 文のプログラムを実行する]
 $ python3 obstacle.py
@@ -503,14 +503,14 @@ False
 
 変数が \cmd{None} かどうかを調べるときは、\cmd{==} ではなく \cmd{is} を使って、\cmd{x is None}（\cmd{None} である）、\cmd{x is not None}（\cmd{None} でない）と書きます。
 
-\begin{lstlisting}[style=python, caption={None で「まだ値がない」ことを表す}, label={lst:python-basics-none}]
+\begin{codelisting}[style=python]{None で「まだ値がない」ことを表す}{lst:python-basics-none}
 distance = None   # まだ距離を測っていない
 
 if distance is None:
     print("まだ距離のデータがありません")
 else:
     print(f"距離は {distance} m です")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[None を使ったプログラムの実行結果]
 まだ距離のデータがありません
@@ -540,11 +540,11 @@ else:
 同じ処理を繰り返すには、\textbf{for 文}を使います。
 \cmd{for 変数 in リストなど:} と書くと、リストなどの要素が先頭から 1 つずつ変数に入り、その下のインデントした処理が繰り返されます。
 
-\begin{lstlisting}[style=python, caption={for 文でリストの要素を順に処理する}, label={lst:python-basics-for}]
+\begin{codelisting}[style=python]{for 文でリストの要素を順に処理する}{lst:python-basics-for}
 sensors = ["camera", "lidar", "imu"]
 for sensor in sensors:
     print(f"{sensor} を確認します")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[for 文の実行結果]
 camera を確認します
@@ -555,19 +555,19 @@ imu を確認します
 決まった回数だけ繰り返すときは、\cmd{range( )} を使います。
 \cmd{range(5)} は 0 から 4 までの 5 つの整数を、\cmd{range(1, 6)} は 1 から 5 までの整数を順に作ります（終わりの数は含まれません）。
 
-\begin{lstlisting}[style=python, caption={range で決まった回数だけ繰り返す}, label={lst:python-basics-range}]
+\begin{codelisting}[style=python]{range で決まった回数だけ繰り返す}{lst:python-basics-range}
 total = 0
 for i in range(1, 11):
     total += i
 print(total)   # 1 から 10 までの合計 55 が表示される
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{break と continue}
 
 \cmd{break} を実行すると、その時点で繰り返しを終了します。
 \cmd{continue} を実行すると、それより後の処理を飛ばして、次の繰り返しに進みます。
 
-\begin{lstlisting}[style=python, caption={break と continue}, label={lst:python-basics-break}]
+\begin{codelisting}[style=python]{break と continue}{lst:python-basics-break}
 distances = [1.2, -1.0, 0.8, 0.2, 1.5]   # -1.0 は測定に失敗した値
 for d in distances:
     if d < 0:
@@ -576,7 +576,7 @@ for d in distances:
         print(f"{d} m: 障害物が近いので停止")
         break             # 繰り返しを終了する
     print(f"{d} m: 前進")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[break と continue の実行結果]
 1.2 m: 前進
@@ -589,26 +589,26 @@ for d in distances:
 \textbf{while 文}は、条件が成り立っている間、処理を繰り返します。
 何回繰り返すかが前もって決まっていないときに便利です。
 
-\begin{lstlisting}[style=python, caption={while 文で繰り返す}, label={lst:python-basics-while}]
+\begin{codelisting}[style=python]{while 文で繰り返す}{lst:python-basics-while}
 battery = 12.6
 minutes = 0
 while battery > 11.0:
     battery -= 0.2      # 1 分ごとに 0.2 V 下がるとする
     minutes += 1
 print(f"{minutes} 分で充電が必要になります")
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{while True:} と書くと、\cmd{break} するまで永遠に繰り返します。
 入力が正しい値になるまで聞き直す、といった処理によく使います。
 
-\begin{lstlisting}[style=python, caption={正しい値が入力されるまで聞き直す}, label={lst:python-basics-while-true}]
+\begin{codelisting}[style=python]{正しい値が入力されるまで聞き直す}{lst:python-basics-while-true}
 while True:
     num = int(input("1〜100 の値を入力してください=> "))
     if 1 <= num <= 100:
         break
     print("範囲外の値です")
 print(f"入力された値は {num} です")
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{1 <= num <= 100} のように、比較演算子をつなげて範囲を表すこともできます。
 
@@ -623,19 +623,19 @@ print(f"入力された値は {num} です")
 リストの要素を 1 つずつ処理して、新しいリストを作りたいことがあります。
 for 文で書くと、次のようになります。
 
-\begin{lstlisting}[style=python, caption={for 文で新しいリストを作る}, label={lst:python-basics-for-list}]
+\begin{codelisting}[style=python]{for 文で新しいリストを作る}{lst:python-basics-for-list}
 distances = [1.2, -1.0, 0.8, 0.2, 1.5]   # [m]、-1.0 は測定に失敗した値
 distances_cm = []
 for d in distances:
     distances_cm.append(d * 100)
 print(distances_cm)   # [120.0, -100.0, 80.0, 20.0, 150.0]
-\end{lstlisting}
+\end{codelisting}
 
 Python には、これを 1 行で書ける\textbf{リスト内包表記}という書き方があります。
 \cmd{[式 for 変数 in リスト]} と書くと、リストの要素を 1 つずつ変数に入れて式を計算し、その結果を並べた新しいリストができます。
 後ろに \cmd{if 条件} を付けると、条件が成り立つ要素だけを取り出せます。
 
-\begin{lstlisting}[style=python, caption={リスト内包表記}, label={lst:python-basics-comprehension}]
+\begin{codelisting}[style=python]{リスト内包表記}{lst:python-basics-comprehension}
 distances = [1.2, -1.0, 0.8, 0.2, 1.5]
 
 distances_cm = [d * 100 for d in distances]
@@ -644,7 +644,7 @@ print(distances_cm)   # [120.0, -100.0, 80.0, 20.0, 150.0]
 valid = [d for d in distances if d >= 0]   # 正しく測れた値だけ
 print(valid)          # [1.2, 0.8, 0.2, 1.5]
 print(min(valid))     # 一番近い障害物までの距離 0.2
-\end{lstlisting}
+\end{codelisting}
 
 LiDAR（レーザで周りの物までの距離を測るセンサ）の距離のデータのように、たくさんの値の中から必要なものだけを取り出す処理は、ロボットのプログラムでよく出てきます。
 最初は for 文で書いても構いませんが、ほかの人のコードを読むときのために、この書き方も覚えておきましょう。
@@ -655,12 +655,12 @@ LiDAR（レーザで周りの物までの距離を測るセンサ）の距離の
 \cmd{import random} と書いておくと、\cmd{random.randint(a, b)} で a 以上 b 以下の整数の乱数を作れます。
 \cmd{import} については、\ref{sec:python-class-module}節で詳しく学びます。
 
-\begin{lstlisting}[style=python, caption={サイコロを 5 回振る}, label={lst:python-basics-random}]
+\begin{codelisting}[style=python]{サイコロを 5 回振る}{lst:python-basics-random}
 import random
 
 for i in range(5):
     print(random.randint(1, 6))
-\end{lstlisting}
+\end{codelisting}
 
 \begin{exercise}
 \begin{enumerate}
@@ -692,18 +692,18 @@ for i in range(5):
 
 関数は、\cmd{def} を使って作ります（\textbf{定義}します）。
 
-\begin{lstlisting}[style=python, caption={関数の書き方}, label={lst:python-basics-def-syntax}]
+\begin{codelisting}[style=python]{関数の書き方}{lst:python-basics-def-syntax}
 def 関数名(引数1, 引数2, ...):
     処理
     return 戻り値
-\end{lstlisting}
+\end{codelisting}
 
 \textbf{引数}（ひきすう）は、関数に渡す値で、関数の中では変数として使えます。
 \textbf{戻り値}は、関数が処理した結果として呼び出し元に返す値で、\cmd{return} で返します。
 引数も戻り値も、必要なければ省略できます。
 関数は、定義した後で \cmd{関数名(引数)} と書いて呼び出します。
 
-\begin{lstlisting}[style=python, caption={円の面積を計算する関数（circle.py）}, label={lst:python-basics-def}]
+\begin{codelisting}[style=python]{円の面積を計算する関数（circle.py）}{lst:python-basics-def}
 def circle_area(radius):
     area = radius * radius * 3.14
     return area
@@ -712,7 +712,7 @@ def circle_area(radius):
 a = circle_area(2.0)
 print(a)
 print(circle_area(5.0))
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[関数のプログラムを実行する]
 $ python3 circle.py
@@ -729,7 +729,7 @@ $ python3 circle.py
 呼び出すときに \cmd{引数名=値} と書くと（\textbf{キーワード引数}）、引数の順番を気にせずに値を渡せます。
 また、\cmd{return} の後ろにカンマで区切って書くと、複数の値を返せます（実際にはタプルとして返されます）。
 
-\begin{lstlisting}[style=python, caption={デフォルト値と複数の戻り値}, label={lst:python-basics-def2}]
+\begin{codelisting}[style=python]{デフォルト値と複数の戻り値}{lst:python-basics-def2}
 def price_with_tax(price, tax_rate=0.1):
     return round(price * (1 + tax_rate))
 
@@ -742,7 +742,7 @@ print(price_with_tax(980))                  # 税率 10% で計算
 print(price_with_tax(250, tax_rate=0.08))   # 税率 8% で計算
 low, high = min_max([1.2, 0.8, 0.5, 1.5])
 print(low, high)
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[デフォルト値と複数の戻り値の実行結果]
 1078

@@ -287,7 +287,7 @@ C++ で書かれたロボット用のソフトウェアの多くは CMake を使
 簡単な例で、CMake を使ったビルドの流れを体験してみましょう。
 \cmd{hello\_cmake} というディレクトリを作り、その中にテキストエディター（\ref{sec:files-edit}節）で次の 2 つのファイルを作ります。
 
-\begin{lstlisting}[style=cpp, caption={ソースコード（hello.c）}, label={lst:package-hello-c}]
+\begin{codelisting}[style=cpp]{ソースコード（hello.c）}{lst:package-hello-c}
 #include <stdio.h>
 
 int main(void)
@@ -295,13 +295,13 @@ int main(void)
     printf("Hello, CMake!\n");
     return 0;
 }
-\end{lstlisting}
+\end{codelisting}
 
-\begin{lstlisting}[caption={ビルドの設定（CMakeLists.txt）}, label={lst:package-cmakelists}]
+\begin{codelisting}{ビルドの設定（CMakeLists.txt）}{lst:package-cmakelists}
 cmake_minimum_required(VERSION 3.10)
 project(hello C)
 add_executable(hello hello.c)
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{CMakeLists.txt} には、「\cmd{hello.c} から \cmd{hello} という実行ファイルを作る」ということが書かれています。
 ビルドは、次の手順で行います。

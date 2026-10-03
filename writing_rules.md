@@ -34,8 +34,9 @@
 | 用途 | 書き方 |
 | --- | --- |
 | ターミナル操作例 | `\begin{terminal}[タイトル] ... \end{terminal}` |
-| ソースコード | `\begin{lstlisting}[style=python, caption={...}, label={lst:...}] ... \end{lstlisting}` |
-| 外部ファイルのコード | `\lstinputlisting[style=python]{samples/rclpy/my_package/my_package/foo.py}` |
+| ソースコード | `\begin{codelisting}[style=python]{キャプション}{lst:ラベル} ... \end{codelisting}`（ページをまたぐと「（次のページに続く）」「（前のページから続く）」が表示される） |
+| 外部ファイルのコード | `\codefile[style=python]{キャプション}{lst:ラベル}{samples/rclpy/my_package/my_package/foo.py}`（`firstline=`・`lastline=` なども `[ ]` に書ける） |
+| キャプションのない短いコード | `\begin{lstlisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt] ... \end{lstlisting}`（コラムや注意などの囲みの中で使う） |
 | この章で学ぶこと | `\begin{goalbox} ... \end{goalbox}` |
 | ポイント | `\begin{point}[タイトル] ... \end{point}`（タイトル省略時は「ポイント」） |
 | 注意 | `\begin{caution}[タイトル] ... \end{caution}`（タイトル省略時は「注意」） |
@@ -47,7 +48,9 @@
 | キー入力 | `\key{Ctrl}+\key{C}` |
 | 未完成箇所 | `\todo{あとで図を追加}` |
 
-`lstlisting` の `style` には `python`, `bash`, `cpp`, `xml` が使えます。
+`codelisting`・`\codefile`・`lstlisting` の `style` には `python`, `bash`, `cpp`, `xml` が使えます。
+本文のソースコードは、キャプションとラベルを付けて `codelisting` か `\codefile` で書きます。`\end{codelisting}` は行の先頭に書いてください。
+ソースコードの枠・TIPS・練習問題は、ページの残りが少ないときは自動で次のページに送られ、ページをまたいだときは「続く」の表示が付きます。
 
 > **注意：見出しの直後の表**
 > `\section` や `\subsection` の直後に、文章を挟まずに表（`tabular`）を置くとビルドエラーになります。見出しと表の間には、必ず 1 文以上の本文を入れてください。
@@ -166,7 +169,7 @@ PDF 上には「Sample」と書かれた枠が表示されます（TikZ は `pre
 ## サンプルコード
 
 - 本文で扱う ROS 2 パッケージやスクリプトは `book/samples/` に置き（ROS 2 のパッケージは `samples/rclpy/`・`samples/rclcpp/`）、実際にビルド・実行できる状態に保ちます。
-- 長いコードは本文に直接書かず、`\lstinputlisting` で `samples/` から読み込みます。これにより本文とサンプルコードの食い違いを防ぎます。本のリポジトリだけでビルドできるように、`book/` の外のファイルは読み込まないでください。
+- 長いコードは本文に直接書かず、`\codefile` で `samples/` から読み込みます。これにより本文とサンプルコードの食い違いを防ぎます。本のリポジトリだけでビルドできるように、`book/` の外のファイルは読み込まないでください。
 - 読者向けのサンプルコードは、別のリポジトリ https://github.com/trcp/erasers_book_code で公開しています（ROS 2 のパッケージは `ros2_ws/src/`、本文に直接書いた短いプログラムは `python/` など）。`book/samples/` や本文のプログラムを直したときは、そちらのリポジトリも合わせて直してください。
 - Python コードは PEP 8 に従ってください。
 

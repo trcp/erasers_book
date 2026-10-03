@@ -47,7 +47,7 @@ Python では、数値も文字列もリストも、すべて\textbf{オブジ�
 
 クラスは、\cmd{class} を使って定義します。
 
-\begin{lstlisting}[style=python, caption={クラスを定義してインスタンスを作る（player.py）}, label={lst:python-class-player}]
+\begin{codelisting}[style=python]{クラスを定義してインスタンスを作る（player.py）}{lst:python-class-player}
 class Player:
     def __init__(self, name, hp):
         self.name = name   # インスタンスごとのデータ（属性）
@@ -68,7 +68,7 @@ hero.attack()
 wizard.attack()
 wizard.heal(20)
 print(hero.hp, wizard.hp)
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[クラスのプログラムを実行する]
 $ python3 player.py
@@ -96,7 +96,7 @@ $ python3 player.py
 もう 1 つ、ロボットらしい例を見てみましょう。
 ロボットの位置を属性として持ち、指令を受けて移動するクラスです。
 
-\begin{lstlisting}[style=python, caption={ロボットを表すクラス（robot.py）}, label={lst:python-class-robot}]
+\begin{codelisting}[style=python]{ロボットを表すクラス（robot.py）}{lst:python-class-robot}
 class Robot:
     def __init__(self, name, max_speed=0.5):
         self.name = name
@@ -114,7 +114,7 @@ class Robot:
 robot = Robot("turtle")
 robot.move(0.3, 2.0)
 robot.move(1.0, 2.0)   # 最高速度 0.5 m/s に制限される
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[ロボットのクラスの実行結果]
 turtle: 0.3 m/s で 2.0 秒進んだ（x = 0.60）
@@ -146,7 +146,7 @@ turtle: 0.5 m/s で 2.0 秒進んだ（x = 1.60）
 
 継承するには、クラスを定義するときに、クラス名の後ろの \cmd{( )} に親クラスの名前を書きます。
 
-\begin{lstlisting}[style=python, caption={継承を使う（inherit.py）}, label={lst:python-class-inherit}]
+\begin{codelisting}[style=python]{継承を使う（inherit.py）}{lst:python-class-inherit}
 class Robot:
     def __init__(self, name):
         self.name = name
@@ -170,7 +170,7 @@ class DroneRobot(Robot):   # Robot クラスを継承する
 drone = DroneRobot("tello", 10)
 drone.hello()    # 親クラスから引き継いだメソッド
 drone.move()     # 子クラスで上書きしたメソッド
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[継承のプログラムの実行結果]
 こんにちは、telloです
@@ -189,7 +189,7 @@ ROS 2 で Python のノードを作るときは、ROS 2 が用意している \c
 \cmd{Node} クラスには、ほかのノードと通信するための機能がたくさん用意されていて、継承するだけでそれらを使えるようになります。
 次のコードは、\ref{chap:rclpy}章で学ぶノードの形を先取りしたものです（今はまだ実行できなくても構いません）。
 
-\begin{lstlisting}[style=python, caption={ROS 2 のノードの形（先取り）}, label={lst:python-class-node-preview}]
+\begin{codelisting}[style=python]{ROS 2 のノードの形（先取り）}{lst:python-class-node-preview}
 from rclpy.node import Node
 
 
@@ -197,7 +197,7 @@ class MyNode(Node):                 # Node クラスを継承する
     def __init__(self):
         super().__init__("my_node")   # 親クラスにノードの名前を渡す
         self.get_logger().info("ノードを起動しました")
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{super().\_\_init\_\_("my\_node")} で親クラス（\cmd{Node}）の準備をし、\cmd{self.get\_logger( )} のように、親クラスから引き継いだメソッドを使っています。
 この章で学んだクラスと継承の知識が、そのまま使われていることがわかるでしょう。
@@ -217,14 +217,14 @@ class MyNode(Node):                 # Node クラスを継承する
 Python では、関数も数値や文字列と同じように、変数に入れたり、ほかの関数の引数として渡したりできます。
 関数名の後ろに \cmd{( )} を付けると関数が\textbf{呼び出され}ますが、\cmd{( )} を付けずに書くと、関数\textbf{そのもの}を表します。
 
-\begin{lstlisting}[style=python, caption={関数を変数に入れる}, label={lst:python-class-func-value}]
+\begin{codelisting}[style=python]{関数を変数に入れる}{lst:python-class-func-value}
 def greet():
     print("こんにちは")
 
 
 f = greet   # ( ) を付けないので、関数そのものを f に入れる
 f()         # f を呼び出すと greet が実行される
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{コールバック}
 
@@ -234,7 +234,7 @@ f()         # f を呼び出すと greet が実行される
 次の例では、\cmd{run\_timer} という関数に「一定の間隔で呼んでほしい関数」を渡しています。
 \cmd{time.sleep(秒)} は、指定した秒数だけ待つ関数です。
 
-\begin{lstlisting}[style=python, caption={コールバック関数を渡す（callback.py）}, label={lst:python-class-callback}]
+\begin{codelisting}[style=python]{コールバック関数を渡す（callback.py）}{lst:python-class-callback}
 import time
 
 
@@ -255,7 +255,7 @@ def check_battery(i):
 
 run_timer(0.5, 3, say_hello)       # ( ) を付けずに関数を渡す
 run_timer(0.5, 2, check_battery)
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[コールバックの実行結果]
 0 回目: こんにちは
@@ -274,7 +274,7 @@ ROS 2 のプログラムは、コールバックの考え方で動いていま�
 「0.5 秒ごとに、この関数を呼んでほしい」（タイマ）、「センサのデータが届いたら、この関数を呼んでほしい」（トピックの受信、\ref{chap:ros2_concepts}章）というように、コールバック関数を ROS 2 に登録しておき、出来事が起きるたびに ROS 2 がその関数を呼び出します。
 ROS 2 では、コールバックとしてクラスのメソッド（\cmd{self.timer\_callback} など）を渡すことがよくあります。
 
-\begin{lstlisting}[style=python, caption={ROS 2 のタイマのコールバック（先取り）}, label={lst:python-class-timer-preview}]
+\begin{codelisting}[style=python]{ROS 2 のタイマのコールバック（先取り）}{lst:python-class-timer-preview}
 class MyNode(Node):
     def __init__(self):
         super().__init__("my_node")
@@ -283,7 +283,7 @@ class MyNode(Node):
 
     def timer_callback(self):
         self.get_logger().info("タイマが呼ばれました")
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{self.create\_timer(0.5, self.timer\_callback)} の \cmd{self.timer\_callback} に \cmd{( )} が付いていないことに注目してください。
 メソッドを呼び出すのではなく、メソッドそのものを ROS 2 に渡しているのです。
@@ -311,7 +311,7 @@ Python には、よく使う機能をまとめた\textbf{モジュール}が最�
 モジュールの機能を使うには、\cmd{import} でモジュールを読み込みます。
 読み込んだ後は、\cmd{モジュール名.関数名( )} の形で使います。
 
-\begin{lstlisting}[style=python, caption={math モジュールと random モジュール}, label={lst:python-class-import}]
+\begin{codelisting}[style=python]{math モジュールと random モジュール}{lst:python-class-import}
 import math
 import random
 
@@ -319,7 +319,7 @@ print(math.sqrt(2))              # 平方根
 print(math.pi)                   # 円周率
 print(math.degrees(math.pi))     # ラジアンを度に変換する（180.0）
 print(random.randint(1, 100))    # 1〜100 の整数の乱数
-\end{lstlisting}
+\end{codelisting}
 
 ロボットの向きや角度の計算では、\cmd{math} モジュールの三角関数（\cmd{math.sin}, \cmd{math.cos}）や、ラジアンと度の変換（\cmd{math.radians}, \cmd{math.degrees}）をよく使います。
 
@@ -328,14 +328,14 @@ print(random.randint(1, 100))    # 1〜100 の整数の乱数
 \cmd{from モジュール名 import 名前} と書くと、モジュール名を付けずに関数などを使えます。
 \cmd{import モジュール名 as 別名} と書くと、モジュールに短い別名を付けられます。
 
-\begin{lstlisting}[style=python, caption={import のいろいろな書き方}, label={lst:python-class-import2}]
+\begin{codelisting}[style=python]{import のいろいろな書き方}{lst:python-class-import2}
 from math import pi, sqrt   # math.pi ではなく pi と書ける
 import numpy as np          # numpy を np という名前で使う
 
 print(pi * 10 * 10)         # 半径 10 の円の面積
 print(sqrt(16))
 print(np.mean([1.0, 2.0, 3.0]))
-\end{lstlisting}
+\end{codelisting}
 
 NumPy のような標準ライブラリ以外のパッケージは、\ref{sec:python-pip}節の方法（Ubuntu では \cmd{sudo apt install python3-numpy} など）でインストールしてから使います。
 なお、\cmd{from math import *} のようにすべてを読み込む書き方もありますが、どの名前がどこから来たのかわからなくなるので、使わないほうがよいでしょう。
@@ -346,7 +346,7 @@ Python のファイルは、それ自体がモジュールになります。
 よく使う関数を別のファイルにまとめておけば、ほかのプログラムから \cmd{import} して使えます。
 次の 2 つのファイルを、同じディレクトリに作ってみましょう。
 
-\begin{lstlisting}[style=python, caption={自分で作るモジュール（robot\_utils.py）}, label={lst:python-class-mymodule}]
+\begin{codelisting}[style=python]{自分で作るモジュール（robot\_utils.py）}{lst:python-class-mymodule}
 def clamp(value, low, high):
     """value を low 以上 high 以下の範囲に収める"""
     if value < low:
@@ -359,14 +359,14 @@ def clamp(value, low, high):
 if __name__ == "__main__":
     # このファイルを直接実行したときだけ動く（動作確認用）
     print(clamp(1.5, -1.0, 1.0))
-\end{lstlisting}
+\end{codelisting}
 
-\begin{lstlisting}[style=python, caption={モジュールを使うプログラム（main.py）}, label={lst:python-class-usemodule}]
+\begin{codelisting}[style=python]{モジュールを使うプログラム（main.py）}{lst:python-class-usemodule}
 import robot_utils
 
 speed = robot_utils.clamp(2.0, -0.5, 0.5)
 print(f"速度: {speed}")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[自分で作ったモジュールを使う]
 $ python3 main.py
@@ -416,14 +416,14 @@ ValueError: could not convert string to float: 'fast'
 
 \cmd{try...except} を使うと、例外が発生したときに、プログラムを止めずに別の処理を行えます。
 
-\begin{lstlisting}[style=python, caption={try...except の書き方}, label={lst:python-class-try-syntax}]
+\begin{codelisting}[style=python]{try...except の書き方}{lst:python-class-try-syntax}
 try:
     例外が発生するかもしれない処理
 except 例外の種類:
     その例外が発生したときの処理
-\end{lstlisting}
+\end{codelisting}
 
-\begin{lstlisting}[style=python, caption={正しい数値が入力されるまで聞き直す（speed\_input.py）}, label={lst:python-class-try}]
+\begin{codelisting}[style=python]{正しい数値が入力されるまで聞き直す（speed\_input.py）}{lst:python-class-try}
 while True:
     try:
         speed = float(input("速度 [m/s] => "))
@@ -431,7 +431,7 @@ while True:
     except ValueError:
         print("数値を入力してください")
 print(f"速度を {speed} m/s に設定しました")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[例外処理をしたプログラムの実行結果]
 $ python3 speed_input.py
@@ -468,7 +468,7 @@ $ python3 speed_input.py
 \cmd{finally} に書いた処理は、例外が発生してもしなくても、最後に必ず実行されます。
 ロボットのプログラムでは、プログラムがどのように終了しても、最後にモータを止めるといった後片付けを確実に行いたい場面があります。
 
-\begin{lstlisting}[style=python, caption={Ctrl+C で止めても後片付けをする（stop.py）}, label={lst:python-class-finally}]
+\begin{codelisting}[style=python]{Ctrl+C で止めても後片付けをする（stop.py）}{lst:python-class-finally}
 import time
 
 try:
@@ -479,7 +479,7 @@ except KeyboardInterrupt:
     print("Ctrl+C が押されました")
 finally:
     print("モータを停止します")
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[Ctrl+C で止めたときの実行結果]
 $ python3 stop.py
@@ -533,7 +533,7 @@ Python には、\textbf{PEP 8} というコーディングの決まり（スタ�
 
 また、ファイルの中は、次の順番で書くと読みやすくなります。
 
-\begin{lstlisting}[style=python, caption={読みやすいファイルの構成}, label={lst:python-class-layout}]
+\begin{codelisting}[style=python]{読みやすいファイルの構成}{lst:python-class-layout}
 # 1. import
 import math
 
@@ -549,7 +549,7 @@ def wheel_speed(rps):
 # 4. 実行する処理
 if __name__ == "__main__":
     print(wheel_speed(2.0))
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{フォーマッタとリンタ}
 
@@ -576,7 +576,7 @@ Python では、変数や引数の型を書く必要はありません（\ref{se
 そこで、Python では、変数や引数・戻り値に、\textbf{型ヒント}として型を書き添えられます。
 引数は \cmd{名前: 型}、戻り値は \cmd{) -> 型:} の形で書きます。
 
-\begin{lstlisting}[style=python, caption={型ヒントを書いた関数}, label={lst:python-class-typehint}]
+\begin{codelisting}[style=python]{型ヒントを書いた関数}{lst:python-class-typehint}
 import math
 
 
@@ -589,7 +589,7 @@ def valid_average(distances: list[float]) -> float | None:
     if len(valid) == 0:
         return None
     return sum(valid) / len(valid)
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{list[float]} は「小数のリスト」、\cmd{float | None} は「小数か \cmd{None}」（\ref{sec:python-basics-none}節）という意味です。
 型ヒントは、あくまで読む人やツールのための「ヒント」で、違う型の値を渡しても、Python はそのまま実行します。
@@ -598,10 +598,10 @@ def valid_average(distances: list[float]) -> float | None:
 ROS 2 の公式のサンプルや、公開されているパッケージのコードでも、次のような型ヒントがよく使われています。
 自分で書くかどうかは自由ですが、読めるようにしておきましょう。
 
-\begin{lstlisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt, caption={ROS 2 のノードでの型ヒントの例}, label={lst:python-class-typehint-ros}]
+\begin{codelisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt]{ROS 2 のノードでの型ヒントの例}{lst:python-class-typehint-ros}
     def listener_callback(self, msg: String) -> None:
         self.get_logger().info(f'I heard: "{msg.data}"')
-\end{lstlisting}
+\end{codelisting}
 
 \section{デバッグの基本}
 \label{sec:python-class-debug}
@@ -645,12 +645,12 @@ ROS 2 の公式のサンプルや、公開されているパッケージのコ�
 そのようなときは、途中の変数の値を \cmd{print( )} で表示して、どこから期待と違う値になっているのかを調べます。
 f 文字列で \cmd{\{変数名=\}} と書くと、変数名と値を一緒に表示できて便利です。
 
-\begin{lstlisting}[style=python, caption={print で途中の値を確かめる}, label={lst:python-class-printdebug}]
+\begin{codelisting}[style=python]{print で途中の値を確かめる}{lst:python-class-printdebug}
 total = 0
 for i in range(1, 4):
     total += i
     print(f"{i=} {total=}")   # i=1 total=1 のように表示される
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{デバッガを使う}
 

@@ -116,11 +116,11 @@ Initialized empty Git repository in /home/user/my_robot/.git/
 
 エディタで \cmd{README.md} というファイルを作り、次の内容を書いて保存しましょう。
 
-\begin{lstlisting}[caption={README.md}, label={lst:git-readme}]
+\begin{codelisting}{README.md}{lst:git-readme}
 # My Robot
 
 ロボットを動かすプログラムです。
-\end{lstlisting}
+\end{codelisting}
 
 \begin{column}{README.md はなぜ必要か}
   \cmd{README}（read me、「私を読んで」）は、そのディレクトリやソフトウェアについて、最初に読んでほしいことを書いておくファイルです。
@@ -195,13 +195,13 @@ $ git commit -m "Add README"
 
 \cmd{README.md} に、次の 2 行を書き足して保存してみましょう。
 
-\begin{lstlisting}[caption={README.md（書き足した後）}, label={lst:git-readme2}]
+\begin{codelisting}{README.md（書き足した後）}{lst:git-readme2}
 # My Robot
 
 ロボットを動かすプログラムです。
 
 ## 使い方
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{git diff} を使うと、最後のコミットから何が変わったのか（\textbf{差分}）を確認できます。
 
@@ -265,7 +265,7 @@ $ git restore --staged README.md    # git add を取り消す
 プログラムをビルドしたときにできるファイルや、ログファイル、Python の仮想環境（\ref{sec:python-venv}節）のように、Git で管理する必要のないファイルもあります。
 これらは、リポジトリの一番上に \cmd{.gitignore} というファイルを作って、名前やパターンを書いておくと、Git に無視させることができます。
 
-\begin{lstlisting}[caption={.gitignore の例}, label={lst:git-gitignore}]
+\begin{codelisting}{.gitignore の例}{lst:git-gitignore}
 # ROS 2 のビルドで作られるディレクトリ
 build/
 install/
@@ -277,7 +277,7 @@ __pycache__/
 
 # ログやデータ
 *.log
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{\#} で始まる行はコメントです。
 \cmd{*} などのワイルドカード（\ref{sec:files-wildcard}節）も使えます。

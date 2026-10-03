@@ -31,13 +31,13 @@ $ cd ~/scripts
 $ gnome-text-editor hello.sh
 \end{terminal}
 
-\begin{lstlisting}[style=bash, caption={はじめてのシェルスクリプト（hello.sh）}, label={lst:shellscript-hello}]
+\begin{codelisting}[style=bash]{はじめてのシェルスクリプト（hello.sh）}{lst:shellscript-hello}
 #!/usr/bin/env bash
 # はじめてのシェルスクリプト
 echo "Hello, robot!"
 echo "今日の日付："
 date
-\end{lstlisting}
+\end{codelisting}
 
 1 行目の \cmd{\#!/usr/bin/env bash} は \textbf{shebang}（シバン）といい、このファイルを bash で実行することをシェルに伝えます。
 2 行目のように \cmd{\#} で始まる行は\textbf{コメント}で、実行されません。
@@ -70,13 +70,13 @@ Wed Sep 30 10:40:12 JST 2026
 シェルスクリプトでも、\ref{sec:env-variable}節で学んだ変数を使えます。
 \cmd{\$\{変数名\}} のように \cmd{\{ \}} で囲むと、変数名の区切りをはっきりさせられます。
 
-\begin{lstlisting}[style=bash, caption={変数を使う（var.sh）}, label={lst:shellscript-var}]
+\begin{codelisting}[style=bash]{変数を使う（var.sh）}{lst:shellscript-var}
 #!/usr/bin/env bash
 ROBOT="turtle"
 LOG_DIR="$HOME/logs"
 echo "robot: $ROBOT"
 echo "log file: ${LOG_DIR}/${ROBOT}.log"
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[変数を使うスクリプトを実行する]
 $ bash var.sh
@@ -88,10 +88,10 @@ log file: /home/user/logs/turtle.log
 これを\textbf{コマンド置換}といいます。
 次の例では、\cmd{date} の出力を使って、日付と時刻の入ったファイル名を作っています。
 
-\begin{lstlisting}[style=bash, caption={コマンド置換を使う}, label={lst:shellscript-subst}]
+\begin{codelisting}[style=bash]{コマンド置換を使う}{lst:shellscript-subst}
 NOW=$(date +%Y%m%d_%H%M%S)
 echo "backup_${NOW}.tar.gz"
-\end{lstlisting}
+\end{codelisting}
 
 このスクリプトを実行すると、\cmd{backup\_20260930\_104012.tar.gz} のように表示されます。
 
@@ -112,12 +112,12 @@ echo "backup_${NOW}.tar.gz"
   \end{tabular}
 \end{tablebox}
 
-\begin{lstlisting}[style=bash, caption={引数を受け取る（greet.sh）}, label={lst:shellscript-args}]
+\begin{codelisting}[style=bash]{引数を受け取る（greet.sh）}{lst:shellscript-args}
 #!/usr/bin/env bash
 echo "script: $0"
 echo "number of args: $#"
 echo "hello, $1!"
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[引数を渡して実行する]
 $ bash greet.sh turtle
@@ -160,7 +160,7 @@ robot: $ROBOT
 条件によって処理を変えるには、\textbf{if 文}を使います。
 条件は \cmd{[ ]} の中に書きます（\cmd{[} の後ろと \cmd{]} の前には、必ずスペースが必要です）。
 
-\begin{lstlisting}[style=bash, caption={ファイルがあるかどうかで処理を変える（check.sh）}, label={lst:shellscript-if}]
+\begin{codelisting}[style=bash]{ファイルがあるかどうかで処理を変える（check.sh）}{lst:shellscript-if}
 #!/usr/bin/env bash
 FILE="$1"
 if [ -f "$FILE" ]; then
@@ -170,7 +170,7 @@ elif [ -d "$FILE" ]; then
 else
     echo "$FILE は見つかりません"
 fi
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{if} の後ろの条件が成り立てば \cmd{then} の後ろが実行され、成り立たなければ \cmd{elif}（別の条件）や \cmd{else} の後ろが実行されます。
 最後は \cmd{fi}（\cmd{if} を逆から書いたもの）で閉じます。
@@ -197,18 +197,18 @@ fi
 その場合は、コマンドが成功したかどうか（\ref{sec:shellscript-exit}節）で判断されます。
 次の例では、\cmd{grep -q}（結果を表示せずに、見つかったかどうかだけを返す）を使って、\cmd{.bashrc} に ROS 2 の設定が書かれているかを調べています。
 
-\begin{lstlisting}[style=bash, caption={コマンドの結果で条件分岐する}, label={lst:shellscript-if-cmd}]
+\begin{codelisting}[style=bash]{コマンドの結果で条件分岐する}{lst:shellscript-if-cmd}
 if grep -q "setup.bash" ~/.bashrc; then
     echo "ROS 2 の設定はすでにあります"
 fi
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{for 文}
 
 同じ処理を繰り返すには、\textbf{for 文}を使います。
 \cmd{in} の後ろに並べた値が 1 つずつ変数に入り、\cmd{do} と \cmd{done} の間の処理が繰り返されます。
 
-\begin{lstlisting}[style=bash, caption={for 文で繰り返す}, label={lst:shellscript-for}]
+\begin{codelisting}[style=bash]{for 文で繰り返す}{lst:shellscript-for}
 for sensor in camera lidar imu; do
     echo "checking $sensor ..."
 done
@@ -222,7 +222,7 @@ done
 for i in {1..3}; do
     echo "trial $i"
 done
-\end{lstlisting}
+\end{codelisting}
 
 ワイルドカード（\ref{sec:files-wildcard}節）やブレース展開と組み合わせると、たくさんのファイルをまとめて処理したり、決まった回数だけ繰り返したりできます。
 
@@ -231,21 +231,21 @@ done
 \textbf{while 文}は、条件が成り立っている間、処理を繰り返します。
 \cmd{\$(( ))} の中では、整数の計算ができます。
 
-\begin{lstlisting}[style=bash, caption={while 文で繰り返す}, label={lst:shellscript-while}]
+\begin{codelisting}[style=bash]{while 文で繰り返す}{lst:shellscript-while}
 count=1
 while [ "$count" -le 3 ]; do
     echo "count: $count"
     count=$((count + 1))
 done
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{while read} を使うと、ファイルを 1 行ずつ読んで処理できます。
 
-\begin{lstlisting}[style=bash, caption={ファイルを 1 行ずつ処理する}, label={lst:shellscript-read}]
+\begin{codelisting}[style=bash]{ファイルを 1 行ずつ処理する}{lst:shellscript-read}
 while read -r line; do
     echo "> $line"
 done < robot.log
-\end{lstlisting}
+\end{codelisting}
 
 \section{終了ステータスとエラー処理}
 \label{sec:shellscript-exit}
@@ -286,12 +286,12 @@ $ cd /nonexistent || echo "移動できませんでした"
 エラーのときは、メッセージを標準エラー出力（\ref{sec:text-pipe-stream}節）に出して、\cmd{0} 以外の値で終了するのが作法です。
 \cmd{>\&2} と書くと、出力を標準エラー出力に送れます。
 
-\begin{lstlisting}[style=bash, caption={引数がなければエラーで終了する}, label={lst:shellscript-exit}]
+\begin{codelisting}[style=bash]{引数がなければエラーで終了する}{lst:shellscript-exit}
 if [ "$#" -lt 1 ]; then
     echo "使い方: $0 ファイル名" >&2
     exit 1
 fi
-\end{lstlisting}
+\end{codelisting}
 
 \subsection{\cmd{set -euo pipefail}}
 
@@ -299,9 +299,9 @@ fi
 たとえば \cmd{cd} に失敗したまま \cmd{rm} を実行すると、思わぬ場所のファイルを消してしまうかもしれません。
 そこで、スクリプトの先頭に次の 1 行を書いておくのがおすすめです。
 
-\begin{lstlisting}[style=bash, caption={安全のための設定}, label={lst:shellscript-set}]
+\begin{codelisting}[style=bash]{安全のための設定}{lst:shellscript-set}
 set -euo pipefail
-\end{lstlisting}
+\end{codelisting}
 
 \begin{description}
   \item[\cmd{-e}] コマンドが失敗したら、その時点でスクリプトを終了する
@@ -315,13 +315,13 @@ set -euo pipefail
 何度も出てくる処理を関数にまとめておくと、スクリプトが読みやすくなります。
 関数の中の \cmd{\$1} や \cmd{\$*} は、関数に渡された引数を表します（\cmd{\$*} はすべての引数をつなげた文字列です）。
 
-\begin{lstlisting}[style=bash, caption={メッセージを表示する関数}, label={lst:shellscript-func}]
+\begin{codelisting}[style=bash]{メッセージを表示する関数}{lst:shellscript-func}
 info() {
     echo "[INFO] $*"
 }
 
 info "処理を始めます"
-\end{lstlisting}
+\end{codelisting}
 
 \section{実践：開発環境セットアップスクリプトを書く}
 \label{sec:shellscript-practice}
@@ -340,7 +340,7 @@ info "処理を始めます"
 \cmd{sudo apt-get install -y パッケージ名} で、確認なしにパッケージをインストールできます。
 apt のしくみについては、\ref{chap:package}章で詳しく学びます。
 
-\lstinputlisting[style=bash, caption={開発環境のセットアップスクリプト（setup\_dev.sh）}, label={lst:shellscript-setup}]{samples/shellscript/setup_dev.sh}
+\codefile[style=bash]{開発環境のセットアップスクリプト（setup\_dev.sh）}{lst:shellscript-setup}{samples/shellscript/setup_dev.sh}
 
 ポイントを見ていきましょう。
 

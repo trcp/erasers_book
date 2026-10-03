@@ -74,7 +74,7 @@ launch ファイルの名前は、\cmd{〇〇.launch.py} とするのが決ま�
 $ mkdir ~/ros2_ws/src/my_package/launch
 \end{terminal}
 
-\lstinputlisting[style=python, caption={はじめての launch ファイル（launch/turtlesim\_controller.launch.py）}, label={lst:launch-first}]{samples/rclpy/my_package/launch/turtlesim_controller.launch.py}
+\codefile[style=python]{はじめての launch ファイル（launch/turtlesim\_controller.launch.py）}{lst:launch-first}{samples/rclpy/my_package/launch/turtlesim_controller.launch.py}
 
 \begin{description}
   \item[\cmd{generate\_launch\_description()}] launch ファイルには、必ずこの名前の関数を書きます。\cmd{ros2 launch} は、この関数を呼び出して、何を起動するかを受け取ります。
@@ -92,7 +92,7 @@ launch ファイルは、普通の Python のプログラムだということ�
 launch ファイルを \cmd{ros2 launch} で実行できるようにするには、ビルドしたときに \cmd{install} にコピーされるように設定します。
 \cmd{setup.py} を、次のように編集します。
 
-\begin{lstlisting}[style=python, caption={setup.py に launch ファイルと設定ファイルのインストールを追加する}, label={lst:launch-setup}]
+\begin{codelisting}[style=python]{setup.py に launch ファイルと設定ファイルのインストールを追加する}{lst:launch-setup}
 import os
 from glob import glob
 
@@ -113,7 +113,7 @@ setup(
             glob('config/*.yaml')),
     ],
     ...
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{data\_files} には、「インストール先のディレクトリ」と「インストールするファイルのリスト」の組を並べます。
 \cmd{glob('launch/*.launch.*')} は、\cmd{launch} ディレクトリの中の、名前に \cmd{.launch.} を含むファイル（\cmd{.launch.py} や、補章\ref{sup:launch-xml}の \cmd{.launch.xml}）のリストを作ります（\ref{sec:files-wildcard}節のワイルドカードと同じ考え方です）。
@@ -121,10 +121,10 @@ setup(
 
 また、\cmd{package.xml} に、launch を使うためのパッケージを追加しておきます。
 
-\begin{lstlisting}[style=xml, caption={package.xml に追加する行}, label={lst:launch-depend}]
+\begin{codelisting}[style=xml]{package.xml に追加する行}{lst:launch-depend}
   <exec_depend>launch_ros</exec_depend>
   <exec_depend>ros2launch</exec_depend>
-\end{lstlisting}
+\end{codelisting}
 
 ビルドして、launch ファイルを実行してみましょう。
 
@@ -151,7 +151,7 @@ $ ros2 launch my_package turtlesim_controller.launch.py
 YAML は、「キー: 値」をインデントで階層にして書く、人間が読み書きしやすい形式です。
 \cmd{my\_package} の中に \cmd{config} ディレクトリを作り、\cmd{turtlesim.yaml} というファイルを作ります。
 
-\lstinputlisting[caption={パラメータのファイル（config/turtlesim.yaml）}, label={lst:launch-yaml}]{samples/rclpy/my_package/config/turtlesim.yaml}
+\codefile{パラメータのファイル（config/turtlesim.yaml）}{lst:launch-yaml}{samples/rclpy/my_package/config/turtlesim.yaml}
 
 1 段目にノードの名前、2 段目に \cmd{ros\_\_parameters}（アンダースコア 2 つ）、3 段目にパラメータの名前と値を書きます。
 1 つのファイルに、複数のノードのパラメータを書けます。
@@ -169,7 +169,7 @@ YAML は、「キー: 値」をインデントで階層にして書く、人間�
 
 launch ファイルの \cmd{Node} に \cmd{parameters} を書くと、パラメータを設定して起動できます。
 
-\lstinputlisting[style=python, caption={パラメータを設定する launch ファイル（launch/param.launch.py）}, label={lst:launch-param}]{samples/rclpy/my_package/launch/param.launch.py}
+\codefile[style=python]{パラメータを設定する launch ファイル（launch/param.launch.py）}{lst:launch-param}{samples/rclpy/my_package/launch/param.launch.py}
 
 \begin{description}
   \item[\cmd{get\_package\_share\_directory()}] パッケージがインストールされた場所（\cmd{install/my\_package/}\allowbreak\cmd{share/my\_package}）を調べます。そこに \cmd{config/turtlesim.yaml} をつなげて、設定ファイルの場所にしています。
@@ -206,7 +206,7 @@ $ ros2 run my_package param_node --ros-args --params-file ~/ros2_ws/src/my_packa
 
 turtlesim と \cmd{turtle\_controller} の組を、名前空間を変えて 2 組起動する launch ファイルを書いてみましょう。
 
-\lstinputlisting[style=python, caption={名前空間を使う launch ファイル（launch/multi\_turtles.launch.py）}, label={lst:launch-multi}]{samples/rclpy/my_package/launch/multi_turtles.launch.py}
+\codefile[style=python]{名前空間を使う launch ファイル（launch/multi\_turtles.launch.py）}{lst:launch-multi}{samples/rclpy/my_package/launch/multi_turtles.launch.py}
 
 \cmd{Node} に \cmd{namespace} を書くと、そのノードを名前空間の中で起動します。
 launch ファイルは Python のプログラムなので、for 文で同じノードを繰り返し作ることもできます。
@@ -241,7 +241,7 @@ $ ros2 topic list      # 別のターミナルで
 turtlesim には、\cmd{/input/pose} を受け取り、同じ動きをするように \cmd{/output/cmd\_vel} に指令を送る、\cmd{mimic}（まねをする）というノードがあります。
 リマップを使って、1 匹目のカメの位置を受け取り、2 匹目のカメに同じ動きをさせてみましょう。
 
-\lstinputlisting[style=python, caption={リマップを使う launch ファイル（launch/mimic.launch.py）}, label={lst:launch-mimic}]{samples/rclpy/my_package/launch/mimic.launch.py}
+\codefile[style=python]{リマップを使う launch ファイル（launch/mimic.launch.py）}{lst:launch-mimic}{samples/rclpy/my_package/launch/mimic.launch.py}
 
 \cmd{remappings} に、\cmd{(元の名前, 新しい名前)} のタプル（\ref{sec:python-basics-list}節）を並べます。
 起動したら、1 匹目のカメに速度の指令を送ってみましょう。
@@ -283,7 +283,7 @@ launch ファイルを実行するときに、値を外から指定できるよ�
 
 launch 引数とインクルードを使って、この章と前の章で作ったノードをまとめて起動する launch ファイルを書いてみましょう。
 
-\lstinputlisting[style=python, caption={launch 引数とインクルードを使う launch ファイル（launch/bringup.launch.py）}, label={lst:launch-bringup}]{samples/rclpy/my_package/launch/bringup.launch.py}
+\codefile[style=python]{launch 引数とインクルードを使う launch ファイル（launch/bringup.launch.py）}{lst:launch-bringup}{samples/rclpy/my_package/launch/bringup.launch.py}
 
 \begin{description}
   \item[\cmd{DeclareLaunchArgument}] launch 引数を宣言します。引数の名前、省略したときの値（\cmd{default\_value}）、説明（\cmd{description}）を書きます。

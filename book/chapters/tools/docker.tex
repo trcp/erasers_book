@@ -238,7 +238,7 @@ Dockerfile があれば、誰でも、何度でも、同じイメージを作る
 ここでは、ROS 2 Jazzy の公式イメージに、亀のシミュレータ turtlesim を追加したイメージを作ってみます。
 新しいディレクトリを作り、その中に \cmd{Dockerfile} という名前のファイルを作ります。
 
-\begin{lstlisting}[style=bash, caption={Dockerfile}, label={lst:docker-dockerfile}]
+\begin{codelisting}[style=bash]{Dockerfile}{lst:docker-dockerfile}
 # 元にするイメージ（ROS 2 Jazzy の公式イメージ）
 FROM ros:jazzy
 
@@ -252,7 +252,7 @@ WORKDIR /root/ros2_ws
 
 # コンテナを起動したときに実行するコマンド
 CMD ["bash"]
-\end{lstlisting}
+\end{codelisting}
 
 主な命令の意味は、次のとおりです。
 
@@ -380,7 +380,7 @@ $ docker run -it --rm --network host --ipc host osrf/ros:jazzy-desktop \
 ここまで見てきたように、ROS 2 のコンテナを動かす \cmd{docker run} のコマンドは、オプションが多くて長くなりがちです。
 \textbf{Docker Compose} を使うと、これらの設定を \cmd{compose.yaml} というファイルに書いておき、短いコマンドでコンテナを起動できます。
 
-\begin{lstlisting}[caption={compose.yaml}, label={lst:docker-compose}]
+\begin{codelisting}{compose.yaml}{lst:docker-compose}
 services:
   ros:
     build: .                     # 同じディレクトリの Dockerfile からイメージを作る
@@ -395,7 +395,7 @@ services:
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
     tty: true
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{volumes} の 2 行目で、ホストの \cmd{./ros2\_ws/src} をコンテナの中の \cmd{/root/ros2\_ws/src} と共有しています。
 ホストのエディタで書いたプログラムを、そのままコンテナの中でビルドして動かせます。
@@ -411,7 +411,7 @@ $ docker compose down            # コンテナを停止して削除する
 \ref{sec:editor-remote}節で紹介した VS Code の Dev Containers を使うと、VS Code そのものをコンテナの中に接続して開発できます。
 プロジェクトのディレクトリに \cmd{.devcontainer/devcontainer.json} というファイルを置き、使う Dockerfile やオプションを書いておきます。
 
-\begin{lstlisting}[caption={.devcontainer/devcontainer.json}, label={lst:docker-devcontainer}]
+\begin{codelisting}{.devcontainer/devcontainer.json}{lst:docker-devcontainer}
 {
   "name": "ROS 2 Jazzy",
   "build": { "dockerfile": "../Dockerfile" },
@@ -422,7 +422,7 @@ $ docker compose down            # コンテナを停止して削除する
     }
   }
 }
-\end{lstlisting}
+\end{codelisting}
 
 VS Code でこのディレクトリを開き、コマンドパレット（\key{Ctrl}+\key{Shift}+\key{P}）で「Dev Containers: Reopen in Container」を選ぶと、イメージが作られてコンテナが起動し、VS Code がコンテナの中に接続されます。
 統合ターミナルもコンテナの中のシェルになり、指定した拡張機能もコンテナの中に自動でインストールされます。

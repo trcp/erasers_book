@@ -24,7 +24,7 @@ drwxrwxr-x 3 user user 4096 Sep 29 18:33 my_package
 \end{terminal}
 
 % ソースコード
-\begin{lstlisting}[style=python, caption={最小のノード}, label={lst:minimal}]
+\begin{codelisting}[style=python]{最小のノード}{lst:minimal}
 import rclpy
 from rclpy.node import Node
 
@@ -33,7 +33,7 @@ def main():
     node = Node('minimal')
     rclpy.spin(node)
     rclpy.shutdown()
-\end{lstlisting}
+\end{codelisting}
 
 % 外部ファイルのコードを読み込む場合
 % \lstinputlisting[style=python]{samples/rclpy/my_package/my_package/talker.py}

@@ -60,10 +60,10 @@ Hello, World!
 このファイルを\textbf{スクリプト}といい、拡張子は \cmd{.py} にするのが決まりです。
 エディタ（\ref{chap:editor}章）で次の内容を書き、\cmd{hello.py} という名前で保存してみましょう。
 
-\begin{lstlisting}[style=python, caption={はじめてのスクリプト（hello.py）}, label={lst:python-env-hello}]
+\begin{codelisting}[style=python]{はじめてのスクリプト（hello.py）}{lst:python-env-hello}
 name = "robot"
 print("Hello, " + name + "!")
-\end{lstlisting}
+\end{codelisting}
 
 保存したら、\cmd{python3} の引数にファイル名を指定して実行します。
 
@@ -77,11 +77,11 @@ Hello, robot!
 スクリプトの 1 行目に次のような行を書いておくと、シェルスクリプト（\ref{chap:shellscript}章）と同じように、ファイルを直接実行できるようになります。
 この行を \textbf{shebang}（シバン）といい、「このファイルは \cmd{python3} で実行する」ということをシェルに伝えます。
 
-\begin{lstlisting}[style=python, caption={shebang を付けたスクリプト（hello.py）}, label={lst:python-env-shebang}]
+\begin{codelisting}[style=python]{shebang を付けたスクリプト（hello.py）}{lst:python-env-shebang}
 #!/usr/bin/env python3
 name = "robot"
 print("Hello, " + name + "!")
-\end{lstlisting}
+\end{codelisting}
 
 ファイルに実行権限を付ければ（\ref{chap:permission}章）、\cmd{./hello.py} で実行できます。
 

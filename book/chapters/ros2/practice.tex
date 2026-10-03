@@ -80,7 +80,7 @@ LiDAR のデータを読んで、障害物を避けながら走り回るノー�
 
 \cmd{my\_package} に \cmd{obstacle\_avoider.py} を作ります。
 
-\lstinputlisting[style=python, lastline=60, caption={障害物を避けるノード（my\_package/obstacle\_avoider.py）}, label={lst:practice-avoider}]{samples/rclpy/my_package/my_package/obstacle_avoider.py}
+\codefile[style=python, lastline=60]{障害物を避けるノード（my\_package/obstacle\_avoider.py）}{lst:practice-avoider}{samples/rclpy/my_package/my_package/obstacle_avoider.py}
 
 \begin{description}
   \item[パラメータ] 止まって曲がり始める距離・進む速さ・回る速さを、パラメータ（\ref{sec:rclpy-param}節）にしています。プログラムを書き換えずに、実行しながら調整できます。\cmd{front\_angle}（LiDAR から見たロボットの正面の向き）と \cmd{stamped}（\cmd{TwistStamped} で送るか、\cmd{Twist} で送るか）は、別のロボットでこのノードを使うためのパラメータで、\ref{chap:kachaka}章で使います。TurtleBot3 では初期値のままで構いません。

@@ -34,7 +34,7 @@ ROS 2 のノードを Python で書くためのライブラリを \textbf{rclpy}
 まずは、起動するとメッセージを 1 つ表示するだけの、いちばん簡単なノードを書いてみましょう。
 VS Code で \cmd{\textasciitilde/ros2\_ws} を開き（\ref{sec:editor-vscode}節）、\cmd{src/my\_package/my\_package} の中に \cmd{hello\_node.py} というファイルを作って、次のように入力します。
 
-\lstinputlisting[style=python, caption={はじめてのノード（my\_package/hello\_node.py）}, label={lst:rclpy-hello}]{samples/rclpy/my_package/my_package/hello_node.py}
+\codefile[style=python]{はじめてのノード（my\_package/hello\_node.py）}{lst:rclpy-hello}{samples/rclpy/my_package/my_package/hello_node.py}
 
 短いプログラムですが、ROS 2 のノードに必要なものがすべて入っています。
 上から順に見ていきましょう。
@@ -59,24 +59,24 @@ VS Code で \cmd{\textasciitilde/ros2\_ws} を開き（\ref{sec:editor-vscode}�
 まず、\cmd{package.xml} に、このパッケージが rclpy を使うことを書きます（\ref{sec:workspace-files}節）。
 この章で使うパッケージをまとめて書いておきましょう。
 
-\begin{lstlisting}[style=xml, caption={package.xml に依存するパッケージを追加する}, label={lst:rclpy-depend}]
+\begin{codelisting}[style=xml]{package.xml に依存するパッケージを追加する}{lst:rclpy-depend}
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>turtlesim</depend>
   <depend>example_interfaces</depend>
-\end{lstlisting}
+\end{codelisting}
 
 次に、\cmd{setup.py} の \cmd{entry\_points} に、ノードを登録します。
 
-\begin{lstlisting}[style=python, caption={setup.py の entry\_points にノードを登録する}, label={lst:rclpy-entry}]
+\begin{codelisting}[style=python]{setup.py の entry\_points にノードを登録する}{lst:rclpy-entry}
     entry_points={
         'console_scripts': [
             'my_node = my_package.my_node:main',
             'hello_node = my_package.hello_node:main',
         ],
     },
-\end{lstlisting}
+\end{codelisting}
 
 行の終わりのカンマ（\cmd{,}）を忘れないように注意しましょう。
 以降、新しいノードのファイルを作ったときは、同じように 1 行ずつ追加していきます。
@@ -107,7 +107,7 @@ $ ros2 run my_package hello_node
 次は、トピック（\ref{sec:ros2-concepts-topic}節）で文字列のメッセージを送るノード（パブリッシャ）を書きます。
 \cmd{talker.py} を作り、次のように入力しましょう。
 
-\lstinputlisting[style=python, lastline=21, caption={パブリッシャ（my\_package/talker.py）}, label={lst:rclpy-talker}]{samples/rclpy/my_package/my_package/talker.py}
+\codefile[style=python, lastline=21]{パブリッシャ（my\_package/talker.py）}{lst:rclpy-talker}{samples/rclpy/my_package/my_package/talker.py}
 
 \begin{description}
   \item[4 行目] 使うメッセージ型（\cmd{std\_msgs/msg/String}）を読み込みます。メッセージ型は、\cmd{from パッケージ名.msg import 型の名前} の形で読み込みます。
@@ -131,7 +131,7 @@ $ ros2 run my_package talker
 
 次に、\cmd{chatter} トピックのメッセージを受け取るノード（サブスクライバ）を書きます。
 
-\lstinputlisting[style=python, lastline=15, caption={サブスクライバ（my\_package/listener.py）}, label={lst:rclpy-listener}]{samples/rclpy/my_package/my_package/listener.py}
+\codefile[style=python, lastline=15]{サブスクライバ（my\_package/listener.py）}{lst:rclpy-listener}{samples/rclpy/my_package/my_package/listener.py}
 
 \begin{description}
   \item[11〜12 行目] \cmd{create\_subscription()} でサブスクライバを作ります。引数は、メッセージ型、トピック名、\textbf{メッセージが届いたときに呼び出す関数（コールバック）}、QoS の 4 つです。
@@ -183,7 +183,7 @@ listener では、メッセージが届くたびに \cmd{listener\_callback} が
 カメの位置（\cmd{/turtle1/pose}）を受け取り、壁に近づいたら曲がり、そうでなければまっすぐ進むように、速度の指令（\cmd{/turtle1/cmd\_vel}）を送ります。
 turtlesim の画面は、左下が (0, 0)、右上がおよそ (11, 11) です。
 
-\lstinputlisting[style=python, lastline=35, caption={カメを自動で動かすノード（my\_package/turtle\_controller.py）}, label={lst:rclpy-turtle-controller}]{samples/rclpy/my_package/my_package/turtle_controller.py}
+\codefile[style=python, lastline=35]{カメを自動で動かすノード（my\_package/turtle\_controller.py）}{lst:rclpy-turtle-controller}{samples/rclpy/my_package/my_package/turtle_controller.py}
 
 \cmd{pose\_callback} は、届いた最新の位置を \cmd{self.pose} に覚えておくだけです。
 どう動くかは、0.1 秒ごとに呼び出される \cmd{timer\_callback} が、覚えておいた位置をもとに決めます。
@@ -216,7 +216,7 @@ int64 b
 int64 sum
 \end{terminal}
 
-\lstinputlisting[style=python, lastline=18, caption={サービスサーバ（my\_package/add\_two\_ints\_server.py）}, label={lst:rclpy-service-server}]{samples/rclpy/my_package/my_package/add_two_ints_server.py}
+\codefile[style=python, lastline=18]{サービスサーバ（my\_package/add\_two\_ints\_server.py）}{lst:rclpy-service-server}{samples/rclpy/my_package/my_package/add_two_ints_server.py}
 
 サービスの型は、\cmd{from パッケージ名.srv import 型の名前} の形で読み込みます。
 \cmd{create\_service()} の引数は、サービスの型、サービス名、リクエストが届いたときに呼び出すコールバックの 3 つです。
@@ -239,7 +239,7 @@ example_interfaces.srv.AddTwoInts_Response(sum=8)
 次に、サービスを呼び出すノード（クライアント）を書きます。
 コマンドラインの引数で 2 つの数を受け取り、サーバに送ります。
 
-\lstinputlisting[style=python, caption={サービスクライアント（my\_package/add\_two\_ints\_client.py）}, label={lst:rclpy-service-client}]{samples/rclpy/my_package/my_package/add_two_ints_client.py}
+\codefile[style=python]{サービスクライアント（my\_package/add\_two\_ints\_client.py）}{lst:rclpy-service-client}{samples/rclpy/my_package/my_package/add_two_ints_client.py}
 
 \begin{description}
   \item[\cmd{create\_client()}] サービスの型とサービス名を指定して、クライアントを作ります。
@@ -269,7 +269,7 @@ $ ros2 run my_package add_two_ints_client 3 5
 アクション（\ref{sec:ros2-concepts-action}節）を使うノードを書きます。
 まず、turtlesim の \cmd{/turtle1/rotate\_absolute} アクションにゴールを送り、カメを指定した角度まで回転させるクライアントを書いてみましょう。
 
-\lstinputlisting[style=python, caption={アクションクライアント（my\_package/rotate\_client.py）}, label={lst:rclpy-action-client}]{samples/rclpy/my_package/my_package/rotate_client.py}
+\codefile[style=python]{アクションクライアント（my\_package/rotate\_client.py）}{lst:rclpy-action-client}{samples/rclpy/my_package/my_package/rotate_client.py}
 
 アクションは、ゴール・フィードバック・リザルトのやり取りがあるので、サービスより少し複雑です。
 処理の流れを順に追ってみましょう。
@@ -297,7 +297,7 @@ $ ros2 run my_package rotate_client 180
 ここでは、ROS 2 に用意されている \cmd{example\_interfaces/action/Fibonacci} 型を使って、フィボナッチ数列（0, 1, 1, 2, 3, 5, \ldots のように、前の 2 つの数を足して次の数を作る数列）を 1 秒に 1 つずつ計算するサーバを作ります。
 ゴールで数列の長さ（\cmd{order}）を受け取り、途中経過として計算中の数列を送り、最後に完成した数列を結果として返します。
 
-\lstinputlisting[style=python, lastline=29, caption={アクションサーバ（my\_package/fibonacci\_server.py）}, label={lst:rclpy-action-server}]{samples/rclpy/my_package/my_package/fibonacci_server.py}
+\codefile[style=python, lastline=29]{アクションサーバ（my\_package/fibonacci\_server.py）}{lst:rclpy-action-server}{samples/rclpy/my_package/my_package/fibonacci_server.py}
 
 \cmd{ActionServer} の引数は、ノード、アクションの型、アクション名、ゴールを受け取ったときに呼び出すコールバックです。
 コールバックの中では、\cmd{publish\_feedback()} で途中経過を送り、処理が終わったら \cmd{succeed()} を呼び出して、結果を \cmd{return} します。
@@ -327,7 +327,7 @@ Goal finished with status: SUCCEEDED
 ノードにパラメータ（\ref{sec:ros2-concepts-param}節）を持たせると、プログラムを書き換えずに設定を変えられるようになります。
 rclpy では、\cmd{declare\_parameter()} でパラメータの名前と初期値を宣言し、\cmd{get\_parameter()} で値を取得します。
 
-\lstinputlisting[style=python, lastline=18, caption={パラメータを使うノード（my\_package/param\_node.py）}, label={lst:rclpy-param}]{samples/rclpy/my_package/my_package/param_node.py}
+\codefile[style=python, lastline=18]{パラメータを使うノード（my\_package/param\_node.py）}{lst:rclpy-param}{samples/rclpy/my_package/my_package/param_node.py}
 
 パラメータの型は、初期値から決まります。
 \cmd{'turtle'} なら文字列、\cmd{0.5} なら小数です。
@@ -388,11 +388,11 @@ $ mkdir my_interfaces/msg my_interfaces/srv
 型の名前は、\cmd{RobotStatus} のように、単語の先頭を大文字にしてつなげた形にします。
 ファイルには、1 行に 1 つずつ「型 名前」を書きます。
 
-\lstinputlisting[caption={メッセージ型の定義（my\_interfaces/msg/RobotStatus.msg）}, label={lst:rclpy-msg}]{samples/rclpy/my_interfaces/msg/RobotStatus.msg}
+\codefile{メッセージ型の定義（my\_interfaces/msg/RobotStatus.msg）}{lst:rclpy-msg}{samples/rclpy/my_interfaces/msg/RobotStatus.msg}
 
 サービスの型は、\cmd{srv} ディレクトリに \cmd{型の名前.srv} というファイルを作り、\cmd{---} の上にリクエスト、下にレスポンスを書きます。
 
-\lstinputlisting[caption={サービスの型の定義（my\_interfaces/srv/SetSpeed.srv）}, label={lst:rclpy-srv}]{samples/rclpy/my_interfaces/srv/SetSpeed.srv}
+\codefile{サービスの型の定義（my\_interfaces/srv/SetSpeed.srv）}{lst:rclpy-srv}{samples/rclpy/my_interfaces/srv/SetSpeed.srv}
 
 使える主な型は、次のとおりです。
 ほかのメッセージ型（\cmd{geometry\_msgs/Twist} など）を中に入れたり、\cmd{float64[]} のように \cmd{[]} を付けて配列にしたりすることもできます。
@@ -416,15 +416,15 @@ $ mkdir my_interfaces/msg my_interfaces/srv
 定義したファイルから、Python や C++ で使うためのコードを自動で作るように、\cmd{CMakeLists.txt} を書きます。
 \cmd{rosidl\_generate\_interfaces} に、定義したファイルを並べます。
 
-\lstinputlisting[style=bash, caption={my\_interfaces/CMakeLists.txt}, label={lst:rclpy-cmake}]{samples/rclpy/my_interfaces/CMakeLists.txt}
+\codefile[style=bash]{my\_interfaces/CMakeLists.txt}{lst:rclpy-cmake}{samples/rclpy/my_interfaces/CMakeLists.txt}
 
 \cmd{package.xml} には、コードを作るために必要なパッケージを書き加えます。
 
-\begin{lstlisting}[style=xml, caption={my\_interfaces/package.xml に追加する行}, label={lst:rclpy-interfaces-xml}]
+\begin{codelisting}[style=xml]{my\_interfaces/package.xml に追加する行}{lst:rclpy-interfaces-xml}
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
   <member_of_group>rosidl_interface_packages</member_of_group>
-\end{lstlisting}
+\end{codelisting}
 
 ビルドしたら、\cmd{ros2 interface show} で定義した型を確かめましょう。
 
@@ -444,13 +444,13 @@ bool is_moving    # 動いているかどうか
 自分で定義した型も、ほかの型と同じように使えます。
 まず、\cmd{my\_package} の \cmd{package.xml} に、\cmd{my\_interfaces} への依存を追加します。
 
-\begin{lstlisting}[style=xml, numbers=none, xleftmargin=0pt, framexleftmargin=0pt, caption={my\_package/package.xml に追加する行}, label={lst:rclpy-depend-interfaces}]
+\begin{codelisting}[style=xml, numbers=none, xleftmargin=0pt, framexleftmargin=0pt]{my\_package/package.xml に追加する行}{lst:rclpy-depend-interfaces}
   <depend>my_interfaces</depend>
-\end{lstlisting}
+\end{codelisting}
 
 \cmd{RobotStatus} 型のメッセージを 1 秒ごとにパブリッシュするノードは、次のようになります。
 
-\lstinputlisting[style=python, lastline=20, caption={自分で定義した型を使うノード（my\_package/status\_publisher.py）}, label={lst:rclpy-status}]{samples/rclpy/my_package/my_package/status_publisher.py}
+\codefile[style=python, lastline=20]{自分で定義した型を使うノード（my\_package/status\_publisher.py）}{lst:rclpy-status}{samples/rclpy/my_package/my_package/status_publisher.py}
 
 \cmd{setup.py} に登録して、ワークスペース全体をビルドします。
 \cmd{package.xml} に依存関係を書いておいたので、colcon が \cmd{my\_interfaces} → \cmd{my\_package} の順にビルドしてくれます。

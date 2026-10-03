@@ -51,7 +51,7 @@ ROS 2 でも、C++ と並んで公式にサポートされている言語で、�
 
 同じ「画面に Hello, World! と表示する」プログラムを、C 言語と Python で書き比べてみましょう。
 
-\begin{lstlisting}[style=cpp, caption={C 言語のプログラム（hello.c）}, label={lst:python-hello-c}]
+\begin{codelisting}[style=cpp]{C 言語のプログラム（hello.c）}{lst:python-hello-c}
 #include <stdio.h>
 
 int main(void)
@@ -59,11 +59,11 @@ int main(void)
     printf("Hello, World!\n");
     return 0;
 }
-\end{lstlisting}
+\end{codelisting}
 
-\begin{lstlisting}[style=python, caption={Python のプログラム（hello.py）}, label={lst:python-hello-py}]
+\begin{codelisting}[style=python]{Python のプログラム（hello.py）}{lst:python-hello-py}
 print("Hello, World!")
-\end{lstlisting}
+\end{codelisting}
 
 C 言語では、\cmd{main} という関数を用意し、その中に処理を書くという決まった形が必要です。
 一方、Python では、やりたいことを 1 行書くだけで済みます。

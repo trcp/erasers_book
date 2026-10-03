@@ -146,14 +146,14 @@ $ source install/local_setup.bash
 erasers\_kachaka は、接続するカチャカの IP アドレスなどを、環境変数（\ref{chap:env}章）から読み取ります。
 \cmd{.bashrc} の最後に、次の行を追加します（\ref{sec:env-bashrc}節）。
 
-\begin{lstlisting}[style=bash, caption={.bashrc に追加する設定}, label={lst:kachaka-bashrc}]
+\begin{codelisting}[style=bash]{.bashrc に追加する設定}{lst:kachaka-bashrc}
 # カチャカ
 export KACHAKA_NAME=er_kachaka                  # 名前空間の名前
 export KACHAKA_IP=192.168.0.10                  # 自分のカチャカの IP アドレス
 export GRPC_PORT=26400                          # 変えない
 export API_GRPC_BRIDGE_SERVER_URI="${KACHAKA_IP}:${GRPC_PORT}"
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp    # 通信に使う DDS
-\end{lstlisting}
+\end{codelisting}
 
 \begin{description}
   \item[\cmd{KACHAKA\_NAME}] トピックの名前空間になります。\cmd{er\_kachaka} なら、トピックは \cmd{/er\_kachaka/...} になります。
@@ -268,7 +268,7 @@ $ ros2 topic pub --once /er_kachaka/kachaka_speak std_msgs/msg/String "{data: '�
 決まった間隔で話させるノードを書いてみましょう。
 \ref{sec:rclpy-pubsub}節の talker とほとんど同じです。
 
-\lstinputlisting[style=python, lastline=21, caption={カチャカに話させるノード（my\_package/kachaka\_speaker.py）}, label={lst:kachaka-speaker}]{samples/rclpy/my_package/my_package/kachaka_speaker.py}
+\codefile[style=python, lastline=21]{カチャカに話させるノード（my\_package/kachaka\_speaker.py）}{lst:kachaka-speaker}{samples/rclpy/my_package/my_package/kachaka_speaker.py}
 
 トピック名を、\cmd{/er\_kachaka/kachaka\_speak} ではなく、\cmd{kachaka\_speak} という相対名（\ref{sec:launch-namespace}節）で書いているのがポイントです。
 起動するときに名前空間 \cmd{/er\_kachaka} を指定すれば、\cmd{/er\_kachaka/kachaka\_speak} になります。
@@ -303,7 +303,7 @@ $ sudo apt install ros-jazzy-cv-bridge python3-opencv
 
 \subsection{画像を表示するノード}
 
-\lstinputlisting[style=python, lastline=28, caption={カメラの画像を表示するノード（my\_package/camera\_viewer.py）}, label={lst:kachaka-camera}]{samples/rclpy/my_package/my_package/camera_viewer.py}
+\codefile[style=python, lastline=28]{カメラの画像を表示するノード（my\_package/camera\_viewer.py）}{lst:kachaka-camera}{samples/rclpy/my_package/my_package/camera_viewer.py}
 
 \begin{description}
   \item[QoS] カメラの画像は、大量のデータを次々と送るので、\cmd{BEST\_EFFORT} でパブリッシュされています。サブスクライバも \cmd{qos\_profile\_sensor\_data} を使わないと、データが届きません（\ref{sec:debug-qos}節）。
@@ -353,7 +353,7 @@ LiDAR の角度 0（x 軸の向き）がロボットの左なので、ロボッ�
 この $\theta$ に、ロボットの正面の向き（$-\pi/2$）を入れれば、正面の障害物までの距離が求められます。
 これを使って、正面の距離を表示するノードを書いてみましょう。
 
-\lstinputlisting[style=python, lastline=36, caption={正面の障害物までの距離を表示するノード（my\_package/front\_distance.py）}, label={lst:kachaka-front}]{samples/rclpy/my_package/my_package/front_distance.py}
+\codefile[style=python, lastline=36]{正面の障害物までの距離を表示するノード（my\_package/front\_distance.py）}{lst:kachaka-front}{samples/rclpy/my_package/my_package/front_distance.py}
 
 計算した番号は小数になるので、\cmd{round()} で一番近い整数にしています。
 距離の値が \cmd{inf}（無限大）のときは測れる範囲に障害物がない、\cmd{nan}（数ではない）のときは正しく測れなかった、という意味です。

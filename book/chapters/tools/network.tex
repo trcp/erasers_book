@@ -232,11 +232,11 @@ Number of key(s) added: 1
 
 \cmd{\textasciitilde/.ssh/config} というファイルに接続先の情報を書いておくと、短い名前で接続できるようになります。
 
-\begin{lstlisting}[caption={SSH の設定ファイル（\textasciitilde/.ssh/config）}, label={lst:network-ssh-config}]
+\begin{codelisting}{SSH の設定ファイル（\textasciitilde/.ssh/config）}{lst:network-ssh-config}
 Host robot
     HostName 192.168.1.20
     User user
-\end{lstlisting}
+\end{codelisting}
 
 \begin{terminal}[設定した名前で接続する]
 $ ssh robot

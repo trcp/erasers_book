@@ -155,7 +155,7 @@ $ ros2 run tf2_ros static_transform_publisher --x 0.1 --y 0 --z 0.2 --yaw 0 --pi
 自分のノードで座標変換を使うときは、\cmd{tf2\_ros} パッケージを使います。
 次のノードは、tf2 のデモが動いている状態で、\cmd{world} 座標系から見た \cmd{turtle1} の位置を 1 秒ごとに表示します。
 
-\lstinputlisting[style=python, firstline=10, lastline=27, caption={座標変換を調べるノード（my\_package/frame\_listener.py）}, label={lst:tf-viz-listener}]{samples/rclpy/my_package/my_package/frame_listener.py}
+\codefile[style=python, firstline=10, lastline=27]{座標変換を調べるノード（my\_package/frame\_listener.py）}{lst:tf-viz-listener}{samples/rclpy/my_package/my_package/frame_listener.py}
 
 \cmd{Buffer} は、届いた座標変換をためておく入れ物で、\cmd{TransformListener} が \cmd{/tf} と \cmd{/tf\_static} をサブスクライブして、\cmd{Buffer} に入れてくれます。
 \cmd{lookup\_transform(親, 子, 時刻)} で、座標変換を問い合わせます。
@@ -195,7 +195,7 @@ URDF では、ロボットを\textbf{リンク}と\textbf{ジョイント}の組
 箱形の本体に、左右の車輪と、上に LiDAR が付いた、簡単な移動ロボットの URDF を書いてみましょう。
 \cmd{my\_package} に \cmd{urdf} ディレクトリを作り、\cmd{simple\_robot.urdf} を作ります。
 
-\lstinputlisting[style=xml, caption={簡単な移動ロボットの URDF（urdf/simple\_robot.urdf）}, label={lst:tf-viz-urdf}]{samples/rclpy/my_package/urdf/simple_robot.urdf}
+\codefile[style=xml]{簡単な移動ロボットの URDF（urdf/simple\_robot.urdf）}{lst:tf-viz-urdf}{samples/rclpy/my_package/urdf/simple_robot.urdf}
 
 \begin{description}
   \item[\cmd{<link>}] \cmd{<visual>} の中に、見た目の形（\cmd{<geometry>}）と色（\cmd{<material>}）を書きます。形には、箱（\cmd{box}）・円柱（\cmd{cylinder}）・球（\cmd{sphere}）や、CAD で作った 3D のデータ（\cmd{mesh}）を使えます。
@@ -208,10 +208,10 @@ URDF は、部品が増えると長くなります。
 
 URDF を書いたら、\ref{sec:launch-python}節の launch ファイルと同じように、\cmd{setup.py} の \cmd{data\_files} に \cmd{urdf} ディレクトリを追加して、インストールされるようにしておきます。
 
-\begin{lstlisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt, caption={setup.py の data\_files に追加する行}, label={lst:tf-viz-setup}]
+\begin{codelisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt]{setup.py の data\_files に追加する行}{lst:tf-viz-setup}
         (os.path.join('share', package_name, 'urdf'),
             glob('urdf/*.urdf')),
-\end{lstlisting}
+\end{codelisting}
 
 \section{robot\_state\_publisher と joint\_state\_publisher}
 \label{sec:tf-viz-rsp}
@@ -238,7 +238,7 @@ robot\_state\_publisher・joint\_state\_publisher\_gui と、次の節で説明�
 $ sudo apt install ros-jazzy-joint-state-publisher-gui
 \end{terminal}
 
-\lstinputlisting[style=python, caption={ロボットのモデルを表示する launch ファイル（launch/display.launch.py）}, label={lst:tf-viz-display}]{samples/rclpy/my_package/launch/display.launch.py}
+\codefile[style=python]{ロボットのモデルを表示する launch ファイル（launch/display.launch.py）}{lst:tf-viz-display}{samples/rclpy/my_package/launch/display.launch.py}
 
 robot\_state\_publisher には、URDF の中身を、\cmd{robot\_description} というパラメータとして渡します。
 \cmd{with open(ファイル名) as f:} は、ファイルを開いて、その下のインデントした部分で使い、終わったら自動で閉じる、という Python の書き方です。

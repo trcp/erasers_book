@@ -106,7 +106,7 @@ ros\_gz\_bridge には、「どの Gazebo のトピックを、どの ROS 2 の�
 コマンドで 1 つずつ指定することもできますが、たくさんのトピックを中継するときは、YAML ファイルに書くのが一般的です。
 次は、LiDAR のデータと速度の指令を中継する設定の例です。
 
-\begin{lstlisting}[caption={ros\_gz\_bridge の設定の例}, label={lst:simulation-bridge-yaml}]
+\begin{codelisting}{ros\_gz\_bridge の設定の例}{lst:simulation-bridge-yaml}
 - ros_topic_name: "scan"
   gz_topic_name: "scan"
   ros_type_name: "sensor_msgs/msg/LaserScan"
@@ -118,7 +118,7 @@ ros\_gz\_bridge には、「どの Gazebo のトピックを、どの ROS 2 の�
   ros_type_name: "geometry_msgs/msg/TwistStamped"
   gz_type_name: "gz.msgs.Twist"
   direction: ROS_TO_GZ        # ROS 2 から Gazebo へ
-\end{lstlisting}
+\end{codelisting}
 
 この章で使う TurtleBot3 のシミュレーションのパッケージには、このような設定がすでに用意されていて、launch ファイルで ros\_gz\_bridge も一緒に起動されます。
 自分でロボットのモデルを作るときに、このような設定を書くことになります。

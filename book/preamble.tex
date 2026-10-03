@@ -82,6 +82,50 @@
   overlay={\node[anchor=east, inner sep=0pt] at ([xshift=-2.5mm]title.east) {\terminalbuttons};},
 }
 
+% ページをまたいだ囲みに「続く」を表示する（breakable な囲みで使う）
+\usepackage{needspace}
+\tikzset{contmark/.style={font=\scriptsize\sffamily, text=black!55, inner sep=1.5pt}}
+\tcbset{
+  contmarks/.style={
+    pad at break*=3.5mm,
+    overlay first={\node[contmark, anchor=south east] at (frame.south east) {（次のページに続く）};},
+    overlay middle={\node[contmark, anchor=south east] at (frame.south east) {（次のページに続く）};
+      \node[contmark, anchor=north east] at (frame.north east) {（前のページから続く）};},
+    overlay last={\node[contmark, anchor=north east] at (frame.north east) {（前のページから続く）};},
+  },
+}
+% ページの残りが少ないときは、囲みごと次のページに送る（数行だけ前のページに残らないように）
+\newcommand{\keeplines}{\par\needspace{6\baselineskip}}
+
+% ソースコードの枠（キャプション付き）：ページをまたぐと「続く」を表示する
+%   \begin{codelisting}[listings のオプション]{キャプション}{ラベル} ... \end{codelisting}
+%   \codefile[listings のオプション]{キャプション}{ラベル}{ファイル名}
+% キャプションのないコード（囲みの中の短い例など）は、これまでどおり lstlisting を使う。
+\tcbset{
+  codebox/.style={
+    enhanced, breakable, contmarks,
+    colback=black!3, colframe=black!40, boxrule=0.4pt, arc=1pt,
+    left=2pt, right=4pt, top=2pt, bottom=2pt,
+    colbacktitle=black!10, coltitle=black, fonttitle=\small, halign title=flush center,
+    toptitle=0.5pt, bottomtitle=0.5pt, titlerule=0.4pt,
+  },
+  codelisting options/.style={listing options={
+    frame=none, backgroundcolor={}, aboveskip=0pt, belowskip=0pt,
+    xleftmargin=1.8em, framexleftmargin=0pt, numbersep=0.8em, #1}},
+}
+\newtcblisting[auto counter, number within=chapter,
+  number freestyle={\noexpand\chapprefix\noexpand\thechapter.\noexpand\arabic{\tcbcounter}}]
+  {codelisting}[3][]{
+  codebox, listing only, codelisting options={#1},
+  title={Listing \thetcbcounter\quad #2}, label={#3},
+}
+\AddToHook{env/codelisting/before}{\keeplines}
+\newtcbinputlisting[use counter from=codelisting]{\codefileinner}[4][]{
+  codebox, listing only, codelisting options={#1}, listing file={#4},
+  title={Listing \thetcbcounter\quad #2}, label={#3},
+}
+\newcommand{\codefile}{\keeplines\codefileinner}
+
 % この章で学ぶこと
 \newtcolorbox{goalbox}{
   colback=blue!4, colframe=blue!50!black, arc=2pt,
@@ -105,10 +149,11 @@
 % TIPS：本筋とは別の、すぐに役立つ実践的なアドバイス（長くてもページをまたげる）
 %   \begin{tips}{タイトル} ... \end{tips}
 \newtcolorbox{tips}[1]{
-  enhanced, breakable,
+  enhanced, breakable, contmarks,
   colback=teal!4, colframe=teal!60!black, arc=2pt,
   title={TIPS：#1}, fonttitle=\sffamily\bfseries,
 }
+\AddToHook{env/tips/before}{\keeplines}
 
 % 本文中の表：前後に余白を空け、表の上にキャプション（表 5.1 など）を付ける
 %   \begin{tablebox}[キャプション][tab:ラベル] \begin{tabular}{ll} ... \end{tabular} \end{tablebox}
@@ -127,12 +172,13 @@
 % 練習問題：\begin{exercise}[label={ex:...}] \begin{enumerate} \item ... \end{enumerate} \end{exercise}
 % 章ごとに「練習問題 18.1」のように番号が振られ、中の問題は (1), (2), ... になる。ページをまたげる。
 \newtcolorbox[auto counter, number within=chapter]{exercise}[1][]{
-  enhanced, breakable,
+  enhanced, breakable, contmarks,
   colback=violet!3, colframe=violet!55!black, arc=2pt,
   title={練習問題 \thetcbcounter}, fonttitle=\sffamily\bfseries,
   before upper={\renewcommand{\labelenumi}{(\arabic{enumi})\hspace{0.5em}}\setlength{\leftmargini}{2.8em}},
   #1
 }
+\AddToHook{env/exercise/before}{\keeplines}
 
 %% ---------- 共通マクロ ----------
 \newcommand{\cmd}[1]{\texttt{#1}}          % インラインのコマンド・ファイル名
