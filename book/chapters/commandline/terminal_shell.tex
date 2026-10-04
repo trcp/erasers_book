@@ -37,19 +37,7 @@ memo.txt  report.pdf
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：ファイルマネージャで Documents を開いた画面と、ターミナルで ls ~/Documents を実行した画面を左右に並べたスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{terminal_shell/gui_vs_cli.png}
+  \includegraphics[width=0.9\linewidth]{terminal_shell/gui_vs_cli.png}
   \caption{同じディレクトリを GUI（左）と CLI（右）で表示した例}
   \label{fig:terminal-gui-cli}
 \end{figure}
@@ -112,19 +100,7 @@ user@robot:~$
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：Ubuntu 24.04 でターミナルを起動した直後のウィンドウのスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{terminal_shell/terminal_window.png}
+  \includegraphics[width=0.9\linewidth]{terminal_shell/terminal_window.png}
   \caption{Ubuntu のターミナル}
   \label{fig:terminal-window}
 \end{figure}
@@ -431,19 +407,7 @@ $ man ls
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：man ls を実行したターミナルのスクリーンショット（NAME, SYNOPSIS, DESCRIPTION が見える状態）
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{terminal_shell/man_ls.png}
+  \includegraphics[width=0.9\linewidth]{terminal_shell/man_ls.png}
   \caption{\cmd{man ls} の表示画面}
   \label{fig:terminal-man}
 \end{figure}

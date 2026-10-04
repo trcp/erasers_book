@@ -413,26 +413,14 @@ VirtualBox を起動し、「新規」ボタンを押して、仮想マシンを
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：VirtualBox で仮想マシンを新しく作るときの画面（名前・ISO イメージ・「自動インストールをスキップ」の項目が見える状態）のスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{what_is_linux/virtualbox_new_vm.png}
+  \includegraphics[width=0.9\linewidth]{what_is_linux/virtualbox_new_vm.png}
   \caption{VirtualBox で仮想マシンを作る画面}
   \label{fig:linux-virtualbox-new}
 \end{figure}
 
 \begin{enumerate}
   \item \textbf{名前と OS}：仮想マシンの名前（たとえば \cmd{ubuntu2404}）を入力し、「ISO イメージ」にダウンロードした \cmd{.iso} ファイルを指定します。
-    「自動インストールをスキップ」（Skip Unattended Installation）にチェックを入れておきます\footnote{自動インストールを使うと、ユーザが \cmd{sudo} を使えない状態で作られるなど、本書の手順と合わないことがあるため、自分の手でインストールします。}。
+    「無人インストールを実行」のチェックを外しておきます（VirtualBox のバージョンによっては、「自動インストールをスキップ」にチェックを入れます）\footnote{自動インストールを使うと、ユーザが \cmd{sudo} を使えない状態で作られるなど、本書の手順と合わないことがあるため、自分の手でインストールします。}。
   \item \textbf{ハードウェア}：メモリを 8192 MB（8 GB）程度、CPU を 4 個程度割り当てます。PC の性能に余裕があれば、もっと増やしても構いません。
   \item \textbf{仮想ハードディスク}：容量を 50 GB 以上にします。実際に使った分だけ PC のストレージを消費する設定（事前に確保しない設定）が標準なので、大きめにしておいて構いません。
   \item 設定を確認して「完了」を押すと、仮想マシンができます。
@@ -493,19 +481,7 @@ Ubuntu 24.04 には、\textbf{GNOME}（グノーム）という\textbf{デスク
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：Ubuntu 24.04 にログインした直後のデスクトップ画面のスクリーンショット（上部バー、左側の Dock、アプリ一覧のボタンに番号を付ける）
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{what_is_linux/desktop.png}
+  \includegraphics[width=0.9\linewidth]{what_is_linux/desktop.png}
   \caption{Ubuntu 24.04 のデスクトップ}
   \label{fig:linux-desktop}
 \end{figure}

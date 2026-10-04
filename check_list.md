@@ -257,6 +257,7 @@
 - [ ] サンプルの `kachaka_speaker.py`・`camera_viewer.py`・`front_distance.py` が `__ns:=/er_kachaka` で動くこと
 - [ ] 第29章の `obstacle_avoider.py`（`front_angle`・`stamped` のパラメータを追加した）が、TurtleBot3 とカチャカの両方で動くこと
 - [ ] 「玉川大学のロボットチーム eR@sers が開発している」という紹介の書き方でよいか
+- [ ] 第2章の VirtualBox の画面（`images/what_is_linux/virtualbox_new_vm.png`）で、「OS バージョン」が自動で「Ubuntu 24.10 (Oracular Oriole)」になっている（ISO は 24.04.5）。このままでよいか、撮り直すか、本文に「バージョンは ISO から自動で設定される」と書くか
 - [ ] 図30.1・図30.3 は `robot_project/imgs/` の画像（`kachaka_lidar.png`・`vb_test3.png`）を `images/kachaka/` にコピーして使った。カチャカの画像の出典（Preferred Robotics 社の製品画像なら、書籍に載せてよいか）を確認する。RViz2 の画面は Humble の環境で撮ったもので、シェルフ付きのモデルが表示されている
 - [ ] 移植しなかった内容：`robot_project/` の AI 活用編（Raspberry Pi と Hailo）はカチャカと関係がないため移植していない。研究室の IP アドレスの対応表と VM のパスワードは載せていない
 
@@ -346,26 +347,19 @@
 ## 4. 図版
 
 図は TikZ で描いて `images/<章のファイル名>/` に置いています（44 点）。
-残りの 13 か所はスクリーンショットが必要なため、プレースホルダのままです。
+残りの 6 か所はスクリーンショットが必要なため、プレースホルダのままです。
 残っている箇所は `grep -rn '入れる画像' book/` で一覧できます。
 
 | 章 | ラベル | 内容 | 状態 |
 | --- | --- | --- | --- |
-| 第12章 | `fig:editor-vscode` | VS Code の画面 | 要スクリーンショット |
-| 第2章 | `fig:linux-desktop` | Ubuntu 24.04 のデスクトップ | 要スクリーンショット |
-| 第2章 | `fig:linux-virtualbox-new` | VirtualBox で仮想マシンを作る画面 | 要スクリーンショット |
-| 第5章 | `fig:files-text-editor` | Ubuntu のテキストエディター | 要スクリーンショット |
 | 第21章 | `fig:ros2-install-turtlesim` | turtlesim のウィンドウ | 要スクリーンショット |
 | 第22章 | `fig:ros2-concepts-rqt-graph` | rqt_graph の表示 | 要スクリーンショット |
 | 第26章 | `fig:tf-viz-rviz` | RViz2 でロボットのモデルと座標系を表示した画面と joint_state_publisher_gui | 要スクリーンショット |
 | 第27章 | `fig:simulation-tb3` | Gazebo で TurtleBot3 を起動した様子 | 要スクリーンショット |
 | 第29章 | `fig:practice-slam` | SLAM で地図を作っている RViz2 の画面 | 要スクリーンショット |
 | 第29章 | `fig:practice-nav2` | Navigation2 で自律移動している RViz2 の画面 | 要スクリーンショット |
-| 第4章 | `fig:terminal-gui-cli` | 同じディレクトリを GUI と CLI で表示した例 | 要スクリーンショット |
-| 第4章 | `fig:terminal-window` | Ubuntu のターミナル | 要スクリーンショット |
-| 第4章 | `fig:terminal-man` | `man ls` の表示画面 | 要スクリーンショット |
 
-- [ ] 上の 13 点のスクリーンショットを撮影する（VirtualBox の画面はホスト OS で、それ以外は Ubuntu 24.04 で）
+- [ ] 上の 6 点のスクリーンショットを撮影する（VirtualBox の画面はホスト OS で、それ以外は Ubuntu 24.04 で）
 - [ ] TikZ で描いた 44 点の図の内容・見た目を確認する（第1章 6 点、第2章 4 点、第3章 3 点、第4章 2 点、第5章 2 点、第6章 1 点、第7章 2 点、第8章 1 点、第9章 1 点、第11章 1 点、第12章 1 点、第13章 2 点、第14章 3 点、第15章 2 点、第16章 1 点、第17章 1 点、第20章 2 点、第21章 1 点、第22章 1 点、第23章 1 点、第26章 2 点、第27章 1 点、第29章 1 点、第30章 2 点）
 - [ ] 第5章のコラム「ホームディレクトリの中のディレクトリ名」に `xdg-user-dirs-gtk-update` のダイアログの画像を入れるか（コラムの囲みの中には `figure` を置けないため、入れる場合はコラムの外に出すか、囲みの中に `\includegraphics` を直接書く）
 

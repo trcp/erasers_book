@@ -242,19 +242,7 @@ VS Code の画面は、主に次の部分でできています（図\ref{fig:edi
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：VS Code で ~/my_robot を開き、エクスプローラーにファイル一覧、エディタに README.md、下部に統合ターミナルを表示した状態のスクリーンショット（各部分に番号を付ける）
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{editor/vscode_window.png}
+  \includegraphics[width=0.9\linewidth]{editor/vscode_window.png}
   \caption{VS Code の画面}
   \label{fig:editor-vscode}
 \end{figure}
