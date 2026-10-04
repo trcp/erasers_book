@@ -146,8 +146,10 @@
 \newcommand{\codefile}{\keeplines\codefileinner}
 
 % この章で学ぶこと
+% 表示例の枠（紺）やほかの囲みと見分けやすいように、赤紫（ラズベリー色）にする
+\definecolor{goalframe}{HTML}{A3245E}
 \newtcolorbox{goalbox}{
-  colback=blue!4, colframe=blue!50!black, arc=2pt,
+  colback=goalframe!5, colframe=goalframe, arc=2pt,
   title={この章で学ぶこと}, fonttitle=\sffamily\bfseries,
 }
 
