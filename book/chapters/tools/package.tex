@@ -172,10 +172,11 @@ $ sudo apt autoremove
 apt のパッケージの実体は、\cmd{.deb} という拡張子のファイルです。
 ソフトウェアによっては、公式サイトで \cmd{.deb} ファイルが直接配布されていることがあります（\ref{chap:editor}章で扱う VS Code など）。
 ダウンロードした \cmd{.deb} ファイルは、パスを指定して \cmd{apt install} でインストールできます。
+次は、VS Code の \cmd{.deb} ファイルの場合の例です（実際の手順は\ref{sec:editor-vscode}節で説明します）。
 
-\begin{terminal}[.deb ファイルからインストールする]
+\begin{termexample}[.deb ファイルからインストールする]
 $ sudo apt install ./code_1.93.1_amd64.deb
-\end{terminal}
+\end{termexample}
 
 ファイル名の前の \cmd{./} を忘れると、リポジトリからその名前のパッケージを探そうとしてしまうので注意してください。
 
@@ -222,13 +223,16 @@ Ubuntu の公式リポジトリにないソフトウェアや、公式リポジ�
   \item \cmd{sudo apt install} でインストールする
 \end{enumerate}
 
-\begin{terminal}[リポジトリを追加する手順の例]
+次は、その手順の書き方の例です。
+ここではまだ実行せず、流れだけを確認してください（実際には、\ref{sec:docker-basic}節の Docker や、\ref{sec:ros2-install-install}節の ROS 2 のインストールで、それぞれのソフトウェアの手順に従って実行します）。
+
+\begin{termexample}[リポジトリを追加する手順の例]
 $ sudo install -m 0755 -d /etc/apt/keyrings
 $ sudo curl -fsSL <GPG 鍵の URL> -o /etc/apt/keyrings/<名前>.asc
 $ echo "deb [signed-by=/etc/apt/keyrings/<名前>.asc] <リポジトリの URL> noble main" | sudo tee /etc/apt/sources.list.d/<名前>.list
 $ sudo apt update
 $ sudo apt install <パッケージ名>
-\end{terminal}
+\end{termexample}
 
 \cmd{\textless{}\textgreater{}} で囲んだ部分は、ソフトウェアごとに異なります。
 
@@ -335,15 +339,16 @@ Hello, CMake!
 ビルドしたソフトウェアをシステム全体で使えるようにするには、\cmd{sudo make install} を実行します。
 多くの場合、ソフトウェアは \cmd{/usr/local/} の下にインストールされます（\ref{sec:linux-internals-fs}節）。
 公開されているソフトウェアをソースからインストールする手順は、おおむね次のような流れになります。
+ここでは流れだけを確認し、実際には、インストールしたいソフトウェアの手順に従って実行してください。
 
-\begin{terminal}[ソースからインストールする一般的な流れ]
+\begin{termexample}[ソースからインストールする一般的な流れ]
 $ git clone <リポジトリの URL>
 $ cd <ソフトウェアのディレクトリ>
 $ mkdir build && cd build
 $ cmake ..
 $ make -j$(nproc)
 $ sudo make install
-\end{terminal}
+\end{termexample}
 
 \cmd{git clone} は、ソースコードをダウンロードするコマンドです（\ref{chap:git}章）。
 \cmd{\&\&} は、前のコマンドが成功したときだけ次のコマンドを実行する、という意味です（\ref{chap:shellscript}章）。

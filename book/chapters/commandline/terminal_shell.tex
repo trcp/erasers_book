@@ -446,35 +446,8 @@ man ページは、おおむね次のような見出しで構成されていま�
 \begin{tips}{man ページが英語で読みにくいとき}
   man ページの多くは英語で書かれています。
   最初は読みにくいかもしれませんが、使われる単語はある程度決まっているので、読んでいるうちに慣れてきます。
-  どうしても読みにくいときは、次に紹介する \cmd{tldr} を使ったり、Web ブラウザで「コマンド名 使い方」と検索したりするとよいでしょう。
+  どうしても読みにくいときは、Web ブラウザで「コマンド名 使い方」と検索するとよいでしょう。
 \end{tips}
-
-\subsection{\cmd{tldr} コマンド}
-
-\cmd{tldr}（Too Long; Didn't Read の略）は、よく使う使用例だけを簡潔にまとめて表示してくれるコマンドです。
-標準ではインストールされていないので、次のようにインストールします（\cmd{apt} については\ref{chap:package}章で説明します）。
-
-\begin{terminal}[tldr をインストールする]
-$ sudo apt install tldr
-$ tldr --update
-\end{terminal}
-
-\cmd{tldr} の後ろにコマンド名を書くと、使用例が表示されます。
-
-\begin{terminal}[tar コマンドの使用例を表示する]
-$ tldr tar
-tar
-Archiving utility.
-
- - Create an archive and write it to a file:
-   tar cf path/to/target.tar path/to/file1 path/to/file2 ...
-
- - Extract a (compressed) archive file into the current directory verbosely:
-   tar xvf path/to/source.tar[.gz|.bz2|.xz]
-...
-\end{terminal}
-
-「細かい説明はいいから、とりあえずよくある使い方を知りたい」というときに便利です。
 
 \subsection{ビルトインコマンドのヘルプ}
 
@@ -492,7 +465,6 @@ cd: cd [-L|[-P [-e]] [-@]] [dir]
   \begin{itemize}
     \item まずは \cmd{コマンド名 --help} で使い方の要約を見る
     \item 詳しく知りたいときは \cmd{man コマンド名} でマニュアルを読む（終了は \key{q}）
-    \item 使用例を知りたいときは \cmd{tldr コマンド名}
     \item ビルトインコマンドは \cmd{help コマンド名}
   \end{itemize}
 \end{point}
@@ -619,6 +591,6 @@ PING localhost (127.0.0.1) 56(84) bytes of data.
   \item ターミナルは文字の入出力を担当するアプリ、シェルは入力を解釈してコマンドを実行するプログラム、コマンドは実際に仕事をするプログラムです。
   \item プロンプト \cmd{user@robot:\textasciitilde\$} には、ユーザ名・ホスト名・カレントディレクトリが表示されます。
   \item コマンドは「コマンド名 オプション 引数」の形で入力します。
-  \item 使い方がわからないときは \cmd{--help}、\cmd{man}、\cmd{tldr} で調べます。
+  \item 使い方がわからないときは \cmd{--help} や \cmd{man} で調べます。
   \item Tab 補完、\key{\(\uparrow\)}、\key{Ctrl}+\key{R}、\key{Ctrl}+\key{C} を使いこなすと、CLI の操作がぐっと楽になります。
 \end{itemize}

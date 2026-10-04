@@ -37,15 +37,26 @@ $ ps
 システム全体のプロセスを表示するには、\cmd{ps aux} とします。
 非常にたくさんのプロセスが表示されるので、パイプ（\ref{sec:text-pipe-pipe}節）で \cmd{grep} と組み合わせて、目的のプロセスを探すのが定番の使い方です。
 
-\begin{terminal}[システム全体から目的のプロセスを探す]
-$ ps aux | grep python3
-USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
-user        4012 12.5  0.6 345680 98012 pts/1    Sl+  10:31   0:15 python3 controller.py
-user        4150  0.0  0.0   9212  2304 pts/2    S+   10:33   0:00 grep --color=auto python3
+試しに、探す対象のプロセスを用意しましょう。
+新しいターミナル（タブ）を開き、指定した秒数だけ待つ \cmd{sleep} コマンドを実行します。
+このコマンドは 1000 秒間何もせずに待ち続けるので、その間、プロセスとして残り続けます。
+
+\begin{terminal}[2 つ目のターミナルで実行する]
+$ sleep 1000
 \end{terminal}
 
-\cmd{\%CPU} と \cmd{\%MEM} は、そのプロセスが使っている CPU とメモリの割合です。
-最後の行は、検索に使った \cmd{grep} 自身です。
+元のターミナルに戻って、\cmd{sleep} のプロセスを探します。
+
+\begin{terminal}[システム全体から目的のプロセスを探す]
+$ ps aux | grep sleep
+user        4012  0.0  0.0   8292  1920 pts/1    S+   10:31   0:00 sleep 1000
+user        4150  0.0  0.0   9212  2304 pts/0    S+   10:33   0:00 grep --color=auto sleep
+\end{terminal}
+
+左から、ユーザ、PID、CPU の使用率（\cmd{\%CPU}）、メモリの使用率（\cmd{\%MEM}）……と並び、最後がコマンドです（\cmd{ps aux} だけを実行すると、1 行目に各列の名前が表示されます）。
+2 行目は、検索に使った \cmd{grep} 自身です。
+PID は、実行するたびに変わります。
+\cmd{sleep} のプロセスは、このあと \ref{sec:process-kill}節で終了させるので、2 つ目のターミナルはそのままにしておきましょう。
 
 \subsection{\cmd{top} と \cmd{htop}：リアルタイムに監視する}
 
@@ -61,8 +72,8 @@ MiB Mem :  15890.2 total,   9012.3 free,   3456.7 used,   3421.2 buff/cache
 MiB Swap:   4096.0 total,   4096.0 free,      0.0 used.  12433.5 avail Mem
 
     PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
-   4012 user      20   0  345680  98012  21504 S  12.5   0.6   0:15.23 python3
    1523 user      20   0 4812344 412300 150212 S   4.3   2.5   2:01.87 gnome-shell
+   2088 user      20   0  612944  58212  41320 S   1.0   0.4   0:03.12 gnome-terminal-
 ...
 \end{terminal}
 
@@ -173,12 +184,22 @@ ROS 2 のノードも、\key{Ctrl}+\key{C}（\cmd{SIGINT}）を受け取ると�
 
 別のターミナルで動いているプロセスや、バックグラウンドのプロセスを終了させるには、\cmd{kill} で PID を指定してシグナルを送ります。
 シグナルを指定しなければ \cmd{SIGTERM} が送られます。
+\ref{sec:process-check}節で 2 つ目のターミナルで動かした \cmd{sleep 1000} を終了させてみましょう。
+\cmd{4012} の部分は、\cmd{ps aux | grep sleep} で調べた、自分の環境での PID に置き換えてください。
 
 \begin{terminal}[プロセスを終了させる]
-$ kill 4012                # SIGTERM を送る（終了を依頼する）
-$ kill -INT 4012           # SIGINT を送る（Ctrl+C と同じ）
-$ kill -9 4012             # SIGKILL を送る（強制終了）
+$ kill 4012
 \end{terminal}
+
+2 つ目のターミナルを見ると、\cmd{sleep} が終了して \cmd{Terminated} と表示され、プロンプトが戻っています。
+
+シグナルの種類を指定するときは、次のように書きます。
+PID を間違えると、関係のないプログラムを終了させてしまうので、実行するときは必ず PID を確かめてください。
+
+\begin{termexample}[シグナルの種類を指定する]
+$ kill -INT <PID>          # SIGINT を送る（Ctrl+C と同じ）
+$ kill -9 <PID>            # SIGKILL を送る（強制終了）
+\end{termexample}
 
 \begin{point}[プロセスを終了させる順番]
   プロセスを終了させるときは、まず \key{Ctrl}+\key{C} か \cmd{kill}（\cmd{SIGTERM}）を試し、それでも終了しないときだけ \cmd{kill -9} を使いましょう。
@@ -193,9 +214,12 @@ PID を調べるのが面倒なときは、プロセスの名前で指定でき�
 \cmd{-a} を付けると、PID と一緒にコマンドライン全体を表示します。
 
 \begin{terminal}[名前でプロセスを探して終了させる]
-$ pgrep -af controller
-4012 python3 controller.py
-$ pkill -f controller.py
+$ sleep 1000 &
+[1] 4230
+$ pgrep -af sleep
+4230 sleep 1000
+$ pkill -f "sleep 1000"
+[1]+  Terminated              sleep 1000
 \end{terminal}
 
 \cmd{pkill} は名前が一致したすべてのプロセスに送られるので、関係のないプロセスまで終了させないように、先に \cmd{pgrep} で対象を確かめておきましょう。
@@ -223,14 +247,15 @@ tmpfs           1.6G  2.4M  1.6G   1% /run
 
 \cmd{du} は、ディレクトリやファイルが使っている容量を表示するコマンドです。
 \cmd{-s} で合計だけを、\cmd{-h} で読みやすい単位で表示します。
-\cmd{sort -h}（単位付きの数値として並べ替える）と組み合わせると、どこが容量を使っているのかがわかります。
+\cmd{sort -h}（単位付きの数値として並べ替える）と組み合わせると、どこが容量を使っているのかがわかります（表示される大きさは、環境によって変わります）。
+ロボット開発では、センサのデータを記録したファイル（\ref{chap:debug}章）などで、ホームディレクトリがすぐにいっぱいになることがあります。
 
 \begin{terminal}[ホームディレクトリの中で容量の大きいものを探す]
 $ du -sh ~/* | sort -h
 4.0K    /home/user/Templates
-120M    /home/user/Documents
-2.3G    /home/user/ros2_ws
-15G     /home/user/bags
+16K     /home/user/practice
+120M    /home/user/Downloads
+350M    /home/user/snap
 \end{terminal}
 
 \subsection{\cmd{free}：メモリの使用量を確認する}
@@ -265,7 +290,7 @@ Linux では、システムやサービス（バックグラウンドで動き�
     \midrule
     \cmd{journalctl -b} & 今回の起動以降のログ \\
     \cmd{journalctl -f} & 新しいログを表示し続ける（\cmd{tail -f} と同じ） \\
-    \cmd{journalctl -u ssh} & 特定のサービス（ここでは SSH のサーバ）のログ \\
+    \cmd{journalctl -u NetworkManager} & 特定のサービス（ここではネットワークを管理するサービス）のログ \\
     \cmd{journalctl -p err} & エラー以上の重要度のログ \\
     \cmd{journalctl --since "10 min ago"} & 直近 10 分間のログ \\
     \bottomrule
@@ -274,13 +299,15 @@ Linux では、システムやサービス（バックグラウンドで動き�
 
 サービスが動いているかどうかは、\cmd{systemctl status} で確認できます。
 
-\begin{terminal}[SSH のサーバが動いているか確認する]
-$ systemctl status ssh
-● ssh.service - OpenBSD Secure Shell server
-     Loaded: loaded (/usr/lib/systemd/system/ssh.service; enabled; preset: enabled)
+\begin{terminal}[ネットワークを管理するサービスが動いているか確認する]
+$ systemctl status NetworkManager
+● NetworkManager.service - Network Manager
+     Loaded: loaded (/usr/lib/systemd/system/NetworkManager.service; enabled; preset: enabled)
      Active: active (running) since Wed 2026-09-30 08:20:11 JST; 2h 15min ago
 ...
 \end{terminal}
+
+\ref{chap:network}章では、SSH のサーバが動いているかを、同じ方法で確かめます。
 
 \cmd{active (running)} と表示されていれば、動いています。
 表示が長いときは \key{q} で終了します。
@@ -292,15 +319,17 @@ $ systemctl status ssh
 Ubuntu では、\cmd{sudo} を付けて実行します。
 
 \cmd{-w} を付けて実行したまま USB 機器を差し込むと、カーネルが機器をどう認識したかをその場で確かめられます。
+次は、USB シリアルの変換器（マイコンボードなどに使われています）を差し込んだときの例です。
+手元に USB 機器があれば、試してみましょう（VirtualBox では、メニューの「デバイス」→「USB」で、機器を仮想マシンにつなぎます）。
 
-\begin{terminal}[USB 機器を差し込んだときのメッセージを見る]
+\begin{termexample}[USB 機器を差し込んだときのメッセージを見る]
 $ sudo dmesg -w
 ...
 [ 8123.456789] usb 1-2: new full-speed USB device number 5 using xhci_hcd
 [ 8123.612345] usb 1-2: New USB device found, idVendor=10c4, idProduct=ea60
 [ 8123.634567] cp210x 1-2:1.0: cp210x converter detected
 [ 8123.645678] usb 1-2: cp210x converter now attached to ttyUSB0
-\end{terminal}
+\end{termexample}
 
 最後の行から、この機器が \cmd{/dev/ttyUSB0} として使えるようになったことがわかります（\ref{sec:linux-internals-device}節）。
 何も表示されなければ、ケーブルや機器そのものに問題がある可能性があります。

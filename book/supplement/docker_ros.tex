@@ -1,0 +1,217 @@
+\chapter{Docker で ROS 2 の開発環境を作る}
+\label{sup:docker-ros}
+
+本編では、ROS 2 を Ubuntu 24.04 に直接インストールして使いました（\ref{chap:ros2_install}章）。
+ROS 2 は、\ref{chap:docker}章で学んだ Docker のコンテナの中でも動かせます。
+この補章では、Docker を使って ROS 2 の開発環境を作る方法を紹介します。
+\ref{chap:docker}章の Docker の基本と、\ref{chap:ros2_concepts}章までの ROS 2 の基本を学んでから読んでください。
+
+\section{コンテナで ROS 2 を使う理由}
+\label{sec:docker-ros-why}
+
+コンテナで ROS 2 を使うと、次のようなことができます。
+
+\begin{itemize}
+  \item \textbf{異なるバージョンの ROS 2 を使い分けられる}：ROS 2 のディストリビューションは、対応する Ubuntu のバージョンが決まっています（\ref{sec:what-is-ros-distro}節）。コンテナを使えば、Ubuntu 22.04 の PC の上で Jazzy を使ったり、1 台の PC で Humble と Jazzy を使い分けたりできます。
+  \item \textbf{チームで同じ環境をそろえられる}：Dockerfile を共有すれば、メンバー全員が、同じパッケージが入った同じ環境で開発できます。
+  \item \textbf{PC の環境を汚さない}：試しにいろいろなパッケージを入れても、コンテナを消せば元どおりです。
+  \item \textbf{ロボットに同じ環境を持っていける}：開発用 PC で動いたコンテナを、そのままロボットの PC で動かせます。
+\end{itemize}
+
+一方、GUI の表示や USB の機器、ネットワークの設定など、直接インストールした場合よりも考えることが増えます。
+ROS 2 に慣れるまでは、本編のように直接インストールした環境で学び、必要になったらコンテナを使う、という順番がおすすめです。
+
+\section{ROS 2 の公式イメージ}
+\label{sec:docker-ros-images}
+
+ROS 2 には、Docker Hub で公式のイメージが用意されています。
+用途に合わせて、次のようなイメージを選びます。
+
+\begin{tablebox}[ROS 2 の公式イメージ][tab:docker-ros-images]
+  \begin{tabular}{lp{0.55\linewidth}}
+    \toprule
+    イメージ & 内容 \\
+    \midrule
+    \cmd{ros:jazzy-ros-core} & ROS 2 の最小限の機能 \\
+    \cmd{ros:jazzy}（\cmd{ros:jazzy-ros-base}） & 基本的な機能と、ビルドの道具 \\
+    \cmd{osrf/ros:jazzy-desktop} & RViz2 などの GUI のツールやデモも含む \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+試しに、2 つのターミナルでそれぞれコンテナを動かし、\ref{sec:ros2-install-turtlesim}節で動かした talker と listener のデモを通信させてみましょう。
+初めて実行するときは、イメージのダウンロードに少し時間がかかります。
+
+\begin{terminal}[1 つ目のターミナル：メッセージを送るノード]
+$ docker run -it --rm --network host --ipc host osrf/ros:jazzy-desktop \
+    ros2 run demo_nodes_cpp talker
+[INFO] [1727660000.123456789] [talker]: Publishing: 'Hello World: 1'
+[INFO] [1727660001.123456789] [talker]: Publishing: 'Hello World: 2'
+...
+\end{terminal}
+
+\begin{terminal}[2 つ目のターミナル：メッセージを受け取るノード]
+$ docker run -it --rm --network host --ipc host osrf/ros:jazzy-desktop \
+    ros2 run demo_nodes_cpp listener
+[INFO] [1727660002.234567890] [listener]: I heard: [Hello World: 3]
+...
+\end{terminal}
+
+2 つのコンテナの間で、メッセージがやり取りされていることがわかります。
+\cmd{--network host} と \cmd{--ipc host}（\ref{sec:docker-gui-device}節）を付けているので、ホストに直接インストールした ROS 2 のノードとも通信できます。
+止めるときは、それぞれのターミナルで \key{Ctrl}+\key{C} を押します。
+
+\section{自分の ROS 2 のイメージを作る}
+\label{sec:docker-ros-image}
+
+\subsection{Dockerfile}
+
+公式のイメージに、自分が使うパッケージを追加したイメージを作りましょう。
+ここでは、ROS 2 Jazzy の公式イメージに、turtlesim を追加します。
+新しいディレクトリを作り、その中に \cmd{Dockerfile} を作ります（\ref{sec:docker-dockerfile}節）。
+
+\begin{terminal}[Dockerfile を置くディレクトリを作る]
+$ mkdir -p ~/docker_ros
+$ cd ~/docker_ros
+$ code Dockerfile
+\end{terminal}
+
+\begin{codelisting}[style=bash]{Dockerfile}{lst:docker-ros-dockerfile}
+# 元にするイメージ（ROS 2 Jazzy の公式イメージ）
+FROM ros:jazzy
+
+# 追加のパッケージをインストールする
+RUN apt-get update && apt-get install -y \
+    ros-jazzy-turtlesim \
+    && rm -rf /var/lib/apt/lists/*
+
+# 作業ディレクトリ（ROS 2 のワークスペース）
+WORKDIR /root/ros2_ws
+
+# コンテナを起動したときに実行するコマンド
+CMD ["bash"]
+\end{codelisting}
+
+公式のイメージの中では、コンテナの中のシェルを開くと、ROS 2 の設定（\cmd{/opt/ros/jazzy/setup.bash}）が自動で読み込まれるようになっています。
+
+\begin{terminal}[イメージを作って動かす]
+$ docker build -t my_ros:jazzy .
+...
+ => => naming to docker.io/library/my_ros:jazzy
+$ docker run -it --rm my_ros:jazzy
+root@a1b2c3d4e5f6:~/ros2_ws# ros2 pkg list | grep turtlesim
+turtlesim
+root@a1b2c3d4e5f6:~/ros2_ws# exit
+\end{terminal}
+
+\subsection{GUI のツールを表示する}
+
+turtlesim や RViz2 のような GUI のツールは、\ref{sec:docker-gui-device}節の \cmd{xeyes} と同じ方法で、ホストの画面に表示します。
+
+\begin{terminal}[コンテナの中の turtlesim を表示する]
+$ xhost +local:
+$ docker run -it --rm --network host --ipc host \
+    -e DISPLAY=$DISPLAY \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    my_ros:jazzy \
+    ros2 run turtlesim turtlesim_node
+\end{terminal}
+
+ホストの画面に turtlesim のウィンドウが表示されます。
+ホストに ROS 2 をインストールしてあれば、ホストのターミナルで \cmd{ros2 run turtlesim turtle\_teleop\_key} を実行して、コンテナの中のカメを動かすこともできます。
+
+RViz2 や Gazebo のように 3D の描画を行うツールは、GPU を使えるようにしないと動作が非常に遅くなります。
+Intel や AMD の GPU では \cmd{--device /dev/dri} を、NVIDIA の GPU では NVIDIA Container Toolkit をインストールしたうえで \cmd{--gpus all} を、\cmd{docker run} に追加します。
+
+\section{Docker Compose で開発環境をまとめる}
+\label{sec:docker-ros-compose}
+
+\subsection{compose.yaml}
+
+ROS 2 の開発では、ネットワーク・GUI・デバイス・ワークスペースの共有など、たくさんの設定が必要です。
+\ref{sec:docker-compose}節の Docker Compose で、これらを 1 つのファイルにまとめておきましょう。
+Dockerfile と同じ \cmd{\textasciitilde/docker\_ros} に、次の \cmd{compose.yaml} を作ります。
+
+\begin{codelisting}{compose.yaml}{lst:docker-ros-compose}
+services:
+  ros:
+    build: .                     # 同じディレクトリの Dockerfile からイメージを作る
+    image: my_ros:jazzy
+    network_mode: host
+    ipc: host
+    environment:
+      - DISPLAY=${DISPLAY}
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./ros2_ws/src:/root/ros2_ws/src   # 自分のパッケージを共有する
+    tty: true
+\end{codelisting}
+
+\begin{description}
+  \item[\cmd{ROS\_DOMAIN\_ID}] ホストの環境変数 \cmd{ROS\_DOMAIN\_ID}（\ref{sec:ros2-install-network}節）を、コンテナにも渡します。ホストで設定されていなければ \cmd{0} になります。
+  \item[\cmd{./ros2\_ws/src}] ホストの \cmd{./ros2\_ws/src} を、コンテナの中のワークスペースの \cmd{src} と共有します。ホストの VS Code で書いたパッケージを、コンテナの中でビルドして動かせます。
+\end{description}
+
+USB の機器を使うときは、\cmd{devices:} という項目に \cmd{- /dev/ttyUSB0:/dev/ttyUSB0} のように書き加えます。
+
+\subsection{コンテナの中でビルドして動かす}
+
+共有するディレクトリに、\ref{chap:rclpy}章の \cmd{my\_package} を置いて、コンテナの中でビルドしてみましょう。
+
+\begin{terminal}[Docker Compose で ROS 2 の開発環境を使う]
+$ cd ~/docker_ros
+$ mkdir -p ros2_ws/src
+$ cp -r ~/ros2_ws/src/my_package ros2_ws/src/
+$ xhost +local:
+$ docker compose up -d
+$ docker compose exec ros bash
+root@robot:~/ros2_ws# colcon build --symlink-install
+root@robot:~/ros2_ws# source install/local_setup.bash
+root@robot:~/ros2_ws# ros2 run my_package talker
+\end{terminal}
+
+別のターミナルで \cmd{docker compose exec ros bash} を実行すれば、同じコンテナの中で、もう 1 つのシェルを開けます（\ref{sec:docker-basic}節）。
+使い終わったら、\cmd{docker compose down} でコンテナを止めます。
+
+\begin{caution}[コンテナの中で作ったファイルの所有者]
+  この例では、コンテナの中では root としてコマンドを実行しています。
+  そのため、コンテナの中でビルドしてできたファイル（\cmd{build} や \cmd{install} など）を、共有したディレクトリに置くと、ホストでは所有者が root になり、自分では消せなくなることがあります（\ref{sec:permission-chmod}節）。
+  この例では、共有するのを \cmd{src} だけにして、ビルドしてできたファイルはコンテナの中に置くようにしています。
+\end{caution}
+
+\section{VS Code の Dev Containers で開発する}
+\label{sec:docker-ros-devcontainer}
+
+\ref{sec:docker-compose}節の Dev Containers を使うと、VS Code をコンテナの中の ROS 2 の環境に接続して開発できます。
+コンテナの中の ROS 2 のライブラリを VS Code が読み込めるので、入力の補完なども、直接インストールした場合と同じように使えます。
+
+\begin{codelisting}{.devcontainer/devcontainer.json}{lst:docker-ros-devcontainer}
+{
+  "name": "ROS 2 Jazzy",
+  "build": { "dockerfile": "../Dockerfile" },
+  "runArgs": ["--network=host", "--ipc=host"],
+  "containerEnv": { "DISPLAY": "${localEnv:DISPLAY}" },
+  "mounts": ["source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"],
+  "workspaceFolder": "/root/ros2_ws",
+  "workspaceMount": "source=${localWorkspaceFolder}/ros2_ws,target=/root/ros2_ws,type=bind",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "ms-iot.vscode-ros"]
+    }
+  }
+}
+\end{codelisting}
+
+\cmd{\textasciitilde/docker\_ros} を VS Code で開き、コマンドパレットで「Dev Containers: Reopen in Container」を選ぶと、イメージが作られて、VS Code がコンテナの中のワークスペースに接続されます。
+統合ターミナルで \cmd{colcon build} や \cmd{ros2 run} を実行でき、ROS の拡張機能（\cmd{ms-iot.vscode-ros}）もコンテナの中にインストールされます。
+この例では、\cmd{ros2\_ws} の全体をホストと共有しているので、前の節の注意のとおり、ビルドしてできたファイルの所有者に気をつけてください。
+
+\begin{point}[直接インストールとコンテナの使い分け]
+  \begin{itemize}
+    \item ROS 2 を学ぶとき、1 人で開発するとき：直接インストールした環境がわかりやすい
+    \item チームで環境をそろえたいとき、複数のバージョンの ROS 2 を使い分けたいとき：コンテナが便利
+    \item ロボットの PC：どちらも使われる。コンテナを使うと、ロボットに同じ環境を持っていきやすい
+  \end{itemize}
+  どちらの場合も、ROS 2 のノード・トピック・ワークスペースといった考え方は同じです。
+\end{point}

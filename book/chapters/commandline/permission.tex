@@ -22,16 +22,21 @@
 \subsection{\cmd{ls -l} の表示}
 
 ファイルのパーミッションは、\cmd{ls -l}（\ref{sec:files-navigation}節）で確認できます。
+この章では、\ref{chap:files}章で作った \cmd{\textasciitilde/practice} の中に、練習用のディレクトリ \cmd{perm} を作って試します。
 
-\begin{terminal}[ファイルのパーミッションを確認する]
+\begin{terminal}[練習用のファイルを作って、パーミッションを確認する]
+$ mkdir ~/practice/perm
+$ cd ~/practice/perm
+$ mkdir scripts
+$ touch notes.txt start_robot.sh
 $ ls -l
-total 12
-drwxr-xr-x 2 user user 4096 Sep 30 10:00 scripts
--rw-r--r-- 1 user user  220 Sep 30 10:01 notes.txt
--rwxr-xr-- 1 user user  512 Sep 30 10:02 start_robot.sh
+total 4
+-rw-rw-r-- 1 user user    0 Sep 30 10:01 notes.txt
+drwxrwxr-x 2 user user 4096 Sep 30 10:00 scripts
+-rw-rw-r-- 1 user user    0 Sep 30 10:02 start_robot.sh
 \end{terminal}
 
-左端の 10 文字がパーミッションで、3 列目と 4 列目がそれぞれ所有者とグループです。
+左端の 10 文字がパーミッションで、3 列目と 4 列目がそれぞれ所有者とグループです（日時やファイルの大きさは、環境によって変わります）。
 10 文字は、図\ref{fig:permission-string}のように区切って読みます。
 
 \begin{figure}[tb]
@@ -49,7 +54,8 @@ drwxr-xr-x 2 user user 4096 Sep 30 10:00 scripts
 \end{enumerate}
 
 それぞれの 3 文字は、左から順に「読み取り（\cmd{r}）」「書き込み（\cmd{w}）」「実行（\cmd{x}）」ができるかどうかを表し、できない場合は \cmd{-} になります。
-たとえば \cmd{start\_robot.sh} の \cmd{-rwxr-xr--} は、次の意味です。
+今作った \cmd{notes.txt} の \cmd{-rw-rw-r--} は、所有者とグループのメンバーが読み書きでき、その他のユーザは読み取りだけができる、という意味です。
+図\ref{fig:permission-string}の \cmd{-rwxr-xr--} なら、次の意味になります（次の節で、\cmd{start\_robot.sh} をこの権限に変えてみます）。
 
 \begin{itemize}
   \item 所有者の \cmd{user} は、読み取り・書き込み・実行のすべてができる（\cmd{rwx}）
@@ -115,12 +121,16 @@ $ chmod +x start_robot.sh       # 誰にも指定しないと、全員に追加
 \end{tablebox}
 
 \begin{terminal}[数字で権限を変える]
+$ chmod 754 start_robot.sh
+$ ls -l start_robot.sh
+-rwxr-xr-- 1 user user 0 Sep 30 10:02 start_robot.sh
 $ chmod 755 start_robot.sh
 $ ls -l start_robot.sh
--rwxr-xr-x 1 user user 512 Sep 30 10:02 start_robot.sh
+-rwxr-xr-x 1 user user 0 Sep 30 10:02 start_robot.sh
 \end{terminal}
 
 たとえば \cmd{755} は、所有者が $4+2+1=7$、グループが $4+1=5$、その他が $4+1=5$ という意味です。
+\cmd{754} なら、その他が $4$（読み取りだけ）になり、図\ref{fig:permission-string}と同じ \cmd{-rwxr-xr--} になります。
 
 \begin{caution}[\cmd{chmod 777} は使わない]
   「\cmd{Permission denied} が出たら \cmd{chmod 777} すればよい」という情報をインターネットで見かけることがあります。
@@ -135,13 +145,21 @@ $ ls -l start_robot.sh
 \cmd{所有者:グループ} のように書くと、両方を同時に変えられます。
 ディレクトリの中身もまとめて変えるときは \cmd{-R} を付けます。
 
-\begin{terminal}[所有者を変える]
-$ sudo chown user:user data.csv
-$ sudo chown -R user:user ~/ros2_ws
-\end{terminal}
-
 うっかり \cmd{sudo} を付けて作ったファイルは、所有者が root になり、自分では編集できなくなります（\ref{sec:linux-internals-users}節）。
 そのようなときに、\cmd{chown} で所有者を自分に戻します。
+\cmd{sudo} を付けてファイルを作り、所有者を戻してみましょう。
+
+\begin{terminal}[所有者を変える]
+$ sudo touch root_file.txt
+$ ls -l root_file.txt
+-rw-r--r-- 1 root root 0 Sep 30 10:05 root_file.txt
+$ sudo chown user:user root_file.txt
+$ ls -l root_file.txt
+-rw-r--r-- 1 user user 0 Sep 30 10:05 root_file.txt
+\end{terminal}
+
+\cmd{user:user} の部分は、自分のユーザ名に置き換えてください（\cmd{\$USER:\$USER} と書くこともできます。\cmd{\$USER} については\ref{chap:env}章で説明します）。
+ディレクトリを中身ごと変えるときは、\cmd{sudo chown -R user:user ディレクトリ名} のように \cmd{-R} を付けます。
 
 \section{sudo と安全な権限の扱い方}
 \label{sec:permission-sudo}
@@ -203,11 +221,13 @@ Docker のリポジトリを登録するとき（\ref{sec:docker-basic}節）に
 
 USB でつないだセンサやマイコンを使おうとして、\cmd{Permission denied} というエラーが出ることがあります。
 デバイスファイル（\ref{sec:linux-internals-device}節）のパーミッションを見てみましょう。
+次は、USB シリアルの機器（マイコンボードなど）をつないだときの例です。
+機器をつないでいなければ \cmd{/dev/ttyUSB0} はないので、同じ結果にはなりません。
 
-\begin{terminal}[デバイスファイルの権限を確認する]
+\begin{termexample}[デバイスファイルの権限を確認する]
 $ ls -l /dev/ttyUSB0
 crw-rw---- 1 root dialout 188, 0 Sep 30 10:15 /dev/ttyUSB0
-\end{terminal}
+\end{termexample}
 
 1 文字目の \cmd{c} は、デバイスファイル（キャラクタデバイス）であることを表しています。
 所有者は root、グループは \cmd{dialout} で、所有者とグループのメンバーだけが読み書きできる（\cmd{rw-rw----}）ことがわかります。
@@ -253,50 +273,14 @@ $ sudo usermod -aG dialout $USER
   \end{tabular}
 \end{tablebox}
 
-\subsection{udev でデバイスの設定を固定する}
-
-\cmd{sudo chmod 666 /dev/ttyUSB0} のようにデバイスファイルの権限を直接変えても、デバイスを差し直したり再起動したりすると元に戻ってしまいます。
-また、\ref{sec:linux-internals-device}節で説明したように、デバイスファイルの番号はつないだ順番で変わってしまいます。
-
-これらを解決するのが \textbf{udev} です。
-udev は、デバイスがつながったときに、デバイスファイルの名前や権限を決めるしくみで、\cmd{/etc/udev/rules.d/} の下に置いた\textbf{ルール}ファイルに従って動きます。
-まず、\cmd{lsusb} でデバイスの ID（ベンダ ID とプロダクト ID）を調べます。
-
-\begin{terminal}[USB デバイスの ID を調べる]
-$ lsusb
-...
-Bus 001 Device 005: ID 10c4:ea60 Silicon Labs CP210x UART Bridge
-...
-\end{terminal}
-
-\cmd{ID} の後ろの \cmd{10c4} がベンダ ID、\cmd{ea60} がプロダクト ID です。
-次に、ルールファイルを作ります（ファイル名の先頭の数字はルールを読み込む順番で、末尾は \cmd{.rules} にします）。
-ルールファイルを置く \cmd{/etc/udev/rules.d/} には root しか書き込めないので、まずホームディレクトリの中でテキストエディター（\ref{sec:files-edit}節）を使ってファイルを作ります。
-
-\begin{terminal}[ホームディレクトリの中でルールファイルを作る]
-$ gnome-text-editor ~/99-lidar.rules
-\end{terminal}
-
-次の 1 行を書いて保存します。
-
-\begin{codelisting}{99-lidar.rules}{lst:permission-udev}
-SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", SYMLINK+="lidar", MODE="0666"
-\end{codelisting}
-
-このルールは、「ベンダ ID が \cmd{10c4}、プロダクト ID が \cmd{ea60} の USB シリアルの機器がつながったら、\cmd{/dev/lidar} という別名を作り、誰でも読み書きできる権限にする」という意味です。
-ルールファイルを保存したら、\cmd{sudo cp} で \cmd{/etc/udev/rules.d/} にコピーし、次のコマンドでルールを読み込み直して、デバイスを差し直します。
-
-\begin{terminal}[ルールファイルを置いて読み込み直す]
-$ sudo cp ~/99-lidar.rules /etc/udev/rules.d/
-$ sudo udevadm control --reload-rules
-$ sudo udevadm trigger
-$ ls -l /dev/lidar
-lrwxrwxrwx 1 root root 7 Sep 30 10:20 /dev/lidar -> ttyUSB0
-\end{terminal}
-
-これで、つなぐ順番に関係なく、いつでも \cmd{/dev/lidar} という名前でこのセンサを使えるようになります。
-同じ種類の変換チップを使った機器を複数つなぐ場合は、シリアル番号（\cmd{ATTRS\{serial\}}）なども条件に加えて区別します。
-センサのメーカーが、udev のルールファイルを用意してくれていることもあります。
+\begin{column}{udev でデバイスの設定を固定する}
+  \cmd{sudo chmod 666 /dev/ttyUSB0} のようにデバイスファイルの権限を直接変えても、機器を挿し直したり再起動したりすると元に戻ってしまいます。
+  また、デバイスファイルの番号は、つないだ順番で変わってしまいます（\ref{sec:linux-internals-device}節）。
+  実際のロボットでは、\textbf{udev} というしくみを使って、これらを解決することがよくあります。
+  udev は、機器がつながったときに、デバイスファイルの名前や権限を決めるしくみです。
+  \cmd{/etc/udev/rules.d/} の下に\textbf{ルール}を書いたファイルを置いておくと、たとえば「この LiDAR がつながったら、いつでも \cmd{/dev/lidar} という名前を付け、誰でも使える権限にする」といった設定ができます。
+  センサのメーカーが、udev のルールファイルを用意してくれていることも多いので、機器の説明書を確認してみましょう。
+\end{column}
 
 \section*{この章のまとめ}
 

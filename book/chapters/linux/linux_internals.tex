@@ -190,11 +190,11 @@ root は UID が 0 番の\textbf{管理者}（スーパーユーザ）で、シ�
 そこで Ubuntu では、ふだんは一般ユーザとして作業し、root の権限が必要なときだけ \cmd{sudo} というコマンドを使って、一時的に root として命令を実行します。
 
 \begin{terminal}[sudo でソフトウェアを入れる]
-$ sudo apt install tldr
+$ sudo apt install tree
 [sudo] password for user:
 \end{terminal}
 
-\cmd{apt install} はソフトウェアをインストールするコマンドで、ここでは \cmd{tldr} というソフトウェアをインストールしています（\cmd{apt} の使い方は\ref{chap:package}章で詳しく説明します）。
+\cmd{apt install} はソフトウェアをインストールするコマンドで、ここでは、ディレクトリの構造を木の形で表示する \cmd{tree} というソフトウェアをインストールしています（\cmd{apt} の使い方は\ref{chap:package}章で詳しく説明します）。
 \cmd{sudo} を使えるのは、\cmd{sudo} グループに所属しているユーザだけです。
 Ubuntu をインストールしたときに作ったユーザは、自動的に \cmd{sudo} グループに入っています。
 \cmd{sudo} を実行すると、本人確認のために自分のパスワードを聞かれます（入力中の文字は画面に表示されません）。

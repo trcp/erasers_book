@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # 開発環境のセットアップスクリプト
-#   使い方: ./setup_dev.sh [ワークスペースのディレクトリ]
+#   使い方: ./setup_dev.sh [作業用のディレクトリ]
 set -euo pipefail
 
-# ワークスペースのディレクトリ（引数がなければ ~/ros2_ws）
-WS_DIR="${1:-$HOME/ros2_ws}"
-ROS_SETUP="/opt/ros/jazzy/setup.bash"
+# 作業用のディレクトリ（引数がなければ ~/dev）
+WORK_DIR="${1:-$HOME/dev}"
+PATH_LINE='export PATH="$HOME/bin:$PATH"'
 
 info() {
     echo "[INFO] $*"
@@ -25,22 +25,22 @@ for pkg in git tree htop tmux; do
     fi
 done
 
-# 2. ワークスペースのディレクトリを作る
-if [ -d "$WS_DIR/src" ]; then
-    info "$WS_DIR/src はすでにあります"
-else
-    mkdir -p "$WS_DIR/src"
-    info "$WS_DIR/src を作りました"
-fi
+# 2. 作業用のディレクトリを作る
+for dir in "$WORK_DIR" "$HOME/bin"; do
+    if [ -d "$dir" ]; then
+        info "$dir はすでにあります"
+    else
+        mkdir -p "$dir"
+        info "$dir を作りました"
+    fi
+done
 
-# 3. .bashrc に ROS 2 の設定を追加する（ROS 2 が入っていて、まだ書かれていなければ）
-if [ ! -f "$ROS_SETUP" ]; then
-    warn "ROS 2 がインストールされていないので、.bashrc の設定は飛ばします"
-elif grep -qF "source $ROS_SETUP" "$HOME/.bashrc"; then
-    info ".bashrc にはすでに ROS 2 の設定があります"
+# 3. ~/bin を PATH に追加する設定を .bashrc に書く（まだ書かれていなければ）
+if grep -qF "$PATH_LINE" "$HOME/.bashrc"; then
+    info ".bashrc にはすでに PATH の設定があります"
 else
-    echo "source $ROS_SETUP" >> "$HOME/.bashrc"
-    info ".bashrc に ROS 2 の設定を追加しました"
+    echo "$PATH_LINE" >> "$HOME/.bashrc"
+    info ".bashrc に PATH の設定を追加しました"
 fi
 
 # 4. dialout グループに入っているか確認する
@@ -48,8 +48,7 @@ if id -nG | grep -qw dialout; then
     info "dialout グループに入っています"
 else
     warn "dialout グループに入っていません"
-    warn "sudo usermod -aG dialout \$USER を実行して、ログインし直してください"
-    exit 1
+    warn "USB の機器を使う前に、sudo usermod -aG dialout \$USER を実行して、ログインし直してください"
 fi
 
 info "セットアップが完了しました"

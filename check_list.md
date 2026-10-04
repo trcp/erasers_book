@@ -16,7 +16,6 @@
 - [ ] Ubuntu 24.04 の標準のターミナルアプリが GNOME Terminal であること、日本語環境でのアプリ名が「端末」であること
 - [ ] `head -n 3 /etc/os-release` の出力（`PRETTY_NAME` のポイントリリース番号 `24.04.1` など）
 - [ ] `ls --help` の出力の冒頭部分
-- [ ] `sudo apt install tldr` でインストールできること、`tldr --update` が必要かどうか、`tldr tar` の出力の形式
 - [ ] `help cd` の出力
 - [ ] `type date` / `type cd` / `which date` の出力（`/usr/bin/date` など）
 - [ ] 存在しないコマンドを入力したときのメッセージ（`LS: command not found`）
@@ -190,8 +189,8 @@
 - [ ] `ros2 launch ... -s` の出力の形式、`[param_node-3]` のようなログの接頭辞の番号
 - [ ] 第24章の `turtle_controller` のトピック名を相対名（`turtle1/pose`）に変更したので、第24章の動作に影響がないこと
 - [ ] コラムの XML の launch ファイルが動くこと
-- [ ] 補章2 の 5 つの XML の launch ファイル（`launch/*.launch.xml`）が Jazzy で動くこと。特に `<push_ros_namespace>`（`<push-ros-namespace>` との違い）、`<param from=...>`、`if="$(var use_chatter)"` の動作
-- [ ] 補章2 の YAML の launch ファイルの例が正しいこと
+- [ ] 補章3 の 5 つの XML の launch ファイル（`launch/*.launch.xml`）が Jazzy で動くこと。特に `<push_ros_namespace>`（`<push-ros-namespace>` との違い）、`<param from=...>`、`if="$(var use_chatter)"` の動作
+- [ ] 補章3 の YAML の launch ファイルの例が正しいこと
 
 ### 第24章 Python でノードを書く（`chapters/ros2/rclpy.tex`、`book/samples/rclpy/`）
 
@@ -261,7 +260,18 @@
 - [ ] 図30.1・図30.3 は `robot_project/imgs/` の画像（`kachaka_lidar.png`・`vb_test3.png`）を `images/kachaka/` にコピーして使った。カチャカの画像の出典（Preferred Robotics 社の製品画像なら、書籍に載せてよいか）を確認する。RViz2 の画面は Humble の環境で撮ったもので、シェルフ付きのモデルが表示されている
 - [ ] 移植しなかった内容：`robot_project/` の AI 活用編（Raspberry Pi と Hailo）はカチャカと関係がないため移植していない。研究室の IP アドレスの対応表と VM のパスワードは載せていない
 
-### 補章1 C++ でノードを書く（`supplement/rclcpp.tex`、`book/samples/rclcpp/my_cpp_package/`）
+### 補章1 Docker で ROS 2 の開発環境を作る（`supplement/docker_ros.tex`）
+
+第15章の「ROS 開発環境をコンテナで構築する」の節を、ROS 2 を学ぶ前に出てくると混乱するため、補章に移して書き直した。第15章には、Docker Compose と Dev Containers の使い方を、ROS を使わない例（`my_tools` のイメージ）で残した。
+
+- [ ] `osrf/ros:jazzy-desktop` で talker と listener が通信できること、ホストの ROS 2 とも通信できること
+- [ ] `ros:jazzy` に turtlesim を追加した Dockerfile と、turtlesim の GUI の表示
+- [ ] `compose.yaml`（`ROS_DOMAIN_ID` の受け渡し、`src` だけの共有）で、コンテナの中で `my_package` をビルドして動かせること
+- [ ] `devcontainer.json`（`workspaceMount`、`mounts`、`containerEnv`、拡張機能 `ms-iot.vscode-ros`）で Dev Containers が動くこと。拡張機能の ID が今も正しいか
+- [ ] 第15章の `compose.yaml`（`my_tools`）の `docker compose exec tools bash` のプロンプトの表示
+- [ ] erasers_book_code の `docker/` を、第15章と補章1の内容に合わせて更新する
+
+### 補章2 C++ でノードを書く（`supplement/rclcpp.tex`、`book/samples/rclcpp/my_cpp_package/`）
 
 - [ ] `my_cpp_package` を Jazzy で `colcon build` し、6 つのノード（`hello_node`・`talker`・`listener`・`turtle_controller`・`add_two_ints_server`・`param_node`）が本文どおりに動くこと（本書を書いた環境には C++ のコンパイラがないため、コンパイルも未確認）
 - [ ] `ament_target_dependencies` は Jazzy では使えるが、新しいディストリビューション（Kilted 以降）では非推奨。`target_link_libraries(... ${std_msgs_TARGETS} rclcpp::rclcpp)` の書き方に変えるか
@@ -335,7 +345,7 @@
   - 第23章：ワークスペース、colcon、ament_python、ament_cmake、package.xml、setup.py、entry_points、CMakeLists.txt、依存関係、rosdep、アンダーレイ、オーバーレイ、local_setup.bash
   - 第18章・第19章（追加分）：None、リスト内包表記、型ヒント
   - 第25章：launch ファイル、LaunchDescription、YAML、ros__parameters、名前空間、相対名、絶対名、リマップ、launch 引数、インクルード、bringup
-  - 補章1：rclcpp、コンストラクタ、メンバ変数、スマートポインタ（shared_ptr）、std::bind、std::optional、CMakeLists.txt、add_executable
+  - 補章2：rclcpp、コンストラクタ、メンバ変数、スマートポインタ（shared_ptr）、std::bind、std::optional、CMakeLists.txt、add_executable
   - 第30章：カチャカ、kachaka API、gRPC、erasers_kachaka、vcstool、Cyclone DDS、OpenCV、cv_bridge、エッジ検出
   - 第24章：rclpy、rclcpp、ログ、spin、コールバック、タイマ、QoS、future、デッドロック、エントリポイント、インタフェース、rosidl
   - 第4章：GUI、CUI、CLI、ターミナル、シェル、bash、プロンプト、ビルトインコマンド、man ページ、Tab 補完
@@ -386,6 +396,13 @@
 - [ ] erasers_book_code の `ros2_ws/` で `colcon build` が通ること
 - [ ] erasers_book_code にライセンスのファイル（`LICENSE`）を置くか（`package.xml` は Apache-2.0）
 
+## PDF へのコメント（main\_add\_comment.pdf）への対応
+
+- [x] 31 個のコメントに対応した（第5〜15章）。表示例用の `termexample` 環境を作り、ROS 2 をインストールする前の章から ROS 2 のコマンドを実行させないようにし、練習用のファイルを先に作る手順を足した
+- [ ] 第10章の `setup_dev.sh` を、ROS 2 を使わない内容（作業用のディレクトリと `~/bin` を作り、`PATH` の設定を `.bashrc` に書く）に書き換えた。別リポジトリ erasers_book_code の `shellscript/setup_dev.sh` も更新する
+- [ ] 第15章の Dockerfile の例を `ros:jazzy` から `ubuntu:24.04`（Python と x11-apps）に、GUI の例を turtlesim から `xeyes` に変えた。erasers_book_code の `docker/` も更新する
+- [ ] 変更した第5〜15章のコマンドを、Ubuntu 24.04 の VirtualBox の環境で、本文の順番どおりに実行して確かめる（特に `tail -f /var/log/syslog`、`find /usr/share/applications`、`locate os-release`、`systemctl status NetworkManager`、`ss -tln` の表示、`ssh user@localhost`、`docker build` の出力）
+
 ## 6. `preamble.tex` の変更・不具合（要 Issue での相談）
 
 - [ ] `\section` / `\subsection` の直後に文章を挟まずに表を置くとビルドエラーになる（jlreq と `tabular` の組み合わせで発生）。原因を調べて直すか、writing_rules.md の注意書きのままにするか
@@ -394,6 +411,7 @@
 - [ ] TIPS 用の `tips` 環境（青緑の囲み・ページをまたげる）を追加した。共同執筆者に共有する
 - [ ] 練習問題用の `exercise` 環境（章ごとの番号付き・ページをまたげる囲み）を追加した。共同執筆者に共有する
 - [ ] `column` 環境（コラム）はページをまたげないため、長いコラムは版面からはみ出す。`preamble.tex` の `column` の定義に `breakable` を付けて、ページをまたげるようにするか
+- [ ] 表示例のターミナルの枠 `termexample`（紺色のタイトルバー・点線の枠）を追加した。共同執筆者に共有する
 - [ ] キャプション付きのソースコードを、tcolorbox の `codelisting` 環境と `\codefile` コマンドに変えた（ページをまたぐと「続く」を表示し、ページの残りが 6 行より少ないときは次のページに送る）。TIPS と練習問題にも同じ表示を付けた。共同執筆者に共有する
 - [ ] 補章のための `\hoshou` コマンドを追加した（見出しを「補章1」、節・図・表・コードの番号を「補1.1」にする。`\appendix` で元に戻る）。表のキャプションが「表補1.1」とつながって表示されるので、「表 補1.1」のように空けるか検討する。共同執筆者に共有する
 - [ ] 図のために `\usepackage{tikz}`、`\usetikzlibrary{...}`、共通スタイル（`figbox` など）を追加した。共同執筆者に共有する

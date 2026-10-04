@@ -247,12 +247,33 @@ $ git log --oneline
 \subsection{変更を取り消す}
 
 ファイルを編集したものの、やはり変更をなかったことにしたいときは、\cmd{git restore} で最後のコミットの状態に戻せます。
-ステージングエリアに登録した変更を取り消したい（ステージングエリアから外したい）ときは、\cmd{--staged} を付けます。
+\cmd{README.md} に間違えて行を追加したことにして、試してみましょう。
 
-\begin{terminal}[変更を取り消す]
-$ git restore README.md             # 編集した内容を捨てる
-$ git restore --staged README.md    # git add を取り消す
+\begin{terminal}[編集した内容を捨てる]
+$ echo "まちがえて追加した行" >> README.md
+$ git status --short
+ M README.md
+$ git restore README.md
+$ git status --short
 \end{terminal}
+
+\cmd{--short} は、\cmd{git status} の表示を短くするオプションで、\cmd{M} は変更されたファイルを表しています。
+\cmd{git restore} の後は何も表示されず、変更がなくなったことがわかります。
+
+\cmd{git add} でステージングエリアに登録した変更を取り消したい（ステージングエリアから外したい）ときは、\cmd{--staged} を付けます。
+このとき、ファイルの編集内容はそのまま残ります。
+
+\begin{terminal}[git add を取り消す]
+$ echo "まちがえて追加した行" >> README.md
+$ git add README.md
+$ git restore --staged README.md
+$ git status --short
+ M README.md
+$ git restore README.md
+\end{terminal}
+
+\cmd{git restore --staged} の後は、ステージングエリアから外れて「編集しただけ」の状態（\cmd{M}）に戻っています。
+最後の \cmd{git restore} で、編集した内容も捨てています。
 
 \begin{caution}[git restore で捨てた変更は戻らない]
   \cmd{git restore ファイル名} を実行すると、コミットしていない編集内容は失われ、元に戻せません。
@@ -391,9 +412,33 @@ README.md  lidar.yaml
 
 2 つのブランチで同じファイルの同じ場所を別々に書き換えていると、Git はどちらの変更を採用すればよいか判断できません。
 これを\textbf{コンフリクト}（衝突）といいます。
+実際にコンフリクトを起こしてみましょう。
+まず、ロボットの最高速度を書いた \cmd{params.yaml} を \cmd{main} ブランチでコミットします。
+次に、\cmd{feature/speed} ブランチでは最高速度を 1.0 に、\cmd{main} ブランチでは 0.5 に、それぞれ書き換えてコミットします。
+
+\begin{terminal}[2 つのブランチで同じ行を書き換える]
+$ echo "max_speed: 0.4" > params.yaml
+$ git add params.yaml
+$ git commit -m "Add params"
+$ git switch -c feature/speed
+$ echo "max_speed: 1.0" > params.yaml
+$ git add params.yaml
+$ git commit -m "Increase max speed"
+$ git switch main
+$ echo "max_speed: 0.5" > params.yaml
+$ git add params.yaml
+$ git commit -m "Change max speed to 0.5"
+\end{terminal}
+
+この状態で \cmd{feature/speed} をマージすると、コンフリクトが起きます。
 コンフリクトが起きると、Git はマージを途中で止めて、ファイルの中に両方の内容を書き込みます。
 
-\begin{terminal}[コンフリクトが起きたときのファイルの中身]
+\begin{terminal}[マージしてコンフリクトが起きる]
+$ git merge feature/speed
+Auto-merging params.yaml
+CONFLICT (content): Merge conflict in params.yaml
+Automatic merge failed; fix conflicts and then commit the result.
+$ cat params.yaml
 <<<<<<< HEAD
 max_speed: 0.5
 =======
@@ -403,6 +448,7 @@ max_speed: 1.0
 
 \cmd{<<<<<<< HEAD} から \cmd{=======} までが今のブランチの内容、\cmd{=======} から \cmd{>>>>>>>} までがマージしようとしたブランチの内容です。
 エディタでこのファイルを開き、正しい内容になるように書き直して、\cmd{<<<<<<<} などの印の行も消します。
+ここでは、\cmd{max\_speed: 1.0} の 1 行だけを残すことにしましょう。
 その後、\cmd{git add} と \cmd{git commit} を行えば、マージが完了します。
 
 \begin{terminal}[コンフリクトを解決してマージを完了する]

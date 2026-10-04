@@ -71,10 +71,14 @@ second line
 \end{caution}
 
 この章で使う練習用のファイルを、リダイレクトを使って作っておきましょう。
+ファイルは、\ref{chap:files}章で作った \cmd{\textasciitilde/practice} の中に \cmd{text} というディレクトリを作り、その中に置くことにします。
+この章のコマンドは、すべてこのディレクトリの中で実行します。
 1 つ目は、ロボットのプログラムが出力したログを想定した \cmd{robot.log} です。
 各行は「日付 時刻 [レベル] 部品名: メッセージ」という形になっています。
 
 \begin{terminal}[練習用のログファイルを作る]
+$ mkdir ~/practice/text
+$ cd ~/practice/text
 $ echo "2026-09-30 10:00:01 [INFO] driver: started" > robot.log
 $ echo "2026-09-30 10:00:02 [INFO] lidar: started" >> robot.log
 $ echo "2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V" >> robot.log
@@ -116,8 +120,9 @@ $ ls /home /nonexistent > all.txt 2>&1
 エラーメッセージを表示したくないときは、\cmd{2> /dev/null} で捨てることができます。
 
 \begin{terminal}[エラーメッセージを捨てる]
-$ find / -name "setup.bash" 2> /dev/null
-/opt/ros/jazzy/setup.bash
+$ find / -name "os-release" 2> /dev/null
+/etc/os-release
+/usr/lib/os-release
 \end{terminal}
 
 システム全体を \cmd{find} で探すと、権限のないディレクトリについてのエラーが大量に表示されます（\ref{sec:files-find}節）が、この方法で見つかった結果だけを表示できます。
@@ -159,12 +164,12 @@ $ cat robot.log | grep ERROR | wc -l
 
 \begin{terminal}[パイプの便利な使い方]
 $ ls /usr/bin | less             # 長い出力を 1 画面ずつ見る
-$ history | grep ssh             # 過去に入力した ssh のコマンドを探す
-$ ros2 topic list | grep scan    # ROS 2 のトピックの中から scan を含むものを探す
+$ history | grep mkdir           # 過去に入力した mkdir のコマンドを探す
+$ ls /etc | grep conf            # /etc の中の、名前に conf を含むものを探す
 \end{terminal}
 
-最後の例の \cmd{ros2} コマンドは、\ref{chap:ros2_concepts}章で学びます。
-ROS 2 のコマンドはたくさんの情報を出力するので、パイプと \cmd{grep} を組み合わせて必要な情報だけを取り出す場面がよくあります。
+後の章で学ぶ ROS 2 のコマンド（\ref{chap:ros2_concepts}章）も、たくさんの情報を出力します。
+パイプと \cmd{grep} を組み合わせて、必要な情報だけを取り出す場面がよくあります。
 
 \subsection{画面に表示しながらファイルにも保存する}
 
@@ -219,10 +224,13 @@ $ grep -v INFO robot.log
 2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V
 2026-09-30 10:00:07 [ERROR] lidar: timeout
 2026-09-30 10:00:12 [ERROR] motor: overcurrent
-$ grep -rn "max_speed" ~/ros2_ws/src
+$ grep -rn timeout ~/practice
+/home/user/practice/text/robot.log:4:2026-09-30 10:00:07 [ERROR] lidar: timeout
+/home/user/practice/text/errors.txt:1:2026-09-30 10:00:07 [ERROR] lidar: timeout
 \end{terminal}
 
-最後の例のように \cmd{-r} を使うと、たくさんのファイルの中から、ある設定やある関数がどこに書かれているかを探せます。
+最後の例のように \cmd{-r} を使うと、ディレクトリの中のすべてのファイルから探せます（表示される順番は変わることがあります）。
+たくさんのファイルの中から、ある設定やある関数がどこに書かれているかを探すときに便利です。
 
 \begin{column}{正規表現}
   \cmd{grep} では、\textbf{正規表現}という記法で、検索する文字列のパターンを指定できます。

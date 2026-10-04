@@ -220,12 +220,17 @@ ROS 2 の開発でも、多くの人が VS Code を使っています。
 VS Code は、公式サイト（\url{https://code.visualstudio.com/}）から Ubuntu 用の \cmd{.deb} ファイルをダウンロードし、\cmd{apt} でインストールします（\ref{sec:package-apt}節）。
 インストールすると、VS Code の公式リポジトリも自動で登録されるので、以降は \cmd{sudo apt upgrade} で最新の版に更新できます。
 
+ファイル名の数字（バージョン）は、ダウンロードした時期によって変わります。
+まず \cmd{ls} で、手元にあるファイルの名前を確かめてから、その名前を指定して実行しましょう（\key{Tab} で補完すると、打ち間違えません）。
+
 \begin{terminal}[VS Code をインストールする]
 $ cd ~/Downloads
+$ ls code_*.deb
+code_1.93.1_amd64.deb
 $ sudo apt install ./code_1.93.1_amd64.deb
 \end{terminal}
 
-ファイル名の数字（バージョン）は、ダウンロードした時期によって変わります。
+\cmd{code\_1.93.1\_amd64.deb} の部分は、\cmd{ls} で表示された名前に置き換えてください。
 
 \subsection{起動と画面の構成}
 

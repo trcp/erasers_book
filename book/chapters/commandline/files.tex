@@ -43,6 +43,11 @@ $ pwd
 ターミナルを起動した直後は、自分の\textbf{ホームディレクトリ}（\cmd{/home/ユーザ名}）にいます。
 ホームディレクトリは、そのユーザが自由にファイルを置ける専用のディレクトリです。
 
+本書では、ユーザ名を \cmd{user} として表示しています。
+\cmd{user} の部分は、Ubuntu をインストールしたときに自分で決めたユーザ名になります（\ref{sec:linux-setup}節）。
+たとえば、ユーザ名を \cmd{taro} にした場合は、\cmd{/home/taro} と表示されます。
+以降の実行結果でも、\cmd{user} は自分のユーザ名に読み替えてください。
+
 \subsection{\cmd{ls}：ディレクトリの中身を表示する}
 
 \cmd{ls}（list）は、ディレクトリの中にあるファイルやディレクトリの一覧を表示します。
@@ -50,7 +55,7 @@ $ pwd
 
 \begin{terminal}[ディレクトリの中身を表示する]
 $ ls
-Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
+Desktop  Documents  Downloads  Music  Pictures  Public  snap  Templates  Videos
 $ ls /
 bin   dev  home  lib64  mnt  proc  run   snap  sys  usr
 boot  etc  lib   media  opt  root  sbin  srv   tmp  var
@@ -172,11 +177,11 @@ $ LANG=C xdg-user-dirs-gtk-update
 \textbf{絶対パス}は、ルートディレクトリ \cmd{/} から目的の場所までの道順をすべて書いたパスです。
 必ず \cmd{/} で始まります。
 
-\begin{terminal}[絶対パスの例]
+\begin{termexample}[絶対パスの例]
 /home/user/Documents/memo.txt
 /etc/os-release
 /opt/ros/jazzy/setup.bash
-\end{terminal}
+\end{termexample}
 
 絶対パスは、カレントディレクトリがどこであっても同じ場所を指します。
 住所でいえば「東京都千代田区……」のように、都道府県から書いた住所にあたります。
@@ -187,12 +192,12 @@ $ LANG=C xdg-user-dirs-gtk-update
 \cmd{/} では始まりません。
 たとえばカレントディレクトリが \cmd{/home/user} のとき、次の 2 つは同じファイルを指します。
 
-\begin{terminal}[絶対パスと相対パス]
+\begin{termexample}[絶対パスと相対パス]
 $ pwd
 /home/user
 $ cat /home/user/Documents/memo.txt    # 絶対パス
 $ cat Documents/memo.txt               # 相対パス
-\end{terminal}
+\end{termexample}
 
 \begin{figure}[tb]
   \centering
@@ -277,6 +282,9 @@ ROS 2 のワークスペースを作るときにも、\cmd{mkdir -p \textasciiti
 
 \cmd{touch} は、空のファイルを作るコマンドです。
 （本来はファイルの更新日時を変更するコマンドですが、ファイルが存在しない場合には新しく作るので、空のファイルを作るためによく使われます。）
+
+ここからの例は、すべて \cmd{\textasciitilde/practice} の中で実行します。
+\cmd{ls} の結果に、ホームディレクトリの \cmd{Desktop} などが表示されないのはそのためです。
 
 \begin{terminal}[空のファイルを作る]
 $ touch memo.txt
@@ -402,6 +410,9 @@ $ cat /etc/hostname
 robot
 \end{terminal}
 
+\cmd{/etc/hostname} には、コンピュータの名前（ホスト名）が書かれています。
+本書では \cmd{robot} と表示していますが、実際には Ubuntu をインストールしたときに決めた名前が表示されます。
+
 もともとは複数のファイルをつなげて（concatenate）表示するためのコマンドなので、引数に複数のファイルを指定すると、続けて表示します。
 
 \subsection{\cmd{less}：1 画面ずつ表示する}
@@ -433,11 +444,15 @@ LOGO=ubuntu-logo
 
 \cmd{tail} に \cmd{-f} オプションを付けると、ファイルの末尾を表示したまま待機し、ファイルに行が追加されるたびに表示を更新します。
 プログラムが書き出すログファイルを監視するときに便利です。
+たとえば、\cmd{/var/log/syslog} には、システムのさまざまなプログラムのログが書き込まれます。
 終了するときは \key{Ctrl}+\key{C} を押します。
 
 \begin{terminal}[ログファイルを監視する]
-$ tail -f ~/.ros/log/latest/launch.log
+$ tail -f /var/log/syslog
 \end{terminal}
+
+USB メモリを挿したり、Wi-Fi につなぎ直したりすると、新しい行が追加されるのがわかります。
+後の章では、ROS 2 のプログラムのログを確かめるときにも使います（\ref{chap:debug}章）。
 
 \section{ファイルを編集する}
 \label{sec:files-edit}
@@ -549,17 +564,24 @@ $ gnome-text-editor ~/.bashrc
 
 \begin{terminal}[名前でファイルを探す]
 $ find ~ -name memo.txt
+/home/user/practice/memo.txt
 /home/user/practice/a/memo.txt
 \end{terminal}
+
+\ref{sec:files-manipulate}節で \cmd{a} の中にコピーした \cmd{memo.txt} と、\ref{sec:files-edit}節でテキストエディターで作った \cmd{memo.txt} が見つかります（テキストエディターで保存していなければ、1 つ目は表示されません）。
 
 名前の一部しかわからないときは、次の節で説明するワイルドカード \cmd{*} を使います。
 このとき、パターンはクォートで囲んでください（理由は次の節で説明します）。
 
 \begin{terminal}[名前の一部で探す]
-$ find /opt/ros/jazzy -name "*.launch.py"
-/opt/ros/jazzy/share/demo_nodes_cpp/launch/topics/talker_listener.launch.py
+$ find /usr/share/applications -name "org.gnome.*"
+/usr/share/applications/org.gnome.TextEditor.desktop
+/usr/share/applications/org.gnome.Terminal.desktop
 ...
 \end{terminal}
+
+\cmd{/usr/share/applications} には、アクティビティ画面に表示されるアプリケーションの情報が入っています。
+表示される順番や数は、環境によって変わります。
 
 \cmd{find} では、ほかにも次のような条件を指定できます。
 
@@ -575,6 +597,9 @@ $ find /opt/ros/jazzy -name "*.launch.py"
     \bottomrule
   \end{tabular}
 \end{tablebox}
+
+ここまでの作業で、\cmd{\textasciitilde/practice} の中には、\cmd{mkdir -p} で作った \cmd{a/b/c} が残っています。
+ディレクトリだけを探してみましょう。
 
 \begin{terminal}[ディレクトリだけを探す]
 $ find ~/practice -type d
@@ -595,8 +620,10 @@ Ubuntu 24.04 では標準でインストールされていないので、次の�
 
 \begin{terminal}[locate を使う]
 $ sudo apt install plocate
-$ locate turtlesim_node
-/opt/ros/jazzy/lib/turtlesim/turtlesim_node
+$ locate os-release
+/etc/os-release
+/usr/lib/os-release
+...
 \end{terminal}
 
 データベースは 1 日に 1 回自動で更新されるため、作ったばかりのファイルは見つからないことがあります。

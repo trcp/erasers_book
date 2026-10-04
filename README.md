@@ -78,7 +78,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 4.2 ターミナル・シェル・コマンドの関係
 - 4.3 プロンプトの読み方
 - 4.4 コマンドの構造（コマンド・オプション・引数）
-- 4.5 ヘルプの調べ方（`--help`, `man`, `tldr`）
+- 4.5 ヘルプの調べ方（`--help`, `man`）
 - 4.6 便利なキー操作（Tab 補完、履歴、`Ctrl+C` / `Ctrl+R` など）
 
 #### 第5章 ファイルとディレクトリの操作
@@ -156,7 +156,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 15.2 イメージとコンテナの操作
 - 15.3 Dockerfile の書き方
 - 15.4 GUI アプリやデバイスをコンテナで使う
-- 15.5 ROS 開発環境をコンテナで構築する
+- 15.5 Docker Compose と Dev Containers（ROS 2 をコンテナで使う方法は補章1）
 
 ### 第IV部 Python 入門
 
@@ -228,7 +228,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 24.5 アクションサーバとクライアント
 - 24.6 パラメータの宣言と利用
 - 24.7 カスタムメッセージ・サービスの定義
-- 24.8 （コラム）C++ で書く場合（`rclcpp`）（詳しくは補章1）
+- 24.8 （コラム）C++ で書く場合（`rclcpp`）（詳しくは補章2）
 
 #### 第25章 launch と設定ファイル
 - 25.1 launch ファイルとは
@@ -236,7 +236,7 @@ Linux とは何かというところから始め、コマンドラインの基�
 - 25.3 YAML によるパラメータ設定
 - 25.4 名前空間とリマップ
 - 25.5 複数ノードをまとめて起動する（launch 引数、インクルード）
-- 25.6 （コラム）XML の launch ファイル（詳しくは補章2）
+- 25.6 （コラム）XML の launch ファイル（詳しくは補章3）
 
 #### 第26章 座標変換と可視化
 - 26.1 ロボットにおける座標系
@@ -279,8 +279,9 @@ Linux とは何かというところから始め、コマンドラインの基�
 
 本編の章の内容を、別の書き方などで補う章です（付録は早見表・用語集などの資料）。
 
-- 補章1 C++ でノードを書く（rclcpp）（第24章のノードを C++ で書き直す）
-- 補章2 XML による launch ファイルの書き方（第25章の launch ファイルを XML で書き直す）
+- 補章1 Docker で ROS 2 の開発環境を作る（第15章の Docker と第21章以降の ROS 2 を組み合わせる）
+- 補章2 C++ でノードを書く（rclcpp）（第24章のノードを C++ で書き直す）
+- 補章3 XML による launch ファイルの書き方（第25章の launch ファイルを XML で書き直す）
 
 ### 付録
 
@@ -438,8 +439,9 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | 28 | データの記録とデバッグ | `chapters/ros2/debug.tex` |
 | 29 | 実践：移動ロボットを動かす | `chapters/ros2/practice.tex` |
 | 30 | 実践：カチャカを動かす | `chapters/ros2/kachaka.tex` |
-| 補章1 | C++ でノードを書く（rclcpp） | `supplement/rclcpp.tex` |
-| 補章2 | XML による launch ファイルの書き方 | `supplement/launch_xml.tex` |
+| 補章1 | Docker で ROS 2 の開発環境を作る | `supplement/docker_ros.tex` |
+| 補章2 | C++ でノードを書く（rclcpp） | `supplement/rclcpp.tex` |
+| 補章3 | XML による launch ファイルの書き方 | `supplement/launch_xml.tex` |
 | 付録A | コマンド早見表 | `appendix/cheatsheet.tex` |
 | 付録B | よく使うキーボードショートカット | `appendix/shortcuts.tex` |
 | 付録C | Python の練習問題の解答例 | `appendix/python_answers.tex` |

@@ -82,6 +82,25 @@
   overlay={\node[anchor=east, inner sep=0pt] at ([xshift=-2.5mm]title.east) {\terminalbuttons};},
 }
 
+% 表示例のターミナル（読者が入力しない例）：紺色のタイトルバー・点線の枠・タイトルの先頭に「例：」
+%   \begin{termexample}[タイトル] ... \end{termexample}
+% 存在しないファイルや機器を使う例、実行すると困る例（kill など）、説明のための書式の例に使う。
+\definecolor{examplebar}{HTML}{2B4C7E}
+\newtcblisting{termexample}[1][]{
+  listing only, enhanced,
+  colback=examplebar!4, colframe=examplebar, arc=2pt, boxrule=0pt,
+  borderline={0.8pt}{0pt}{examplebar, dashed},
+  left=5pt, right=4pt, top=2pt, bottom=2pt,
+  listing options={basicstyle=\ttfamily\small,
+    columns=fullflexible, keepspaces=true, breaklines=true,
+    numbers=none, frame=none, backgroundcolor={}, aboveskip=0pt, belowskip=0pt,
+    xleftmargin=0pt, framexleftmargin=0pt,
+    morecomment={[l][\bfseries]{\$}}},
+  title={\makebox[\linewidth][c]{\strut 例：#1}},
+  fonttitle=\sffamily\small\bfseries, colbacktitle=examplebar, coltitle=white,
+  toptitle=0.8pt, bottomtitle=0.8pt,
+}
+
 % ページをまたいだ囲みに「続く」を表示する（breakable な囲みで使う）
 \usepackage{needspace}
 \tikzset{contmark/.style={font=\scriptsize\sffamily, text=black!55, inner sep=1.5pt}}

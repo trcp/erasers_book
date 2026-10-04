@@ -77,30 +77,51 @@ $ ip a
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
     inet 127.0.0.1/8 scope host lo
 ...
-3: wlp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-    link/ether 3c:22:fb:12:34:56 brd ff:ff:ff:ff:ff:ff
-    inet 192.168.1.10/24 brd 192.168.1.255 scope global dynamic noprefixroute wlp2s0
+2: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:12:34:56 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic noprefixroute enp0s3
 ...
 \end{terminal}
 
 たくさんの情報が表示されますが、まずは \cmd{inet} の行を見ます。
-\cmd{lo} は自分自身を表す仮想的なネットワーク、\cmd{wlp2s0} は Wi-Fi のネットワークです（名前はコンピュータによって異なり、有線 LAN は \cmd{enp0s31f6} のような名前になります）。
-この例では、Wi-Fi の IP アドレスが \cmd{192.168.1.10} であることがわかります。
-末尾の \cmd{/24} は、先頭の 24 ビット（\cmd{192.168.1} の部分）が同じ IP アドレスどうしが同じネットワークに属する、という意味です。
+\cmd{lo} は自分自身を表す仮想的なネットワーク、\cmd{enp0s3} は VirtualBox の仮想マシンのネットワークです。
+この例では、仮想マシンの IP アドレスが \cmd{10.0.2.15} であることがわかります。
+末尾の \cmd{/24} は、先頭の 24 ビット（\cmd{10.0.2} の部分）が同じ IP アドレスどうしが同じネットワークに属する、という意味です。
+
+VirtualBox の標準の設定（NAT）では、仮想マシンは、パソコンの中に作られた専用の小さなネットワークにつながり、どの仮想マシンも \cmd{10.0.2.15} のようなアドレスになります。
+この設定のままでは、インターネットにはつながりますが、ほかのコンピュータ（ロボットの PC など）からは仮想マシンが見えません。
+ロボットの PC と通信するには、仮想マシンのネットワークの設定を\textbf{ブリッジアダプター}に変えて、家や研究室のネットワークに直接つなぎます（\ref{sec:ros2-install-network}節）。
+すると、\cmd{192.168.1.10} のような、そのネットワークのアドレスが割り当てられます。
+Ubuntu を直接インストールしたパソコンでは、Wi-Fi なら \cmd{wlp2s0}、有線 LAN なら \cmd{enp0s31f6} のような名前で表示されます。
 
 IP アドレスだけを手早く知りたいときは、\cmd{hostname -I} も便利です。
 
 \begin{terminal}[IP アドレスだけを表示する]
 $ hostname -I
-192.168.1.10
+10.0.2.15
 \end{terminal}
 
 \subsection{\cmd{ping}：相手とつながっているか確認する}
 
 \cmd{ping} は、相手のコンピュータに小さなデータを送り、返事が返ってくるかどうかで、通信できるかを確認するコマンドです。
 \cmd{-c} オプションで、送る回数を指定できます。
+まずは、自分自身（\cmd{localhost}）に送ってみましょう。
 
-\begin{terminal}[ロボットの PC と通信できるか確認する]
+\begin{terminal}[自分自身と通信できるか確認する]
+$ ping -c 3 localhost
+PING localhost (127.0.0.1) 56(84) bytes of data.
+64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.031 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=2 ttl=64 time=0.045 ms
+64 bytes from localhost (127.0.0.1): icmp_seq=3 ttl=64 time=0.042 ms
+
+--- localhost ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2041ms
+\end{terminal}
+
+次は、同じネットワークにつながったロボットの PC（IP アドレスが \cmd{192.168.1.20}）と通信できるかを確かめる例です。
+先に説明したように、VirtualBox の標準の設定のままでは、ほかのコンピュータとは通信できません。
+
+\begin{termexample}[ロボットの PC と通信できるか確認する]
 $ ping -c 3 192.168.1.20
 PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.
 64 bytes from 192.168.1.20: icmp_seq=1 ttl=64 time=3.21 ms
@@ -109,7 +130,7 @@ PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.
 
 --- 192.168.1.20 ping statistics ---
 3 packets transmitted, 3 received, 0% packet loss, time 2003ms
-\end{terminal}
+\end{termexample}
 
 \cmd{time=} は、返事が返ってくるまでの時間（応答時間）です。
 \cmd{0\% packet loss} であれば、すべての返事が返ってきています。
@@ -124,13 +145,14 @@ PING 192.168.1.20 (192.168.1.20) 56(84) bytes of data.
 \begin{terminal}[待ち受けているポートを確認する]
 $ ss -tln
 State   Recv-Q  Send-Q   Local Address:Port    Peer Address:Port
-LISTEN  0       4096           0.0.0.0:22           0.0.0.0:*
+LISTEN  0       4096     127.0.0.53%lo:53           0.0.0.0:*
 LISTEN  0       4096         127.0.0.1:631          0.0.0.0:*
 ...
 \end{terminal}
 
-この例では、22 番のポートで SSH のサーバが待ち受けていることがわかります。
-次の節で SSH のサーバをインストールしたら、このコマンドで動いているかを確かめられます。
+\cmd{Local Address:Port} の列の \cmd{:} の後ろがポート番号です。
+この例では、名前の解決（53 番）と印刷（631 番）のためのプログラムが、自分自身（\cmd{127.0.0.x}）からの通信を待ち受けています（表示は環境によって変わります）。
+次の節で SSH のサーバをインストールすると、22 番のポートが表示されるようになります。
 
 \section{SSH によるリモートログインと鍵認証}
 \label{sec:network-ssh}
@@ -142,20 +164,48 @@ LISTEN  0       4096         127.0.0.1:631          0.0.0.0:*
 SSH を使えば、手元の開発用 PC のターミナルから、ロボットの PC のシェルを操作できます。
 
 SSH で接続するには、接続される側（ロボットの PC）で SSH の\textbf{サーバ}が動いている必要があります。
-Ubuntu のデスクトップ版には SSH のサーバが入っていないので、ロボットの PC で次のようにインストールします。
+Ubuntu のデスクトップ版には SSH のサーバが入っていないので、次のようにインストールします。
 
-\begin{terminal}[SSH のサーバを入れる（ロボット）]
+\begin{point}[2 台目のコンピュータがないとき]
+  この節の例は、開発用 PC からロボットの PC（IP アドレスが \cmd{192.168.1.20}）に接続する場面を想定しています。
+  ロボットの PC は、表示例（紺色の枠）で示します。
+  2 台目のコンピュータがなくても、自分の PC に SSH のサーバを入れて、自分自身（\cmd{localhost}）に接続すれば、同じ操作を練習できます。
+  以下の普通のターミナルの枠は、この方法で試せるようにしてあります。
+\end{point}
+
+\begin{terminal}[SSH のサーバを入れる]
 $ sudo apt install openssh-server
+$ systemctl status ssh
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/usr/lib/systemd/system/ssh.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-09-30 10:20:11 JST; 5s ago
+...
 \end{terminal}
 
 インストールすると、SSH のサーバが自動的に起動し、22 番のポートで接続を待ち受けるようになります。
+\cmd{systemctl status}（\ref{sec:process-log}節）で \cmd{active (running)} と表示されれば、動いています。
 
 \subsection{ログインする}
 
 開発用 PC から接続するには、\cmd{ssh ユーザ名@接続先} と入力します。
 接続先には、IP アドレスかホスト名を指定します。
+まずは、自分自身に接続して練習してみましょう（\cmd{user} は自分のユーザ名に置き換えます）。
 
-\begin{terminal}[ロボットの PC に SSH でログインする]
+\begin{terminal}[自分自身に SSH でログインする]
+$ ssh user@localhost
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ED25519 key fingerprint is SHA256:Xk3v...
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+user@localhost's password:
+...
+$ exit
+logout
+Connection to localhost closed.
+\end{terminal}
+
+ロボットの PC に接続するときは、次のようになります。
+
+\begin{termexample}[ロボットの PC に SSH でログインする]
 $ ssh user@192.168.1.20
 The authenticity of host '192.168.1.20 (192.168.1.20)' can't be established.
 ED25519 key fingerprint is SHA256:Xk3v...
@@ -163,11 +213,11 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 user@192.168.1.20's password:
 ...
 user@robot:~$
-\end{terminal}
+\end{termexample}
 
 初めて接続する相手の場合は、「この相手を信頼してよいか」と聞かれるので、\cmd{yes} と入力します。
 続いて、ロボットの PC のユーザのパスワードを入力すると、ログインできます。
-プロンプトのホスト名が \cmd{robot} に変わったことに注目してください。
+ロボットの PC に接続した例では、プロンプトのホスト名が \cmd{robot} に変わっていることに注目してください。
 ここから先に入力するコマンドは、すべてロボットの PC の上で実行されます。
 
 ログインを終了するには、\cmd{exit} と入力するか、\key{Ctrl}+\key{D} を押します。
@@ -214,11 +264,13 @@ Your public key has been saved in /home/user/.ssh/id_ed25519.pub
 次に、\cmd{ssh-copy-id} で公開鍵をロボットの PC に登録します。
 このときだけ、ロボットの PC のパスワードを入力します。
 
-\begin{terminal}[公開鍵を登録する（開発用 PC）]
+\begin{termexample}[公開鍵を登録する（開発用 PC）]
 $ ssh-copy-id user@192.168.1.20
 ...
 Number of key(s) added: 1
-\end{terminal}
+\end{termexample}
+
+自分自身で練習するときは、\cmd{ssh-copy-id user@localhost} を実行してから、\cmd{ssh user@localhost} でパスワードを聞かれずにログインできることを確かめましょう。
 
 これで、次からはパスワードを入力せずにログインできるようになります（パスフレーズを設定した場合は、パスフレーズを聞かれることがあります）。
 
@@ -238,10 +290,10 @@ Host robot
     User user
 \end{codelisting}
 
-\begin{terminal}[設定した名前で接続する]
+\begin{termexample}[設定した名前で接続する]
 $ ssh robot
 user@robot:~$
-\end{terminal}
+\end{termexample}
 
 \begin{tips}{GUI のアプリをリモートで表示する}
   \cmd{ssh -X robot} のように \cmd{-X} オプションを付けて接続すると、ロボットの PC で起動した GUI のアプリの画面を、手元の PC に表示できます（X11 転送）。
@@ -258,11 +310,13 @@ user@robot:~$
 使い方は \cmd{cp}（\ref{sec:files-manipulate}節）と同じで、\cmd{scp コピー元 コピー先} と指定します。
 別のコンピュータのファイルは、\cmd{接続先:パス} の形で表します。
 
-\begin{terminal}[scp でファイルを転送する]
+次は、ロボットの PC との間でファイルをコピーする例です。
+
+\begin{termexample}[scp でファイルを転送する]
 $ scp map.yaml robot:~/maps/             # 手元 → ロボット
 $ scp robot:~/logs/run1.csv .            # ロボット → 手元
 $ scp -r robot:~/logs ./robot_logs       # ディレクトリごと
-\end{terminal}
+\end{termexample}
 
 接続先には、\cmd{\textasciitilde/.ssh/config} で設定した名前（\cmd{robot}）や、\cmd{user@192.168.1.20} を指定できます。
 ディレクトリをコピーするときは、\cmd{cp} と同じく \cmd{-r} オプションを付けます。
@@ -273,14 +327,14 @@ $ scp -r robot:~/logs ./robot_logs       # ディレクトリごと
 2 回目以降は、変更のあったファイルだけを転送するので、大きなディレクトリでも短い時間で済みます。
 手元の PC で編集したプログラムをロボットの PC に送る、といった作業に便利です。
 
-\begin{terminal}[rsync でディレクトリを同期する]
+\begin{termexample}[rsync でディレクトリを同期する]
 $ rsync -av ~/ros2_ws/src/ robot:~/ros2_ws/src/
 sending incremental file list
 my_robot/my_robot/controller.py
 
 sent 2,345 bytes  received 56 bytes  4,802.00 bytes/sec
 total size is 48,210  speedup is 20.08
-\end{terminal}
+\end{termexample}
 
 \cmd{-a} はファイルの権限や更新日時などをそのまま保ってコピーするオプション、\cmd{-v} は転送したファイルを表示するオプションです。
 この例では、前回から変更された \cmd{controller.py} だけが転送されています。

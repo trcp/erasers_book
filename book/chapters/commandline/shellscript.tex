@@ -195,11 +195,11 @@ fi
 
 \cmd{[ ]} の代わりに、コマンドをそのまま条件として書くこともできます。
 その場合は、コマンドが成功したかどうか（\ref{sec:shellscript-exit}節）で判断されます。
-次の例では、\cmd{grep -q}（結果を表示せずに、見つかったかどうかだけを返す）を使って、\cmd{.bashrc} に ROS 2 の設定が書かれているかを調べています。
+次の例では、\cmd{grep -q}（結果を表示せずに、見つかったかどうかだけを返す）を使って、\cmd{.bashrc} に \cmd{EDITOR} の設定（\ref{sec:env-bashrc}節）が書かれているかを調べています。
 
 \begin{codelisting}[style=bash]{コマンドの結果で条件分岐する}{lst:shellscript-if-cmd}
-if grep -q "setup.bash" ~/.bashrc; then
-    echo "ROS 2 の設定はすでにあります"
+if grep -q "EDITOR" ~/.bashrc; then
+    echo "EDITOR の設定はすでにあります"
 fi
 \end{codelisting}
 
@@ -331,9 +331,9 @@ info "処理を始めます"
 
 \begin{enumerate}
   \item 開発に使うパッケージ（git, tree, htop, tmux）が入っていなければインストールする
-  \item ROS 2 のワークスペースのディレクトリを作る
-  \item ROS 2 がインストールされていれば、\cmd{.bashrc} に ROS 2 の設定を追加する（まだ書かれていなければ）
-  \item 自分が \cmd{dialout} グループに入っているかを確認する
+  \item 作業用のディレクトリと、自分のスクリプトを置く \cmd{\textasciitilde/bin}（\ref{sec:env-variable}節）を作る
+  \item \cmd{\textasciitilde/bin} を \cmd{PATH} に追加する設定を、\cmd{.bashrc} に書く（まだ書かれていなければ）
+  \item 自分が \cmd{dialout} グループ（\ref{sec:permission-device}節）に入っているかを確認する
 \end{enumerate}
 
 パッケージのインストールには \cmd{apt-get} というコマンドを使います。
@@ -346,11 +346,12 @@ apt のしくみについては、\ref{chap:package}章で詳しく学びます�
 
 \begin{itemize}
   \item 先頭の \cmd{set -euo pipefail} で、途中で失敗したら止まるようにしています。
-  \item \cmd{WS\_DIR="\$\{1:-\$HOME/ros2\_ws\}"} で、引数があればそのディレクトリを、なければ \cmd{\textasciitilde/ros2\_ws} をワークスペースにしています。
+  \item \cmd{WORK\_DIR="\$\{1:-\$HOME/dev\}"} で、引数があればそのディレクトリを、なければ \cmd{\textasciitilde/dev} を作業用のディレクトリにしています。
   \item \cmd{info} と \cmd{warn} という関数で、メッセージの表示をそろえています。\cmd{warn} は標準エラー出力に出しています。
   \item 1 では、\cmd{for} 文でパッケージを 1 つずつ調べています。\cmd{dpkg -s} はパッケージの情報を表示するコマンドで、インストールされていれば成功（終了ステータス 0）を返します。その出力は必要ないので、\cmd{/dev/null} に捨てています。
-  \item 3 では、ROS 2 がまだインストールされていないときに \cmd{.bashrc} に設定を書いてしまわないよう、\cmd{[ ! -f "\$ROS\_SETUP" ]} で確認しています。また、\cmd{grep -qF} ですでに書かれていないかを確かめてから追記しているので、何度実行しても同じ行が増えません。
-  \item 4 で \cmd{dialout} グループに入っていなければ、対処の方法を表示して、終了ステータス 1 で終了します。
+  \item 2 では、ディレクトリがすでにあるかを \cmd{[ -d ]} で確かめてから作っています。
+  \item 3 では、\cmd{grep -qF}（\cmd{-F} は、文字列を正規表現ではなくそのまま探すオプション）ですでに書かれていないかを確かめてから追記しているので、何度実行しても同じ行が増えません。
+  \item 4 で \cmd{dialout} グループに入っていなければ、対処の方法を表示します。
 \end{itemize}
 
 実行すると、次のように表示されます。
@@ -361,12 +362,16 @@ $ ./setup_dev.sh
 [INFO] git はインストール済みです
 [INFO] tree をインストールします
 ...
-[INFO] /home/user/ros2_ws/src を作りました
-[WARN] ROS 2 がインストールされていないので、.bashrc の設定は飛ばします
-[INFO] dialout グループに入っています
+[INFO] /home/user/dev を作りました
+[INFO] /home/user/bin はすでにあります
+[INFO] .bashrc にはすでに PATH の設定があります
+[WARN] dialout グループに入っていません
+[WARN] USB の機器を使う前に、sudo usermod -aG dialout $USER を実行して、ログインし直してください
 [INFO] セットアップが完了しました
 \end{terminal}
 
+表示は、それまでにどこまで設定したかによって変わります（\ref{chap:env}章の手順どおりに進めていれば、\cmd{\textasciitilde/bin} と \cmd{PATH} の設定はすでにあります）。
+ROS 2 をインストールした後は、ROS 2 の設定を \cmd{.bashrc} に追加する処理を、このスクリプトに書き足すこともできます。
 「何度実行しても同じ結果になる」ように書いておくと、新しい PC やロボットの環境を整えるときに、安心して何度でも使えます。
 このスクリプトを Git で管理して（\ref{chap:git}章）、チームで共有するのもよいでしょう。
 
