@@ -79,24 +79,24 @@ second line
 \begin{terminal}[練習用のログファイルを作る]
 $ mkdir ~/practice/text
 $ cd ~/practice/text
-$ echo "2026-09-30 10:00:01 [INFO] driver: started" > robot.log
-$ echo "2026-09-30 10:00:02 [INFO] lidar: started" >> robot.log
-$ echo "2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V" >> robot.log
-$ echo "2026-09-30 10:00:07 [ERROR] lidar: timeout" >> robot.log
-$ echo "2026-09-30 10:00:08 [INFO] lidar: reconnected" >> robot.log
-$ echo "2026-09-30 10:00:12 [ERROR] motor: overcurrent" >> robot.log
+~/practice/text$ echo "2026-09-30 10:00:01 [INFO] driver: started" > robot.log
+~/practice/text$ echo "2026-09-30 10:00:02 [INFO] lidar: started" >> robot.log
+~/practice/text$ echo "2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V" >> robot.log
+~/practice/text$ echo "2026-09-30 10:00:07 [ERROR] lidar: timeout" >> robot.log
+~/practice/text$ echo "2026-09-30 10:00:08 [INFO] lidar: reconnected" >> robot.log
+~/practice/text$ echo "2026-09-30 10:00:12 [ERROR] motor: overcurrent" >> robot.log
 \end{terminal}
 
 2 つ目は、ロボットの位置と速度を記録した CSV ファイル（値をカンマで区切ったテキストファイル）の \cmd{data.csv} です。
 1 行目は各列の名前（時刻、x 座標、y 座標、速度）です。
 
 \begin{terminal}[練習用の CSV ファイルを作る]
-$ echo "time,x,y,speed" > data.csv
-$ echo "0.0,0.00,0.00,0.00" >> data.csv
-$ echo "0.5,0.10,0.00,0.20" >> data.csv
-$ echo "1.0,0.25,0.02,0.30" >> data.csv
-$ echo "1.5,0.42,0.05,0.35" >> data.csv
-$ echo "2.0,0.60,0.10,0.36" >> data.csv
+~/practice/text$ echo "time,x,y,speed" > data.csv
+~/practice/text$ echo "0.0,0.00,0.00,0.00" >> data.csv
+~/practice/text$ echo "0.5,0.10,0.00,0.20" >> data.csv
+~/practice/text$ echo "1.0,0.25,0.02,0.30" >> data.csv
+~/practice/text$ echo "1.5,0.42,0.05,0.35" >> data.csv
+~/practice/text$ echo "2.0,0.60,0.10,0.36" >> data.csv
 \end{terminal}
 
 実際には、ファイルはエディタ（\ref{chap:editor}章）で作ったり、プログラムが書き出したりすることがほとんどです。
@@ -108,19 +108,19 @@ $ echo "2.0,0.60,0.10,0.36" >> data.csv
 bash では、同じことを \cmd{\&> ファイル} と短く書くこともできます。
 
 \begin{terminal}[エラーの出力先を切り替える]
-$ ls /home /nonexistent 2> error.txt
+~/practice/text$ ls /home /nonexistent 2> error.txt
 /home:
 user
-$ cat error.txt
+~/practice/text$ cat error.txt
 ls: cannot access '/nonexistent': No such file or directory
-$ ls /home /nonexistent > all.txt 2>&1
+~/practice/text$ ls /home /nonexistent > all.txt 2>&1
 \end{terminal}
 
 \cmd{/dev/null} は、書き込んだものをすべて捨てる特別なファイルです（\ref{sec:linux-internals-device}節）。
 エラーメッセージを表示したくないときは、\cmd{2> /dev/null} で捨てることができます。
 
 \begin{terminal}[エラーメッセージを捨てる]
-$ find / -name "os-release" 2> /dev/null
+~/practice/text$ find / -name "os-release" 2> /dev/null
 /etc/os-release
 /usr/lib/os-release
 \end{terminal}
@@ -133,7 +133,7 @@ $ find / -name "os-release" 2> /dev/null
 \cmd{wc -l}（行数を数えるコマンド、\ref{sec:text-pipe-tools}節）で試してみましょう。
 
 \begin{terminal}[ファイルを標準入力に渡す]
-$ wc -l < robot.log
+~/practice/text$ wc -l < robot.log
 6
 \end{terminal}
 
@@ -153,7 +153,7 @@ $ wc -l < robot.log
 \end{figure}
 
 \begin{terminal}[パイプでコマンドをつなぐ]
-$ cat robot.log | grep ERROR | wc -l
+~/practice/text$ cat robot.log | grep ERROR | wc -l
 2
 \end{terminal}
 
@@ -163,9 +163,9 @@ $ cat robot.log | grep ERROR | wc -l
 パイプは、次のような場面でよく使います。
 
 \begin{terminal}[パイプの便利な使い方]
-$ ls /usr/bin | less             # 長い出力を 1 画面ずつ見る
-$ history | grep mkdir           # 過去に入力した mkdir のコマンドを探す
-$ ls /etc | grep conf            # /etc の中の、名前に conf を含むものを探す
+~/practice/text$ ls /usr/bin | less             # 長い出力を 1 画面ずつ見る
+~/practice/text$ history | grep mkdir           # 過去に入力した mkdir のコマンドを探す
+~/practice/text$ ls /etc | grep conf            # /etc の中の、名前に conf を含むものを探す
 \end{terminal}
 
 後の章で学ぶ ROS 2 のコマンド（\ref{chap:ros2_concepts}章）も、たくさんの情報を出力します。
@@ -177,7 +177,7 @@ $ ls /etc | grep conf            # /etc の中の、名前に conf を含むも�
 T 字型の配管のように、流れを 2 つに分けるイメージです。
 
 \begin{terminal}[画面に表示しながらファイルにも保存する]
-$ grep ERROR robot.log | tee errors.txt
+~/practice/text$ grep ERROR robot.log | tee errors.txt
 2026-09-30 10:00:07 [ERROR] lidar: timeout
 2026-09-30 10:00:12 [ERROR] motor: overcurrent
 \end{terminal}
@@ -196,7 +196,7 @@ $ grep ERROR robot.log | tee errors.txt
 \cmd{grep} は、指定した文字列を含む行だけを取り出すコマンドです。
 
 \begin{terminal}[文字列を含む行を探す]
-$ grep ERROR robot.log
+~/practice/text$ grep ERROR robot.log
 2026-09-30 10:00:07 [ERROR] lidar: timeout
 2026-09-30 10:00:12 [ERROR] motor: overcurrent
 \end{terminal}
@@ -216,15 +216,15 @@ $ grep ERROR robot.log
 \end{tablebox}
 
 \begin{terminal}[grep のオプションを使う]
-$ grep -n lidar robot.log
+~/practice/text$ grep -n lidar robot.log
 2:2026-09-30 10:00:02 [INFO] lidar: started
 4:2026-09-30 10:00:07 [ERROR] lidar: timeout
 5:2026-09-30 10:00:08 [INFO] lidar: reconnected
-$ grep -v INFO robot.log
+~/practice/text$ grep -v INFO robot.log
 2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V
 2026-09-30 10:00:07 [ERROR] lidar: timeout
 2026-09-30 10:00:12 [ERROR] motor: overcurrent
-$ grep -rn timeout ~/practice
+~/practice/text$ grep -rn timeout ~/practice
 /home/user/practice/text/robot.log:4:2026-09-30 10:00:07 [ERROR] lidar: timeout
 /home/user/practice/text/errors.txt:1:2026-09-30 10:00:07 [ERROR] lidar: timeout
 \end{terminal}
@@ -245,7 +245,7 @@ $ grep -rn timeout ~/practice
 \cmd{-l} を付けると、行数だけを表示します。
 
 \begin{terminal}[行数を数える]
-$ wc -l robot.log
+~/practice/text$ wc -l robot.log
 6 robot.log
 \end{terminal}
 
@@ -255,7 +255,7 @@ $ wc -l robot.log
 \cmd{-d} で区切り文字を、\cmd{-f} で取り出す列の番号を指定します。
 
 \begin{terminal}[CSV ファイルから速度の列を取り出す]
-$ cut -d, -f4 data.csv
+~/practice/text$ cut -d, -f4 data.csv
 speed
 0.00
 0.20
@@ -277,11 +277,11 @@ speed
 これらを組み合わせて、ログのレベルごとに行数を数えてみましょう。
 
 \begin{terminal}[ログのレベルごとに行数を数える]
-$ cut -d' ' -f3 robot.log | sort | uniq -c
+~/practice/text$ cut -d' ' -f3 robot.log | sort | uniq -c
       2 [ERROR]
       3 [INFO]
       1 [WARN]
-$ cut -d' ' -f3 robot.log | sort | uniq -c | sort -rn
+~/practice/text$ cut -d' ' -f3 robot.log | sort | uniq -c | sort -rn
       3 [INFO]
       2 [ERROR]
       1 [WARN]
@@ -294,7 +294,7 @@ $ cut -d' ' -f3 robot.log | sort | uniq -c | sort -rn
 \cmd{tail -n +2} は、2 行目以降（見出しの行を除いた部分）を表示するという意味です。
 
 \begin{terminal}[速度が最も大きい行を探す]
-$ tail -n +2 data.csv | sort -t, -k4 -rn | head -n 1
+~/practice/text$ tail -n +2 data.csv | sort -t, -k4 -rn | head -n 1
 2.0,0.60,0.10,0.36
 \end{terminal}
 
@@ -308,7 +308,7 @@ $ tail -n +2 data.csv | sort -t, -k4 -rn | head -n 1
 末尾に \cmd{g} を付けると、1 行の中で一致したすべての部分を置き換えます（付けないと、各行の最初の 1 か所だけ）。
 
 \begin{terminal}[文字列を置き換える]
-$ sed 's/ERROR/FAILED/' robot.log | grep FAILED
+~/practice/text$ sed 's/ERROR/FAILED/' robot.log | grep FAILED
 2026-09-30 10:00:07 [FAILED] lidar: timeout
 2026-09-30 10:00:12 [FAILED] motor: overcurrent
 \end{terminal}
@@ -318,13 +318,13 @@ $ sed 's/ERROR/FAILED/' robot.log | grep FAILED
 設定ファイルの値をまとめて書き換えるときなどに便利ですが、元に戻せないので、\cmd{-i.bak} のようにしてバックアップ（\cmd{ファイル名.bak}）を残しておくと安心です。
 
 \begin{terminal}[ファイルの中の値を書き換える（バックアップ付き）]
-$ sed -i.bak 's/max_speed: 0.5/max_speed: 0.3/' params.yaml
+~/practice/text$ sed -i.bak 's/max_speed: 0.5/max_speed: 0.3/' params.yaml
 \end{terminal}
 
 \cmd{-n} と \cmd{p} を組み合わせると、特定の行だけを表示できます。
 
 \begin{terminal}[2〜3 行目だけを表示する]
-$ sed -n '2,3p' robot.log
+~/practice/text$ sed -n '2,3p' robot.log
 2026-09-30 10:00:02 [INFO] lidar: started
 2026-09-30 10:00:05 [WARN] battery: low voltage 11.2V
 \end{terminal}
@@ -336,7 +336,7 @@ awk は、小さなプログラミング言語でもあります。
 各行は空白で区切られて \cmd{\$1}, \cmd{\$2}, \ldots に入り、\cmd{\$0} は行全体を表します。
 
 \begin{terminal}[列を選んで表示する]
-$ awk '{print $2, $3}' robot.log
+~/practice/text$ awk '{print $2, $3}' robot.log
 10:00:01 [INFO]
 10:00:02 [INFO]
 10:00:05 [WARN]
@@ -349,10 +349,10 @@ $ awk '{print $2, $3}' robot.log
 \cmd{-F} で区切り文字を指定でき、\cmd{NR} は今処理している行の番号を表します。
 
 \begin{terminal}[条件に合う行を選ぶ]
-$ awk '$3 == "[ERROR]" {print $4, $5}' robot.log
+~/practice/text$ awk '$3 == "[ERROR]" {print $4, $5}' robot.log
 lidar: timeout
 motor: overcurrent
-$ awk -F, 'NR > 1 && $4 > 0.3 {print $1, $4}' data.csv
+~/practice/text$ awk -F, 'NR > 1 && $4 > 0.3 {print $1, $4}' data.csv
 1.5 0.35
 2.0 0.36
 \end{terminal}
@@ -361,7 +361,7 @@ $ awk -F, 'NR > 1 && $4 > 0.3 {print $1, $4}' data.csv
 これを使って、速度の平均を計算してみましょう。
 
 \begin{terminal}[速度の平均を計算する]
-$ awk -F, 'NR > 1 {sum += $4; n++} END {print sum / n}' data.csv
+~/practice/text$ awk -F, 'NR > 1 {sum += $4; n++} END {print sum / n}' data.csv
 0.242
 \end{terminal}
 

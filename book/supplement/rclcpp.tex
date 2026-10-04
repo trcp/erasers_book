@@ -58,11 +58,11 @@ C++ のノードは、\cmd{ament\_cmake} のパッケージに入れます（\re
 
 \begin{terminal}[C++ のパッケージを作る]
 $ cd ~/ros2_ws/src
-$ ros2 pkg create --build-type ament_cmake --license Apache-2.0 --dependencies rclcpp std_msgs geometry_msgs turtlesim example_interfaces my_cpp_package
+~/ros2_ws/src$ ros2 pkg create --build-type ament_cmake --license Apache-2.0 --dependencies rclcpp std_msgs geometry_msgs turtlesim example_interfaces my_cpp_package
 \end{terminal}
 
 \begin{terminal}[C++ のパッケージの中身]
-$ tree my_cpp_package
+~/ros2_ws/src$ tree my_cpp_package
 my_cpp_package
 ├── CMakeLists.txt
 ├── include
@@ -124,14 +124,14 @@ Python のパッケージで、\cmd{setup.py} の \cmd{entry\_points} に 1 行�
 \subsection{ビルドして実行する}
 
 \begin{terminal}[C++ のノードをビルドして実行する]
-$ cd ~/ros2_ws
-$ colcon build --packages-select my_cpp_package
+~/ros2_ws/src$ cd ~/ros2_ws
+~/ros2_ws$ colcon build --packages-select my_cpp_package
 Starting >>> my_cpp_package
 Finished <<< my_cpp_package [35.2s]
 
 Summary: 1 package finished [35.5s]
-$ source install/local_setup.bash
-$ ros2 run my_cpp_package hello_node
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 run my_cpp_package hello_node
 [INFO] [1727852400.123456789] [hello_node]: こんにちは、ROS 2!
 \end{terminal}
 

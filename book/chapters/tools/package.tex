@@ -312,17 +312,17 @@ add_executable(hello hello.c)
 
 \begin{terminal}[CMake でビルドする]
 $ cd ~/hello_cmake
-$ mkdir build
-$ cd build
-$ cmake ..
+~/hello_cmake$ mkdir build
+~/hello_cmake$ cd build
+~/hello_cmake/build$ cmake ..
 -- The C compiler identification is GNU 13.2.0
 ...
 -- Build files have been written to: /home/user/hello_cmake/build
-$ make
+~/hello_cmake/build$ make
 [ 50%] Building C object CMakeFiles/hello.dir/hello.c.o
 [100%] Linking C executable hello
 [100%] Built target hello
-$ ./hello
+~/hello_cmake/build$ ./hello
 Hello, CMake!
 \end{terminal}
 

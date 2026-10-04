@@ -73,7 +73,7 @@ $ docker run -it --rm --network host --ipc host osrf/ros:jazzy-desktop \
 \begin{terminal}[Dockerfile を置くディレクトリを作る]
 $ mkdir -p ~/docker_ros
 $ cd ~/docker_ros
-$ code Dockerfile
+~/docker_ros$ code Dockerfile
 \end{terminal}
 
 \begin{codelisting}[style=bash]{Dockerfile}{lst:docker-ros-dockerfile}
@@ -95,10 +95,10 @@ CMD ["bash"]
 公式のイメージの中では、コンテナの中のシェルを開くと、ROS 2 の設定（\cmd{/opt/ros/jazzy/setup.bash}）が自動で読み込まれるようになっています。
 
 \begin{terminal}[イメージを作って動かす]
-$ docker build -t my_ros:jazzy .
+~/docker_ros$ docker build -t my_ros:jazzy .
 ...
  => => naming to docker.io/library/my_ros:jazzy
-$ docker run -it --rm my_ros:jazzy
+~/docker_ros$ docker run -it --rm my_ros:jazzy
 root@a1b2c3d4e5f6:~/ros2_ws# ros2 pkg list | grep turtlesim
 turtlesim
 root@a1b2c3d4e5f6:~/ros2_ws# exit
@@ -109,8 +109,8 @@ root@a1b2c3d4e5f6:~/ros2_ws# exit
 turtlesim や RViz2 のような GUI のツールは、\ref{sec:docker-gui-device}節の \cmd{xeyes} と同じ方法で、ホストの画面に表示します。
 
 \begin{terminal}[コンテナの中の turtlesim を表示する]
-$ xhost +local:
-$ docker run -it --rm --network host --ipc host \
+~/docker_ros$ xhost +local:
+~/docker_ros$ docker run -it --rm --network host --ipc host \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     my_ros:jazzy \
@@ -160,12 +160,11 @@ USB の機器を使うときは、\cmd{devices:} という項目に \cmd{- /dev/
 共有するディレクトリに、\ref{chap:rclpy}章の \cmd{my\_package} を置いて、コンテナの中でビルドしてみましょう。
 
 \begin{terminal}[Docker Compose で ROS 2 の開発環境を使う]
-$ cd ~/docker_ros
-$ mkdir -p ros2_ws/src
-$ cp -r ~/ros2_ws/src/my_package ros2_ws/src/
-$ xhost +local:
-$ docker compose up -d
-$ docker compose exec ros bash
+~/docker_ros$ mkdir -p ros2_ws/src
+~/docker_ros$ cp -r ~/ros2_ws/src/my_package ros2_ws/src/
+~/docker_ros$ xhost +local:
+~/docker_ros$ docker compose up -d
+~/docker_ros$ docker compose exec ros bash
 root@robot:~/ros2_ws# colcon build --symlink-install
 root@robot:~/ros2_ws# source install/local_setup.bash
 root@robot:~/ros2_ws# ros2 run my_package talker

@@ -564,6 +564,20 @@ $ sudo apt upgrade
 途中で \cmd{Do you want to continue? [Y/n]} と聞かれたら、\key{Y} を入力して \key{Enter} を押します。
 コマンドの意味は、\ref{chap:terminal_shell}章以降で少しずつ学んでいくので、今はこのとおりに入力するだけで構いません（\cmd{apt} については\ref{chap:package}章で詳しく説明します）。
 
+\subsection{ホームディレクトリの中のフォルダ名を英語にする}
+
+Ubuntu を日本語でインストールすると、ホームディレクトリ（自分のファイルを置く場所）の中のフォルダが、「デスクトップ」「ドキュメント」「ダウンロード」のような日本語の名前で作られます。
+ターミナルで日本語の名前を入力するには、入力方法の切り替えが必要になって不便なので、英語の名前に変えておきます。
+ターミナルで次のコマンドを入力してください。
+
+\begin{terminal}[フォルダ名を英語にする]
+$ LANG=C xdg-user-dirs-gtk-update
+\end{terminal}
+
+フォルダの名前を変えるかを聞くダイアログが表示されるので、「Don't ask me this again」にチェックを入れてから、「Update Names」を押します。
+これで、フォルダの名前が \cmd{Desktop}, \cmd{Documents}, \cmd{Downloads} などの英語の名前に変わります。
+本書では、英語の名前を使って説明します。
+
 \subsection{Guest Additions を入れる}
 
 \textbf{Guest Additions} は、仮想マシンを快適に使うための追加のソフトウェアです。

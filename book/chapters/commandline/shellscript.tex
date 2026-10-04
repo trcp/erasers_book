@@ -28,7 +28,7 @@
 \begin{terminal}[スクリプトのファイルを作る]
 $ mkdir -p ~/scripts
 $ cd ~/scripts
-$ gnome-text-editor hello.sh
+~/scripts$ gnome-text-editor hello.sh
 \end{terminal}
 
 \begin{codelisting}[style=bash]{はじめてのシェルスクリプト（hello.sh）}{lst:shellscript-hello}
@@ -46,8 +46,8 @@ date
 スクリプトを実行するには、\cmd{chmod} で実行権限を付けて（\ref{sec:permission-chmod}節）、パスを指定して実行します。
 
 \begin{terminal}[スクリプトを実行する]
-$ chmod +x hello.sh
-$ ./hello.sh
+~/scripts$ chmod +x hello.sh
+~/scripts$ ./hello.sh
 Hello, robot!
 今日の日付：
 Wed Sep 30 10:40:12 JST 2026
@@ -79,7 +79,7 @@ echo "log file: ${LOG_DIR}/${ROBOT}.log"
 \end{codelisting}
 
 \begin{terminal}[変数を使うスクリプトを実行する]
-$ bash var.sh
+~/scripts$ bash var.sh
 robot: turtle
 log file: /home/user/logs/turtle.log
 \end{terminal}
@@ -120,7 +120,7 @@ echo "hello, $1!"
 \end{codelisting}
 
 \begin{terminal}[引数を渡して実行する]
-$ bash greet.sh turtle
+~/scripts$ bash greet.sh turtle
 script: greet.sh
 number of args: 1
 hello, turtle!
@@ -139,10 +139,10 @@ hello, turtle!
 \end{description}
 
 \begin{terminal}[クォートの違い]
-$ ROBOT=turtle
-$ echo "robot: $ROBOT"
+~/scripts$ ROBOT=turtle
+~/scripts$ echo "robot: $ROBOT"
 robot: turtle
-$ echo 'robot: $ROBOT'
+~/scripts$ echo 'robot: $ROBOT'
 robot: $ROBOT
 \end{terminal}
 
@@ -257,12 +257,12 @@ done < robot.log
 直前のコマンドの終了ステータスは、\cmd{\$?} で確認できます。
 
 \begin{terminal}[終了ステータスを確認する]
-$ ls /home > /dev/null
-$ echo $?
+~/scripts$ ls /home > /dev/null
+~/scripts$ echo $?
 0
-$ ls /nonexistent
+~/scripts$ ls /nonexistent
 ls: cannot access '/nonexistent': No such file or directory
-$ echo $?
+~/scripts$ echo $?
 2
 \end{terminal}
 
@@ -276,8 +276,8 @@ $ echo $?
 \end{description}
 
 \begin{terminal}[\&\& と || を使う]
-$ mkdir -p build && cd build
-$ cd /nonexistent || echo "移動できませんでした"
+~/scripts$ mkdir -p build && cd build
+~/scripts/build$ cd /nonexistent || echo "移動できませんでした"
 \end{terminal}
 
 \subsection{スクリプトの終了ステータスとエラーメッセージ}
@@ -357,8 +357,9 @@ apt のしくみについては、\ref{chap:package}章で詳しく学びます�
 実行すると、次のように表示されます。
 
 \begin{terminal}[セットアップスクリプトを実行する]
-$ chmod +x setup_dev.sh
-$ ./setup_dev.sh
+~/scripts/build$ cd ~/scripts
+~/scripts$ chmod +x setup_dev.sh
+~/scripts$ ./setup_dev.sh
 [INFO] git はインストール済みです
 [INFO] tree をインストールします
 ...

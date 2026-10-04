@@ -89,9 +89,9 @@ VS Code で \cmd{\textasciitilde/ros2\_ws} を開き（\ref{sec:editor-vscode}�
 
 \begin{terminal}[はじめてのノードをビルドして実行する]
 $ cd ~/ros2_ws
-$ colcon build --symlink-install --packages-select my_package
-$ source install/local_setup.bash
-$ ros2 run my_package hello_node
+~/ros2_ws$ colcon build --symlink-install --packages-select my_package
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 run my_package hello_node
 [INFO] [1727852400.123456789] [hello_node]: こんにちは、ROS 2!
 \end{terminal}
 
@@ -119,7 +119,7 @@ $ ros2 run my_package hello_node
 \cmd{setup.py} に \cmd{'talker = my\_package.talker:main',} を追加してビルドし、実行してみましょう。
 
 \begin{terminal}[パブリッシャを実行する]
-$ ros2 run my_package talker
+~/ros2_ws$ ros2 run my_package talker
 [INFO] [1727852400.623456789] [talker]: Publishing: "Hello, ROS 2! 0"
 [INFO] [1727852401.123456789] [talker]: Publishing: "Hello, ROS 2! 1"
 ...
@@ -141,7 +141,7 @@ $ ros2 run my_package talker
 \cmd{setup.py} に \cmd{'listener = my\_package.listener:main',} を追加してビルドし、2 つのターミナルで talker と listener を起動します。
 
 \begin{terminal}[サブスクライバを実行する]
-$ ros2 run my_package listener
+~/ros2_ws$ ros2 run my_package listener
 [INFO] [1727852402.623456789] [listener]: I heard: "Hello, ROS 2! 4"
 [INFO] [1727852403.123456789] [listener]: I heard: "Hello, ROS 2! 5"
 ...
@@ -209,7 +209,7 @@ $ ros2 run my_package turtle_controller    # 2 つ目のターミナル
 まず、型の中身を確かめておきましょう。
 
 \begin{terminal}[AddTwoInts 型の中身]
-$ ros2 interface show example_interfaces/srv/AddTwoInts
+~/ros2_ws$ ros2 interface show example_interfaces/srv/AddTwoInts
 int64 a
 int64 b
 ---
@@ -227,7 +227,7 @@ int64 sum
 
 \begin{terminal}[サービスサーバをコマンドから呼び出す]
 $ ros2 run my_package add_two_ints_server   # 1 つ目のターミナル
-$ ros2 service call /add_two_ints example_interfaces/srv/AddTwoInts "{a: 3, b: 5}"
+~/ros2_ws$ ros2 service call /add_two_ints example_interfaces/srv/AddTwoInts "{a: 3, b: 5}"
 requester: making request: example_interfaces.srv.AddTwoInts_Request(a=3, b=5)
 
 response:
@@ -251,7 +251,7 @@ example_interfaces.srv.AddTwoInts_Response(sum=8)
 \cmd{sys.argv} は、コマンドラインの引数のリストです（\cmd{sys.argv[1]} が 1 つ目の引数）。
 
 \begin{terminal}[サービスクライアントを実行する]
-$ ros2 run my_package add_two_ints_client 3 5
+~/ros2_ws$ ros2 run my_package add_two_ints_client 3 5
 [INFO] [1727852410.123456789] [add_two_ints_client]: 結果: 8
 \end{terminal}
 
@@ -284,7 +284,7 @@ $ ros2 run my_package add_two_ints_client 3 5
 角度は度で受け取り、\cmd{math.radians()} でラジアンに変換して送っています。
 
 \begin{terminal}[アクションクライアントを実行する]
-$ ros2 run my_package rotate_client 180
+~/ros2_ws$ ros2 run my_package rotate_client 180
 [INFO] [...] [rotate_client]: ゴールが受け付けられました
 [INFO] [...] [rotate_client]: 残りの回転量: 3.12 rad
 ...
@@ -308,7 +308,7 @@ $ ros2 run my_package rotate_client 180
 
 \begin{terminal}[アクションサーバにゴールを送る]
 $ ros2 run my_package fibonacci_server      # 1 つ目のターミナル
-$ ros2 action send_goal --feedback /fibonacci example_interfaces/action/Fibonacci "{order: 5}"
+~/ros2_ws$ ros2 action send_goal --feedback /fibonacci example_interfaces/action/Fibonacci "{order: 5}"
 ...
 Feedback:
     sequence: [0, 1, 1]
@@ -338,7 +338,7 @@ rclpy では、\cmd{declare\_parameter()} でパラメータの名前と初期�
 \cmd{ros2 run} で起動するときは、\cmd{--ros-args -p 名前:=値} でパラメータの値を指定できます。
 
 \begin{terminal}[パラメータを指定して起動する]
-$ ros2 run my_package param_node --ros-args -p robot_name:=robo -p max_speed:=1.0
+~/ros2_ws$ ros2 run my_package param_node --ros-args -p robot_name:=robo -p max_speed:=1.0
 [INFO] [...] [param_node]: robo の最高速度は 1.0 m/s です
 ...
 \end{terminal}
@@ -346,7 +346,7 @@ $ ros2 run my_package param_node --ros-args -p robot_name:=robo -p max_speed:=1.
 起動した後も、別のターミナルから \cmd{ros2 param set} で値を変えられます。
 
 \begin{terminal}[実行中にパラメータを変更する]
-$ ros2 param set /param_node max_speed 0.3
+~/ros2_ws$ ros2 param set /param_node max_speed 0.3
 Set parameter successful
 \end{terminal}
 
@@ -379,9 +379,9 @@ ROS 2 には多くのメッセージ型が用意されていますが（表\ref{
 中に \cmd{msg} と \cmd{srv} のディレクトリも作っておきます。
 
 \begin{terminal}[インタフェースのパッケージを作る]
-$ cd ~/ros2_ws/src
-$ ros2 pkg create --build-type ament_cmake --license Apache-2.0 my_interfaces
-$ mkdir my_interfaces/msg my_interfaces/srv
+~/ros2_ws$ cd ~/ros2_ws/src
+~/ros2_ws/src$ ros2 pkg create --build-type ament_cmake --license Apache-2.0 my_interfaces
+~/ros2_ws/src$ mkdir my_interfaces/msg my_interfaces/srv
 \end{terminal}
 
 メッセージ型は、\cmd{msg} ディレクトリに \cmd{型の名前.msg} というファイルを作って定義します。
@@ -429,10 +429,10 @@ $ mkdir my_interfaces/msg my_interfaces/srv
 ビルドしたら、\cmd{ros2 interface show} で定義した型を確かめましょう。
 
 \begin{terminal}[インタフェースのパッケージをビルドする]
-$ cd ~/ros2_ws
-$ colcon build --packages-select my_interfaces
-$ source install/local_setup.bash
-$ ros2 interface show my_interfaces/msg/RobotStatus
+~/ros2_ws/src$ cd ~/ros2_ws
+~/ros2_ws$ colcon build --packages-select my_interfaces
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 interface show my_interfaces/msg/RobotStatus
 # ロボットの状態
 string name       # ロボットの名前
 float64 battery   # バッテリの残量 [%]
@@ -456,10 +456,9 @@ bool is_moving    # 動いているかどうか
 \cmd{package.xml} に依存関係を書いておいたので、colcon が \cmd{my\_interfaces} → \cmd{my\_package} の順にビルドしてくれます。
 
 \begin{terminal}[自分で定義した型を使うノードを実行する]
-$ cd ~/ros2_ws
-$ colcon build --symlink-install
-$ source install/local_setup.bash
-$ ros2 run my_package status_publisher
+~/ros2_ws$ colcon build --symlink-install
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 run my_package status_publisher
 \end{terminal}
 
 別のターミナルで \cmd{ros2 topic echo /robot\_status} を実行すると、定義したとおりの形のメッセージが届いていることがわかります。

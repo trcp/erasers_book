@@ -156,19 +156,19 @@ TurtleBot3 の本体のパッケージは apt でインストールし、シミ�
 \begin{terminal}[TurtleBot3 のパッケージをインストールする]
 $ sudo apt install ros-jazzy-turtlebot3 ros-jazzy-turtlebot3-msgs
 $ cd ~/ros2_ws/src
-$ git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
-$ cd ~/ros2_ws
-$ rosdep install -i --from-path src --rosdistro jazzy -y
-$ colcon build --symlink-install
-$ source install/local_setup.bash
+~/ros2_ws/src$ git clone -b jazzy https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+~/ros2_ws/src$ cd ~/ros2_ws
+~/ros2_ws$ rosdep install -i --from-path src --rosdistro jazzy -y
+~/ros2_ws$ colcon build --symlink-install
+~/ros2_ws$ source install/local_setup.bash
 \end{terminal}
 
 TurtleBot3 のパッケージは、環境変数 \cmd{TURTLEBOT3\_MODEL}（\ref{chap:env}章）で、どのモデルを使うかを決めます。
 毎回設定しなくて済むように、\cmd{.bashrc} に書いておきましょう（\ref{sec:env-bashrc}節）。
 
 \begin{terminal}[使うモデルを .bashrc に設定する]
-$ echo 'export TURTLEBOT3_MODEL=burger' >> ~/.bashrc
-$ source ~/.bashrc
+~/ros2_ws$ echo 'export TURTLEBOT3_MODEL=burger' >> ~/.bashrc
+~/ros2_ws$ source ~/.bashrc
 \end{terminal}
 
 \subsection{シミュレーションを起動する}
@@ -176,7 +176,7 @@ $ source ~/.bashrc
 TurtleBot3 と、障害物が置かれた世界を、Gazebo で起動します。
 
 \begin{terminal}[TurtleBot3 のシミュレーションを起動する]
-$ ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
+~/ros2_ws$ ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 \end{terminal}
 
 Gazebo の画面に、六角形の壁の中に柱が並んだ世界と、そこに置かれた TurtleBot3 が表示されます（図\ref{fig:simulation-tb3}）。
@@ -204,7 +204,7 @@ Gazebo の画面に、六角形の壁の中に柱が並んだ世界と、そこ�
 別のターミナルで、トピックの一覧を見てみましょう。
 
 \begin{terminal}[シミュレーションのトピックの一覧]
-$ ros2 topic list
+~/ros2_ws$ ros2 topic list
 /clock
 /cmd_vel
 /imu
@@ -225,7 +225,7 @@ $ ros2 topic list
 TurtleBot3 には、キーボードで操作するためのノードが用意されています。
 
 \begin{terminal}[TurtleBot3 をキーボードで操作する]
-$ ros2 run turtlebot3_teleop teleop_keyboard
+~/ros2_ws$ ros2 run turtlebot3_teleop teleop_keyboard
 ...
 Moving around:
         w
@@ -262,7 +262,7 @@ LiDAR のデータは、\cmd{/scan} トピックに \cmd{sensor\_msgs/msg/LaserS
 型の中身の主な部分を見てみましょう。
 
 \begin{terminal}[LaserScan 型の中身（一部）]
-$ ros2 interface show sensor_msgs/msg/LaserScan
+~/ros2_ws$ ros2 interface show sensor_msgs/msg/LaserScan
 std_msgs/Header header
 float32 angle_min        # start angle of the scan [rad]
 float32 angle_max        # end angle of the scan [rad]
@@ -283,7 +283,7 @@ float32[] ranges         # range data [m]
 \cmd{ranges} は長いので、\cmd{--field} で見たい部分だけを表示するとよいでしょう。
 
 \begin{terminal}[LaserScan の一部だけを表示する]
-$ ros2 topic echo --once --field range_max /scan
+~/ros2_ws$ ros2 topic echo --once --field range_max /scan
 3.5
 ---
 \end{terminal}
@@ -294,7 +294,7 @@ $ ros2 topic echo --once --field range_max /scan
 \cmd{use\_sim\_time} を \cmd{true} にして RViz2 を起動し、次のように設定してみましょう。
 
 \begin{terminal}[シミュレーションの時刻を使って RViz2 を起動する]
-$ rviz2 --ros-args -p use_sim_time:=true
+~/ros2_ws$ rviz2 --ros-args -p use_sim_time:=true
 \end{terminal}
 
 \begin{enumerate}
@@ -313,7 +313,7 @@ TurtleBot3 Waffle には、カメラも搭載されています。
 画像は、RViz2 の「Image」の表示か、\cmd{rqt\_image\_view} で見られます。
 
 \begin{terminal}[Waffle でシミュレーションを起動して、カメラの画像を見る]
-$ TURTLEBOT3_MODEL=waffle ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
+~/ros2_ws$ TURTLEBOT3_MODEL=waffle ros2 launch turtlebot3_gazebo turtlebot3_world.launch.py
 $ ros2 run rqt_image_view rqt_image_view   # 別のターミナルで
 \end{terminal}
 
@@ -324,7 +324,7 @@ IMU のデータは、\cmd{/imu} トピックに \cmd{sensor\_msgs/msg/Imu} 型�
 ロボットの向き（クォータニオン）、角速度、加速度が入っていて、ロボットを回転させると \cmd{angular\_velocity.z} の値が変わります。
 
 \begin{terminal}[IMU のデータを表示する]
-$ ros2 topic echo --field angular_velocity /imu
+~/ros2_ws$ ros2 topic echo --field angular_velocity /imu
 \end{terminal}
 
 シミュレーションのセンサにも、設定によっては現実のセンサのような雑音が加えられています。

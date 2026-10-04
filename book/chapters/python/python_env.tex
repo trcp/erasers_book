@@ -174,8 +174,8 @@ Python には、仮想環境を作るための \textbf{venv} という機能が�
 \begin{terminal}[仮想環境を作る]
 $ mkdir ~/py_practice
 $ cd ~/py_practice
-$ python3 -m venv .venv
-$ ls -a
+~/py_practice$ python3 -m venv .venv
+~/py_practice$ ls -a
 .  ..  .venv
 \end{terminal}
 
@@ -187,7 +187,7 @@ $ ls -a
 有効化すると、プロンプトの先頭に仮想環境の名前が表示されます。
 
 \begin{terminal}[仮想環境を有効にする]
-$ source .venv/bin/activate
+~/py_practice$ source .venv/bin/activate
 (.venv) user@robot:~/py_practice$
 \end{terminal}
 
@@ -195,18 +195,18 @@ $ source .venv/bin/activate
 \cmd{which} コマンド（\ref{sec:terminal-relation}節）で確かめてみましょう。
 
 \begin{terminal}[仮想環境の python3 を確かめる]
-$ which python3
+~/py_practice$ which python3
 /home/user/py_practice/.venv/bin/python3
 \end{terminal}
 
 仮想環境の中であれば、\cmd{pip install} でパッケージをインストールできます。
 
 \begin{terminal}[仮想環境でパッケージを入れる]
-$ pip install numpy
+~/py_practice$ pip install numpy
 Collecting numpy
 ...
 Successfully installed numpy-2.1.1
-$ python3 -c "import numpy; print(numpy.__version__)"
+~/py_practice$ python3 -c "import numpy; print(numpy.__version__)"
 2.1.1
 \end{terminal}
 
@@ -219,7 +219,7 @@ $ python3 -c "import numpy; print(numpy.__version__)"
 プロンプトの先頭の \cmd{(.venv)} が消え、システムの Python に戻ります。
 
 \begin{terminal}[仮想環境を終了する]
-$ deactivate
+~/py_practice$ deactivate
 user@robot:~/py_practice$
 \end{terminal}
 
@@ -264,7 +264,7 @@ user@robot:~/py_practice$
 Ubuntu 24.04 で、仮想環境の外から \cmd{pip install} を実行すると、次のようなエラーが表示されます。
 
 \begin{terminal}[仮想環境の外で pip install する]
-$ pip install numpy
+~/py_practice$ pip install numpy
 error: externally-managed-environment
 ...
 \end{terminal}
@@ -304,7 +304,7 @@ ROS 2 には、パッケージが必要とするものを apt でまとめてイ
 仮想環境の中から ROS 2 を使うこともできますが、その場合は、仮想環境を作るときに \cmd{--system-site-packages} オプションを付けて、システムにインストールされた \cmd{rclpy} なども見えるようにする必要があります。
 
 \begin{terminal}[システムのパッケージも使う仮想環境]
-$ python3 -m venv --system-site-packages .venv
+~/py_practice$ python3 -m venv --system-site-packages .venv
 \end{terminal}
 
 ROS 2 と仮想環境を組み合わせるとトラブルの原因にもなりやすいので、本書では、ROS 2 のノードで使うパッケージは apt で入れることにします。

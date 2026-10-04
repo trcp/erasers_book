@@ -130,9 +130,9 @@ setup(
 
 \begin{terminal}[はじめての launch ファイルを実行する]
 $ cd ~/ros2_ws
-$ colcon build --symlink-install --packages-select my_package
-$ source install/local_setup.bash
-$ ros2 launch my_package turtlesim_controller.launch.py
+~/ros2_ws$ colcon build --symlink-install --packages-select my_package
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 launch my_package turtlesim_controller.launch.py
 \end{terminal}
 
 1 つのコマンドで、turtlesim が開き、カメが自動で動き始めます。
@@ -180,7 +180,7 @@ launch ファイルの \cmd{Node} に \cmd{parameters} を書くと、パラメ�
 こうしておけば、ワークスペースの場所が変わっても、ほかの人のコンピュータでも、同じ launch ファイルが動きます。
 
 \begin{terminal}[パラメータを設定する launch ファイルを実行する]
-$ ros2 launch my_package param.launch.py
+~/ros2_ws$ ros2 launch my_package param.launch.py
 ...
 [param_node-2] [INFO] [...] [param_node]: robo の最高速度は 0.8 m/s です
 \end{terminal}
@@ -190,7 +190,7 @@ turtlesim の背景が紺色になり、\cmd{param\_node} は YAML ファイル�
 \cmd{ros2 run} で起動するときも、\cmd{--params-file} で YAML ファイルを指定できます（\ref{sec:ros2-concepts-param}節）。
 
 \begin{terminal}[ros2 run で YAML ファイルを読み込む]
-$ ros2 run my_package param_node --ros-args --params-file ~/ros2_ws/src/my_package/config/turtlesim.yaml
+~/ros2_ws$ ros2 run my_package param_node --ros-args --params-file ~/ros2_ws/src/my_package/config/turtlesim.yaml
 \end{terminal}
 
 \section{名前空間とリマップ}
@@ -212,7 +212,7 @@ turtlesim と \cmd{turtle\_controller} の組を、名前空間を変えて 2 �
 launch ファイルは Python のプログラムなので、for 文で同じノードを繰り返し作ることもできます。
 
 \begin{terminal}[名前空間を使う launch ファイルを実行する]
-$ ros2 launch my_package multi_turtles.launch.py
+~/ros2_ws$ ros2 launch my_package multi_turtles.launch.py
 $ ros2 topic list      # 別のターミナルで
 /parameter_events
 /robot1/turtle1/cmd_vel
@@ -247,8 +247,8 @@ turtlesim には、\cmd{/input/pose} を受け取り、同じ動きをするよ�
 起動したら、1 匹目のカメに速度の指令を送ってみましょう。
 
 \begin{terminal}[1 匹目のカメを動かす]
-$ ros2 launch my_package mimic.launch.py
-$ ros2 topic pub --rate 1 /turtlesim1/turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0}, angular: {z: -1.8}}"
+~/ros2_ws$ ros2 launch my_package mimic.launch.py
+~/ros2_ws$ ros2 topic pub --rate 1 /turtlesim1/turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0}, angular: {z: -1.8}}"
 \end{terminal}
 
 指令を送っていない 2 匹目のカメも、1 匹目と同じように円を描いて動きます。
@@ -259,8 +259,8 @@ $ ros2 topic pub --rate 1 /turtlesim1/turtle1/cmd_vel geometry_msgs/msg/Twist "{
 名前空間やリマップは、\cmd{ros2 run} で起動するときも、\cmd{--ros-args} の後ろに \cmd{-r}（\cmd{--remap} の略）で指定できます。
 
 \begin{terminal}[ros2 run で名前空間とリマップを指定する]
-$ ros2 run turtlesim turtlesim_node --ros-args -r __ns:=/robot1
-$ ros2 run my_package listener --ros-args -r chatter:=my_chatter
+~/ros2_ws$ ros2 run turtlesim turtlesim_node --ros-args -r __ns:=/robot1
+~/ros2_ws$ ros2 run my_package listener --ros-args -r chatter:=my_chatter
 \end{terminal}
 
 \cmd{\_\_ns:=} で名前空間を、\cmd{元の名前:=新しい名前} でリマップを指定します。
@@ -295,13 +295,13 @@ launch 引数は、\cmd{ros2 launch} の後ろに \cmd{名前:=値} の形で指
 \cmd{-s}（\cmd{--show-args}）を付けると、その launch ファイルで指定できる引数の一覧が表示されます。
 
 \begin{terminal}[launch 引数を指定して実行する]
-$ ros2 launch my_package bringup.launch.py -s
+~/ros2_ws$ ros2 launch my_package bringup.launch.py -s
 Arguments (pass arguments as '<name>:=<value>'):
 
     'robot_name':
         ロボットの名前
         (default: 'turtle')
-$ ros2 launch my_package bringup.launch.py robot_name:=erasers
+~/ros2_ws$ ros2 launch my_package bringup.launch.py robot_name:=erasers
 ...
 [param_node-3] [INFO] [...] [param_node]: erasers の最高速度は 0.5 m/s です
 [listener-5] [INFO] [...] [listener]: I heard: "Hello, ROS 2! 0"

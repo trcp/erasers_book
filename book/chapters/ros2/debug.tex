@@ -40,7 +40,7 @@ turtlesim を使って、試してみましょう。
 
 \begin{terminal}[トピックを記録する]
 $ mkdir ~/bag_files && cd ~/bag_files
-$ ros2 bag record -o turtle_bag /turtle1/cmd_vel /turtle1/pose
+~/bag_files$ ros2 bag record -o turtle_bag /turtle1/cmd_vel /turtle1/pose
 [INFO] [...] [rosbag2_recorder]: Press SPACE for pausing/resuming
 ...
 [INFO] [...] [rosbag2_recorder]: Subscribed to topic '/turtle1/cmd_vel'
@@ -57,7 +57,7 @@ $ ros2 bag record -o turtle_bag /turtle1/cmd_vel /turtle1/pose
 \cmd{ros2 bag info} で、bag ファイルに何が記録されているかを確かめられます。
 
 \begin{terminal}[bag ファイルの情報を表示する]
-$ ros2 bag info turtle_bag
+~/bag_files$ ros2 bag info turtle_bag
 Files:             turtle_bag_0.mcap
 Bag size:          102.5 KiB
 Storage id:        mcap
@@ -78,8 +78,8 @@ ROS 2 Jazzy では、bag ファイルは \textbf{MCAP} という形式で保存�
 \cmd{turtle\_teleop\_key} を止め、turtlesim の \cmd{/reset} サービス（\ref{sec:ros2-concepts-service}節）でカメを最初の位置に戻してから、再生してみましょう。
 
 \begin{terminal}[記録したメッセージを再生する]
-$ ros2 service call /reset std_srvs/srv/Empty
-$ ros2 bag play turtle_bag
+~/bag_files$ ros2 service call /reset std_srvs/srv/Empty
+~/bag_files$ ros2 bag play turtle_bag
 \end{terminal}
 
 記録したときと同じように、カメが動きます。
@@ -138,7 +138,7 @@ $ ros2 bag play turtle_bag
 起動するときに、\cmd{--ros-args --log-level} でログレベルを変えられます。
 
 \begin{terminal}[DEBUG のログも表示する]
-$ ros2 run my_package talker --ros-args --log-level debug
+~/bag_files$ ros2 run my_package talker --ros-args --log-level debug
 \end{terminal}
 
 この方法では、rclpy の内部のログも表示されて、多すぎることがあります。
@@ -170,7 +170,7 @@ launch ファイルでたくさんのノードを起動していると、ター�
 そのようなときは、\textbf{rqt\_console} を使うと、\cmd{/rosout} に届いたすべてのノードのログを一覧で表示し、レベルやノード名で絞り込めます。
 
 \begin{terminal}[rqt\_console でログを見る]
-$ ros2 run rqt_console rqt_console
+~/bag_files$ ros2 run rqt_console rqt_console
 \end{terminal}
 
 \section{よくあるトラブルと対処法}
@@ -191,7 +191,7 @@ ROS 2 で思ったとおりに動かないときは、次の順番で確かめ�
 \cmd{ros2 doctor} を使うと、ROS 2 の環境やネットワークの設定に問題がないかを、まとめて調べてくれます。
 
 \begin{terminal}[ROS 2 の環境を調べる]
-$ ros2 doctor
+~/bag_files$ ros2 doctor
 ...
 All 5 checks passed
 \end{terminal}
@@ -287,7 +287,7 @@ self.create_subscription(OccupancyGrid, 'map', self.map_callback, map_qos)
 このようなときは、\cmd{ros2 topic info -v} で、両者の QoS を確かめましょう。
 
 \begin{terminal}[トピックの QoS を確かめる]
-$ ros2 topic info -v /scan
+~/bag_files$ ros2 topic info -v /scan
 Type: sensor_msgs/msg/LaserScan
 
 Publisher count: 1
@@ -305,7 +305,7 @@ QoS profile:
 そのときは、\cmd{--qos-reliability best\_effort} のように、QoS を指定して実行します。
 
 \begin{terminal}[QoS を指定してトピックを表示する]
-$ ros2 topic echo --qos-reliability best_effort /scan
+~/bag_files$ ros2 topic echo --qos-reliability best_effort /scan
 \end{terminal}
 
 \section*{この章のまとめ}

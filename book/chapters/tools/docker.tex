@@ -241,7 +241,7 @@ Dockerfile があれば、誰でも、何度でも、同じイメージを作る
 \begin{terminal}[Dockerfile を置くディレクトリを作る]
 $ mkdir ~/practice/docker
 $ cd ~/practice/docker
-$ gnome-text-editor Dockerfile
+~/practice/docker$ gnome-text-editor Dockerfile
 \end{terminal}
 
 \begin{codelisting}[style=bash]{Dockerfile}{lst:docker-dockerfile}
@@ -278,10 +278,10 @@ Dockerfile からイメージを作るには、Dockerfile のあるディレク�
 最後の \cmd{.} は、カレントディレクトリの Dockerfile を使う、という意味です。
 
 \begin{terminal}[イメージを作る]
-$ docker build -t my_tools .
+~/practice/docker$ docker build -t my_tools .
 ...
  => => naming to docker.io/library/my_tools
-$ docker run -it --rm my_tools
+~/practice/docker$ docker run -it --rm my_tools
 root@a1b2c3d4e5f6:~/work# python3 --version
 Python 3.12.3
 root@a1b2c3d4e5f6:~/work# exit
@@ -302,8 +302,8 @@ Python がインストールされたコンテナを動かせました（バー�
 次に、環境変数 \cmd{DISPLAY} と、X サーバとの通信に使うディレクトリをコンテナに渡して起動します。
 
 \begin{terminal}[コンテナの中の GUI アプリを表示する]
-$ xhost +local:
-$ docker run -it --rm \
+~/practice/docker$ xhost +local:
+~/practice/docker$ docker run -it --rm \
     -e DISPLAY=$DISPLAY \
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     my_tools \
@@ -345,7 +345,7 @@ $ docker run -it --rm --device /dev/ttyUSB0 my_tools
 後の章で学ぶ ROS 2 のプログラムをコンテナで動かすときにも、この 2 つのオプションをよく使います（補章\ref{sup:docker-ros}）。
 
 \begin{terminal}[ホストのネットワークを使うコンテナ]
-$ docker run -it --rm --network host --ipc host my_tools
+~/practice/docker$ docker run -it --rm --network host --ipc host my_tools
 \end{terminal}
 
 \section{Docker Compose と Dev Containers}
@@ -379,12 +379,11 @@ USB の機器を渡すときは、\cmd{devices:} という項目に \cmd{- /dev/
 共有するディレクトリは、先に作っておきます。
 
 \begin{terminal}[Docker Compose でコンテナを起動する]
-$ cd ~/practice/docker
-$ mkdir -p work
-$ docker compose up -d             # バックグラウンドで起動する
-$ docker compose exec tools bash   # コンテナの中のシェルを開く
+~/practice/docker$ mkdir -p work
+~/practice/docker$ docker compose up -d             # バックグラウンドで起動する
+~/practice/docker$ docker compose exec tools bash   # コンテナの中のシェルを開く
 root@robot:~/work# exit
-$ docker compose down              # コンテナを停止して削除する
+~/practice/docker$ docker compose down              # コンテナを停止して削除する
 \end{terminal}
 
 \cmd{network\_mode: host} を指定しているので、コンテナの中のプロンプトのホスト名も、ホストと同じ名前になります。

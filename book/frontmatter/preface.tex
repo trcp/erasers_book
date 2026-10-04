@@ -98,10 +98,14 @@
 \begin{terminal}[ターミナルの枠の例]
 $ echo "Hello, robot!"
 Hello, robot!
+$ cd ~/practice
+~/practice$ ls
+memo.txt
 \end{terminal}
 
 \begin{itemize}
   \item \cmd{\$} から始まる行は、一般ユーザで実行するコマンドです。\cmd{\$} は入力せず、その後ろの部分だけを入力して \key{Enter} を押します。
+  \item \cmd{\textasciitilde/practice\$ ls} のように、\cmd{\$} の前にパスが書かれている行は、そのディレクトリ（ここではホームディレクトリの中の \cmd{practice}）で実行するコマンドです。その前に \cmd{cd} で移動したときに、今どこにいるのかがわかるように書いています。パスと \cmd{\$} は入力しません。
   \item \cmd{\#} から始まる行は、root 権限で実行するコマンドです。
   \item \cmd{\$} や \cmd{\#} が付いていない行は、コマンドの実行結果です（入力しません）。長い実行結果は、途中を \cmd{...} で省略しています。
   \item \cmd{<ファイル名>} のように山括弧で囲まれた部分は、自分の環境に合わせて置き換えてください。

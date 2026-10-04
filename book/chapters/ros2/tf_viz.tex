@@ -246,9 +246,9 @@ robot\_state\_publisher には、URDF の中身を、\cmd{robot\_description} �
 
 \begin{terminal}[ロボットのモデルを表示する]
 $ cd ~/ros2_ws
-$ colcon build --symlink-install --packages-select my_package
-$ source install/local_setup.bash
-$ ros2 launch my_package display.launch.py
+~/ros2_ws$ colcon build --symlink-install --packages-select my_package
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 launch my_package display.launch.py
 \end{terminal}
 
 joint\_state\_publisher\_gui のウィンドウと、RViz2 のウィンドウが開きます。

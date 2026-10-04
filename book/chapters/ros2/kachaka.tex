@@ -123,12 +123,12 @@ vcstool は、\ref{sec:ros2-install-install}節でインストールした \cmd{
 
 \begin{terminal}[erasers\_kachaka をダウンロードしてビルドする]
 $ cd ~/ros2_ws/src
-$ git clone https://github.com/trcp/erasers_kachaka.git
-$ vcs import . < erasers_kachaka/depends.repos
-$ cd ~/ros2_ws
-$ rosdep install -i --from-path src --rosdistro jazzy -y
-$ colcon build --symlink-install --packages-up-to erasers_kachaka_bringup
-$ source install/local_setup.bash
+~/ros2_ws/src$ git clone https://github.com/trcp/erasers_kachaka.git
+~/ros2_ws/src$ vcs import . < erasers_kachaka/depends.repos
+~/ros2_ws/src$ cd ~/ros2_ws
+~/ros2_ws$ rosdep install -i --from-path src --rosdistro jazzy -y
+~/ros2_ws$ colcon build --symlink-install --packages-up-to erasers_kachaka_bringup
+~/ros2_ws$ source install/local_setup.bash
 \end{terminal}
 
 \cmd{--packages-up-to}（\ref{sec:workspace-colcon}節）で、起動に必要なパッケージだけをビルドしています。
@@ -178,7 +178,7 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp    # 通信に使う DDS
 \cmd{use\_rviz:=True} は、RViz2 も一緒に起動するための launch 引数（\ref{sec:launch-bringup}節）です。
 
 \begin{terminal}[erasers\_kachaka を起動する]
-$ ros2 launch erasers_kachaka_bringup bringup.launch.py use_rviz:=True
+~/ros2_ws$ ros2 launch erasers_kachaka_bringup bringup.launch.py use_rviz:=True
 \end{terminal}
 
 しばらく待つと、カチャカが「スタート」と話し、RViz2 にカチャカのモデルと、LiDAR で測った点などが表示されます（図\ref{fig:kachaka-rviz}）。
@@ -196,7 +196,7 @@ RViz2 の表示が重くて作業しにくいときは、\cmd{use\_rviz:=False} 
 別のターミナルで、どのようなトピックがあるかを調べてみましょう（\ref{sec:ros2-concepts-topic}節）。
 
 \begin{terminal}[カチャカのトピックを調べる]
-$ ros2 topic list | grep er_kachaka
+~/ros2_ws$ ros2 topic list | grep er_kachaka
 /er_kachaka/front_camera/image_raw
 /er_kachaka/kachaka_speak
 /er_kachaka/lidar/scan
@@ -231,7 +231,7 @@ $ ros2 topic list | grep er_kachaka
 カチャカが 1 m ほど動くので、周りに十分な空間があることを確かめてから実行してください。
 
 \begin{terminal}[コマンドからカチャカを動かす]
-$ ros2 topic pub --rate 5 --times 10 /er_kachaka/manual_control/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}, angular: {z: 0.1}}"
+~/ros2_ws$ ros2 topic pub --rate 5 --times 10 /er_kachaka/manual_control/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}, angular: {z: 0.1}}"
 \end{terminal}
 
 \cmd{--rate 5 --times 10} は、「1 秒に 5 回、合計 10 回送る」という意味です。
@@ -244,7 +244,7 @@ $ ros2 topic pub --rate 5 --times 10 /er_kachaka/manual_control/cmd_vel geometry
 カチャカは \cmd{Twist} を使うので、\cmd{stamped} の設定は不要です。
 
 \begin{terminal}[キーボードでカチャカを動かす]
-$ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=/er_kachaka/manual_control/cmd_vel
+~/ros2_ws$ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r cmd_vel:=/er_kachaka/manual_control/cmd_vel
 \end{terminal}
 
 はじめは \key{Z} を何回か押して、速度を下げてから動かしましょう。
@@ -260,7 +260,7 @@ erasers\_kachaka は、\cmd{/er\_kachaka/kachaka\_speak} トピックに \cmd{st
 まずはコマンドから試してみましょう。
 
 \begin{terminal}[コマンドからカチャカに話させる]
-$ ros2 topic pub --once /er_kachaka/kachaka_speak std_msgs/msg/String "{data: 'こんにちは'}"
+~/ros2_ws$ ros2 topic pub --once /er_kachaka/kachaka_speak std_msgs/msg/String "{data: 'こんにちは'}"
 \end{terminal}
 
 \subsection{話させるノード}
@@ -277,7 +277,7 @@ $ ros2 topic pub --once /er_kachaka/kachaka_speak std_msgs/msg/String "{data: '�
 \cmd{setup.py} に \cmd{'kachaka\_speaker = my\_package.kachaka\_speaker:main',} を追加してビルドし、名前空間とパラメータを指定して起動します。
 
 \begin{terminal}[カチャカに話させるノードを起動する]
-$ ros2 run my_package kachaka_speaker --ros-args -r __ns:=/er_kachaka -p text:="ROS 2 を勉強しています" -p interval:=15.0
+~/ros2_ws$ ros2 run my_package kachaka_speaker --ros-args -r __ns:=/er_kachaka -p text:="ROS 2 を勉強しています" -p interval:=15.0
 [INFO] [...] [er_kachaka.kachaka_speaker]: 話す内容: ROS 2 を勉強しています
 ...
 \end{terminal}
@@ -298,7 +298,7 @@ ROS 2 の画像のメッセージと、OpenCV で扱う画像は形が違うの�
 どちらも apt でインストールします（\ref{sec:python-pep668}節）。
 
 \begin{terminal}[cv\_bridge と OpenCV をインストールする]
-$ sudo apt install ros-jazzy-cv-bridge python3-opencv
+~/ros2_ws$ sudo apt install ros-jazzy-cv-bridge python3-opencv
 \end{terminal}
 
 \subsection{画像を表示するノード}
@@ -313,8 +313,8 @@ $ sudo apt install ros-jazzy-cv-bridge python3-opencv
 \end{description}
 
 \begin{terminal}[カメラの画像を表示する]
-$ ros2 run my_package camera_viewer --ros-args -r __ns:=/er_kachaka
-$ ros2 run my_package camera_viewer --ros-args -r __ns:=/er_kachaka -p edge:=true
+~/ros2_ws$ ros2 run my_package camera_viewer --ros-args -r __ns:=/er_kachaka
+~/ros2_ws$ ros2 run my_package camera_viewer --ros-args -r __ns:=/er_kachaka -p edge:=true
 \end{terminal}
 
 ウィンドウに、カチャカから見た景色が表示されます。
@@ -361,7 +361,7 @@ LiDAR の角度 0（x 軸の向き）がロボットの左なので、ロボッ�
 ログは、\cmd{throttle\_duration\_sec}（\ref{sec:debug-log}節）で 1 秒に 1 回だけ表示するようにしています。
 
 \begin{terminal}[正面の距離を表示する]
-$ ros2 run my_package front_distance --ros-args -r __ns:=/er_kachaka
+~/ros2_ws$ ros2 run my_package front_distance --ros-args -r __ns:=/er_kachaka
 [INFO] [...] [er_kachaka.front_distance]: 正面の障害物までの距離: 1.23 m
 ...
 \end{terminal}
@@ -388,7 +388,7 @@ $ ros2 run my_package front_distance --ros-args -r __ns:=/er_kachaka
 プログラムは 1 行も書き換えずに、起動するときの指定だけで、カチャカに対応させられます。
 
 \begin{terminal}[障害物を避けるノードをカチャカで動かす]
-$ ros2 run my_package obstacle_avoider --ros-args -r __ns:=/er_kachaka -r cmd_vel:=manual_control/cmd_vel -r scan:=lidar/scan -p stamped:=false -p front_angle:=-1.5708 -p linear_speed:=0.1
+~/ros2_ws$ ros2 run my_package obstacle_avoider --ros-args -r __ns:=/er_kachaka -r cmd_vel:=manual_control/cmd_vel -r scan:=lidar/scan -p stamped:=false -p front_angle:=-1.5708 -p linear_speed:=0.1
 \end{terminal}
 
 \begin{description}

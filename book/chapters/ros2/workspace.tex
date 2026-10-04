@@ -76,25 +76,24 @@ turtlesim のソースコードは、\cmd{ros\_tutorials} というリポジト�
 \cmd{git clone}（\ref{sec:git-github}節）で、Jazzy 用のブランチ（\cmd{-b jazzy}）をダウンロードします。
 
 \begin{terminal}[turtlesim のソースコードをダウンロードする]
-$ cd ~/ros2_ws/src
-$ git clone https://github.com/ros/ros_tutorials.git -b jazzy
+~/ros2_ws$ cd ~/ros2_ws/src
+~/ros2_ws/src$ git clone https://github.com/ros/ros_tutorials.git -b jazzy
 \end{terminal}
 
 ビルドする前に、パッケージが必要としている依存パッケージをインストールしておきます（詳しくは\ref{sec:workspace-rosdep}節で説明します）。
 
 \begin{terminal}[依存パッケージをインストールする]
-$ cd ~/ros2_ws
-$ sudo rosdep init        # 最初の 1 回だけ
-$ rosdep update
-$ rosdep install -i --from-path src --rosdistro jazzy -y
+~/ros2_ws/src$ cd ~/ros2_ws
+~/ros2_ws$ sudo rosdep init        # 最初の 1 回だけ
+~/ros2_ws$ rosdep update
+~/ros2_ws$ rosdep install -i --from-path src --rosdistro jazzy -y
 #All required rosdeps installed successfully
 \end{terminal}
 
 準備ができたら、\textbf{ワークスペースのディレクトリ}（\cmd{\textasciitilde/ros2\_ws}）で \cmd{colcon build} を実行します。
 
 \begin{terminal}[ワークスペースをビルドする]
-$ cd ~/ros2_ws
-$ colcon build
+~/ros2_ws$ colcon build
 Starting >>> turtlesim
 Finished <<< turtlesim [25.2s]
 
@@ -105,7 +104,7 @@ Summary: 1 package finished [25.6s]
 ワークスペースの中を見ると、\cmd{build}・\cmd{install}・\cmd{log} ができています。
 
 \begin{terminal}[ビルド後のワークスペース]
-$ ls
+~/ros2_ws$ ls
 build  install  log  src
 \end{terminal}
 
@@ -144,8 +143,8 @@ Python のノードを書くときは、\cmd{--symlink-install} を付けてお�
 パッケージは、ワークスペースの \cmd{src} ディレクトリの中に作ります。
 
 \begin{terminal}[Python のパッケージを作る]
-$ cd ~/ros2_ws/src
-$ ros2 pkg create --build-type ament_python --license Apache-2.0 --node-name my_node my_package
+~/ros2_ws$ cd ~/ros2_ws/src
+~/ros2_ws/src$ ros2 pkg create --build-type ament_python --license Apache-2.0 --node-name my_node my_package
 going to create a new package
 package name: my_package
 destination directory: /home/user/ros2_ws/src
@@ -166,7 +165,7 @@ destination directory: /home/user/ros2_ws/src
 作られたパッケージの中を、\cmd{tree} コマンド（\ref{sec:package-apt}節）で見てみましょう。
 
 \begin{terminal}[Python のパッケージの中身]
-$ tree my_package
+~/ros2_ws/src$ tree my_package
 my_package
 ├── my_package
 │   ├── __init__.py
@@ -208,14 +207,14 @@ if __name__ == '__main__':
 ビルドしたパッケージを使うには、ワークスペースの \cmd{install/local\_setup.bash} を \cmd{source} で読み込む必要があります（\ref{sec:workspace-overlay}節）。
 
 \begin{terminal}[パッケージをビルドして実行する]
-$ cd ~/ros2_ws
-$ colcon build --packages-select my_package
+~/ros2_ws/src$ cd ~/ros2_ws
+~/ros2_ws$ colcon build --packages-select my_package
 Starting >>> my_package
 Finished <<< my_package [1.21s]
 
 Summary: 1 package finished [1.52s]
-$ source install/local_setup.bash
-$ ros2 run my_package my_node
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 run my_package my_node
 Hi from my_package.
 \end{terminal}
 
@@ -308,15 +307,14 @@ rosdep を初めて使うときは、最初に 1 回だけ \cmd{sudo rosdep init
 その後、\cmd{rosdep update} で、依存パッケージの対応表を最新にします。
 
 \begin{terminal}[rosdep の初期設定と更新]
-$ sudo rosdep init
-$ rosdep update
+~/ros2_ws$ sudo rosdep init
+~/ros2_ws$ rosdep update
 \end{terminal}
 
 依存パッケージをインストールするには、ワークスペースのディレクトリで次のコマンドを実行します。
 
 \begin{terminal}[依存パッケージをインストールする]
-$ cd ~/ros2_ws
-$ rosdep install -i --from-path src --rosdistro jazzy -y
+~/ros2_ws$ rosdep install -i --from-path src --rosdistro jazzy -y
 \end{terminal}
 
 \begin{description}
@@ -356,8 +354,8 @@ apt でインストールした ROS 2（\cmd{/opt/ros/jazzy}）の上に、自�
 ワークスペースを使うときは、まずアンダーレイ（ROS 2 本体）の設定を読み込み、その後にオーバーレイ（自分のワークスペース）の設定を読み込みます。
 
 \begin{terminal}[アンダーレイとオーバーレイを読み込む]
-$ source /opt/ros/jazzy/setup.bash          # アンダーレイ
-$ source ~/ros2_ws/install/local_setup.bash # オーバーレイ
+~/ros2_ws$ source /opt/ros/jazzy/setup.bash          # アンダーレイ
+~/ros2_ws$ source ~/ros2_ws/install/local_setup.bash # オーバーレイ
 \end{terminal}
 
 1 行目は、\ref{sec:ros2-install-setup}節で \cmd{.bashrc} に書いたので、ターミナルを開いたときに自動で実行されています。
@@ -382,10 +380,9 @@ turtlesim のウィンドウのタイトルを決めているのは、\cmd{turtl
 テキストエディターや VS Code でこのファイルを開き、\cmd{"TurtleSim"} を \cmd{"MyTurtleSim"} に書き換えて保存してから、ビルドし直します。
 
 \begin{terminal}[改造した turtlesim をビルドして起動する]
-$ cd ~/ros2_ws
-$ colcon build --packages-select turtlesim
-$ source install/local_setup.bash
-$ ros2 run turtlesim turtlesim_node
+~/ros2_ws$ colcon build --packages-select turtlesim
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 run turtlesim turtlesim_node
 \end{terminal}
 
 ウィンドウのタイトルが「MyTurtleSim」になっていれば、オーバーレイ（自分のワークスペース）の turtlesim が使われています。

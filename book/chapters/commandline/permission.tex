@@ -27,9 +27,9 @@
 \begin{terminal}[練習用のファイルを作って、パーミッションを確認する]
 $ mkdir ~/practice/perm
 $ cd ~/practice/perm
-$ mkdir scripts
-$ touch notes.txt start_robot.sh
-$ ls -l
+~/practice/perm$ mkdir scripts
+~/practice/perm$ touch notes.txt start_robot.sh
+~/practice/perm$ ls -l
 total 4
 -rw-rw-r-- 1 user user    0 Sep 30 10:01 notes.txt
 drwxrwxr-x 2 user user 4096 Sep 30 10:00 scripts
@@ -83,7 +83,7 @@ drwxrwxr-x 2 user user 4096 Sep 30 10:00 scripts
 権限がないと、次のようなエラーになります。
 
 \begin{terminal}[実行権限がないファイルを実行した場合]
-$ ./notes.txt
+~/practice/perm$ ./notes.txt
 bash: ./notes.txt: Permission denied
 \end{terminal}
 
@@ -98,9 +98,9 @@ bash: ./notes.txt: Permission denied
 \textbf{記号で指定する方法}では、「誰に（\cmd{u}：所有者、\cmd{g}：グループ、\cmd{o}：その他、\cmd{a}：全員）」「追加するか削除するか（\cmd{+} / \cmd{-}）」「どの権限を（\cmd{r}, \cmd{w}, \cmd{x}）」を組み合わせて書きます。
 
 \begin{terminal}[記号で権限を変える]
-$ chmod u+x start_robot.sh      # 所有者に実行権限を追加
-$ chmod go-w notes.txt          # グループとその他から書き込み権限を削除
-$ chmod +x start_robot.sh       # 誰にも指定しないと、全員に追加
+~/practice/perm$ chmod u+x start_robot.sh      # 所有者に実行権限を追加
+~/practice/perm$ chmod go-w notes.txt          # グループとその他から書き込み権限を削除
+~/practice/perm$ chmod +x start_robot.sh       # 誰にも指定しないと、全員に追加
 \end{terminal}
 
 最もよく使うのは、スクリプトに実行権限を付ける \cmd{chmod +x} です。
@@ -121,11 +121,11 @@ $ chmod +x start_robot.sh       # 誰にも指定しないと、全員に追加
 \end{tablebox}
 
 \begin{terminal}[数字で権限を変える]
-$ chmod 754 start_robot.sh
-$ ls -l start_robot.sh
+~/practice/perm$ chmod 754 start_robot.sh
+~/practice/perm$ ls -l start_robot.sh
 -rwxr-xr-- 1 user user 0 Sep 30 10:02 start_robot.sh
-$ chmod 755 start_robot.sh
-$ ls -l start_robot.sh
+~/practice/perm$ chmod 755 start_robot.sh
+~/practice/perm$ ls -l start_robot.sh
 -rwxr-xr-x 1 user user 0 Sep 30 10:02 start_robot.sh
 \end{terminal}
 
@@ -150,11 +150,11 @@ $ ls -l start_robot.sh
 \cmd{sudo} を付けてファイルを作り、所有者を戻してみましょう。
 
 \begin{terminal}[所有者を変える]
-$ sudo touch root_file.txt
-$ ls -l root_file.txt
+~/practice/perm$ sudo touch root_file.txt
+~/practice/perm$ ls -l root_file.txt
 -rw-r--r-- 1 root root 0 Sep 30 10:05 root_file.txt
-$ sudo chown user:user root_file.txt
-$ ls -l root_file.txt
+~/practice/perm$ sudo chown user:user root_file.txt
+~/practice/perm$ ls -l root_file.txt
 -rw-r--r-- 1 user user 0 Sep 30 10:05 root_file.txt
 \end{terminal}
 
@@ -199,7 +199,7 @@ ROS 2 のワークスペースのビルド（\ref{chap:workspace}章）や、自
 たとえば、root しか書き込めないファイルに、\cmd{>}（\ref{sec:text-pipe-redirect}節）で文字を書き込もうとすると、\cmd{sudo} を付けてもエラーになります。
 
 \begin{terminal}[sudo を付けても書き込めない例]
-$ sudo echo "hello" > /etc/robot.conf
+~/practice/perm$ sudo echo "hello" > /etc/robot.conf
 bash: /etc/robot.conf: Permission denied
 \end{terminal}
 
@@ -207,7 +207,7 @@ bash: /etc/robot.conf: Permission denied
 このような場合は、\cmd{tee} コマンドを \cmd{sudo} で実行して書き込みます。
 
 \begin{terminal}[tee を使って root の権限で書き込む]
-$ echo "hello" | sudo tee /etc/robot.conf
+~/practice/perm$ echo "hello" | sudo tee /etc/robot.conf
 hello
 \end{terminal}
 
@@ -238,7 +238,7 @@ crw-rw---- 1 root dialout 188, 0 Sep 30 10:15 /dev/ttyUSB0
 自分が所属しているグループは、\cmd{groups} コマンドで確認できます。
 
 \begin{terminal}[所属しているグループを確認する]
-$ groups
+~/practice/perm$ groups
 user adm cdrom sudo dip plugdev users lpadmin
 \end{terminal}
 
@@ -247,7 +247,7 @@ user adm cdrom sudo dip plugdev users lpadmin
 \cmd{\$USER} は、自分のユーザ名が入った環境変数です（\ref{chap:env}章）。
 
 \begin{terminal}[dialout グループに自分を追加する]
-$ sudo usermod -aG dialout $USER
+~/practice/perm$ sudo usermod -aG dialout $USER
 \end{terminal}
 
 \textbf{グループの変更は、一度ログアウトしてログインし直すまで反映されません。}

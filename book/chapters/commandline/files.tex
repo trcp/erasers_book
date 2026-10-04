@@ -119,10 +119,10 @@ $ ls -a
 
 \begin{terminal}[ディレクトリを移動する]
 $ cd Documents
-$ pwd
+~/Documents$ pwd
 /home/user/Documents
-$ cd /etc
-$ pwd
+~/Documents$ cd /etc
+/etc$ pwd
 /etc
 \end{terminal}
 
@@ -142,28 +142,21 @@ $ pwd
 \end{tablebox}
 
 \begin{terminal}[cd の便利な使い方]
-$ cd /usr/share
-$ cd ..
-$ pwd
+/etc$ cd /usr/share
+/usr/share$ cd ..
+/usr$ pwd
 /usr
-$ cd
-$ pwd
+/usr$ cd
+~$ pwd
 /home/user
-$ cd -
+~$ cd -
 /usr
 \end{terminal}
 
 どこにいるのかわからなくなったら、\cmd{cd} だけを入力してホームディレクトリに戻りましょう。
 
-\begin{tips}{ホームディレクトリの中のディレクトリ名}
-  Ubuntu を日本語でインストールすると、ホームディレクトリの中のディレクトリが「デスクトップ」「ドキュメント」のような日本語の名前で作られます。
-  CLI では日本語の入力切り替えが必要になって不便なので、英語の名前に変えておくことをおすすめします。
-  次のコマンドを実行し、表示されたダイアログで「Update Names」を選ぶと、ディレクトリ名が英語に変わります。
-  \begin{terminal}
-$ LANG=C xdg-user-dirs-gtk-update
-  \end{terminal}
-  本書では、英語の名前（\cmd{Desktop}, \cmd{Documents} など）を使って説明します。
-\end{tips}
+\ref{sec:linux-first-setup}節でフォルダ名を英語にしていない場合は、\cmd{Desktop} や \cmd{Documents} が「デスクトップ」「ドキュメント」のような日本語の名前になっています。
+本書の説明と同じにするために、\ref{sec:linux-first-setup}節の手順で英語の名前に変えておきましょう。
 
 \section{絶対パスと相対パス}
 \label{sec:files-path}
@@ -230,17 +223,17 @@ $ cat Documents/memo.txt               # 相対パス
 \cmd{..} は重ねて使うこともできます。
 
 \begin{terminal}[特別な記号を使ったパス]
-$ cd ~/Documents     # /home/user/Documents に移動
-$ cd ..              # /home/user に移動
-$ cd ../..           # 2 つ上の / に移動
-$ ls ~/Downloads     # どこにいても /home/user/Downloads の中身を表示
+/usr$ cd ~/Documents     # /home/user/Documents に移動
+~/Documents$ cd ..              # /home/user に移動
+~$ cd ../..           # 2 つ上の / に移動
+/$ ls ~/Downloads     # どこにいても /home/user/Downloads の中身を表示
 \end{terminal}
 
 \cmd{.} は一見使い道がないように思えますが、「カレントディレクトリにあるプログラムを実行する」ときなどに使います（\ref{chap:shellscript}章）。
 
-\begin{terminal}[ここにあるプログラムを実行する]
+\begin{termexample}[ここにあるプログラムを実行する]
 $ ./setup.sh
-\end{terminal}
+\end{termexample}
 
 \begin{point}[どちらを使えばよいか]
   ターミナルで手を動かしているときは、短く書ける相対パスが便利です。
@@ -258,10 +251,10 @@ $ ./setup.sh
 \cmd{mkdir}（make directory）は、ディレクトリを作るコマンドです。
 
 \begin{terminal}[ディレクトリを作る]
-$ cd
-$ mkdir practice
-$ cd practice
-$ pwd
+/$ cd
+~$ mkdir practice
+~$ cd practice
+~/practice$ pwd
 /home/user/practice
 \end{terminal}
 
@@ -269,10 +262,10 @@ $ pwd
 \cmd{-p} を付けると、途中のディレクトリが存在しなければまとめて作ってくれます。
 
 \begin{terminal}[深い階層のディレクトリを一度に作る]
-$ mkdir a/b/c
+~/practice$ mkdir a/b/c
 mkdir: cannot create directory 'a/b/c': No such file or directory
-$ mkdir -p a/b/c
-$ ls a/b
+~/practice$ mkdir -p a/b/c
+~/practice$ ls a/b
 c
 \end{terminal}
 
@@ -287,8 +280,8 @@ ROS 2 のワークスペースを作るときにも、\cmd{mkdir -p \textasciiti
 \cmd{ls} の結果に、ホームディレクトリの \cmd{Desktop} などが表示されないのはそのためです。
 
 \begin{terminal}[空のファイルを作る]
-$ touch memo.txt
-$ ls
+~/practice$ touch memo.txt
+~/practice$ ls
 a  memo.txt
 \end{terminal}
 
@@ -298,26 +291,26 @@ a  memo.txt
 \cmd{cp コピー元 コピー先} の順に指定します。
 
 \begin{terminal}[ファイルをコピーする]
-$ cp memo.txt memo_backup.txt
-$ ls
+~/practice$ cp memo.txt memo_backup.txt
+~/practice$ ls
 a  memo.txt  memo_backup.txt
 \end{terminal}
 
 コピー先に既存のディレクトリを指定すると、そのディレクトリの中に同じ名前でコピーされます。
 
 \begin{terminal}[ディレクトリの中にコピーする]
-$ cp memo.txt a/
-$ ls a
+~/practice$ cp memo.txt a/
+~/practice$ ls a
 b  memo.txt
 \end{terminal}
 
 ディレクトリを中身ごとコピーするときは、\cmd{-r}（recursive）オプションが必要です。
 
 \begin{terminal}[ディレクトリを中身ごとコピーする]
-$ cp a a_copy
+~/practice$ cp a a_copy
 cp: -r not specified; omitting directory 'a'
-$ cp -r a a_copy
-$ ls
+~/practice$ cp -r a a_copy
+~/practice$ ls
 a  a_copy  memo.txt  memo_backup.txt
 \end{terminal}
 
@@ -328,16 +321,16 @@ a  a_copy  memo.txt  memo_backup.txt
 ディレクトリの場合も \cmd{-r} は必要ありません。
 
 \begin{terminal}[ファイルを移動する]
-$ mv memo_backup.txt a/
-$ ls
+~/practice$ mv memo_backup.txt a/
+~/practice$ ls
 a  a_copy  memo.txt
 \end{terminal}
 
 Linux には「名前を変える」専用のコマンドはなく、\cmd{mv} で同じディレクトリの中の別の名前に移動することで名前を変更します。
 
 \begin{terminal}[名前を変える]
-$ mv a_copy b
-$ ls
+~/practice$ mv a_copy b
+~/practice$ ls
 a  b  memo.txt
 \end{terminal}
 
@@ -356,18 +349,18 @@ cp: overwrite 'a/memo.txt'? n
 \cmd{rm}（remove）は、ファイルを削除するコマンドです。
 
 \begin{terminal}[ファイルを削除する]
-$ rm memo.txt
-$ ls
+~/practice$ rm memo.txt
+~/practice$ ls
 a  b
 \end{terminal}
 
 ディレクトリを中身ごと削除するときは、\cmd{-r} オプションを付けます。
 
 \begin{terminal}[ディレクトリを中身ごと削除する]
-$ rm b
+~/practice$ rm b
 rm: cannot remove 'b': Is a directory
-$ rm -r b
-$ ls
+~/practice$ rm -r b
+~/practice$ ls
 a
 \end{terminal}
 
@@ -386,10 +379,10 @@ a
 そのため、名前にスペースを含むファイルを扱うときは、クォートで囲むか、スペースの前に \cmd{\textbackslash} を付ける必要があります。
 
 \begin{terminal}[スペースを含む名前を扱う]
-$ touch "my memo.txt"
-$ ls
+~/practice$ touch "my memo.txt"
+~/practice$ ls
 a  'my memo.txt'
-$ rm my\ memo.txt
+~/practice$ rm my\ memo.txt
 \end{terminal}
 
 入力の手間や間違いのもとになるので、自分でファイルを作るときは、名前にスペースや日本語を使わず、半角英数字とハイフン（\cmd{-}）・アンダースコア（\cmd{\_}）だけを使うようにしましょう。
@@ -406,7 +399,7 @@ $ rm my\ memo.txt
 短いファイルの中身を確認するときに使います。
 
 \begin{terminal}[ファイルの中身を表示する]
-$ cat /etc/hostname
+~/practice$ cat /etc/hostname
 robot
 \end{terminal}
 
@@ -421,7 +414,7 @@ robot
 そのようなときは \cmd{less} を使います。
 
 \begin{terminal}[長いファイルを 1 画面ずつ表示する]
-$ less /etc/services
+~/practice$ less /etc/services
 \end{terminal}
 
 \cmd{less} の操作は、\ref{sec:terminal-help}節で紹介した \cmd{man} と同じです（実は \cmd{man} は、内部で \cmd{less} を使って表示しています）。
@@ -434,10 +427,10 @@ $ less /etc/services
 標準では 10 行を表示し、\cmd{-n} オプションで行数を指定できます。
 
 \begin{terminal}[先頭と末尾を表示する]
-$ head -n 2 /etc/os-release
+~/practice$ head -n 2 /etc/os-release
 PRETTY_NAME="Ubuntu 24.04.1 LTS"
 NAME="Ubuntu"
-$ tail -n 2 /etc/os-release
+~/practice$ tail -n 2 /etc/os-release
 UBUNTU_CODENAME=noble
 LOGO=ubuntu-logo
 \end{terminal}
@@ -448,7 +441,7 @@ LOGO=ubuntu-logo
 終了するときは \key{Ctrl}+\key{C} を押します。
 
 \begin{terminal}[ログファイルを監視する]
-$ tail -f /var/log/syslog
+~/practice$ tail -f /var/log/syslog
 \end{terminal}
 
 USB メモリを挿したり、Wi-Fi につなぎ直したりすると、新しい行が追加されるのがわかります。
@@ -477,8 +470,7 @@ USB メモリを挿したり、Wi-Fi につなぎ直したりすると、新し�
 指定したファイルがなければ、その名前の新しいファイルとして開かれます（保存したときにファイルが作られます）。
 
 \begin{terminal}[ターミナルからテキストエディターを起動する]
-$ cd ~/practice
-$ gnome-text-editor memo.txt
+~/practice$ gnome-text-editor memo.txt
 \end{terminal}
 
 起動すると、図\ref{fig:files-text-editor}のようなウィンドウが開きます。
@@ -533,7 +525,7 @@ $ gnome-text-editor memo.txt
 \cmd{\textasciitilde/.bashrc}（\ref{chap:env}章）のような隠しファイルも、ターミナルからファイル名を指定すれば、ほかのファイルと同じように開けます。
 
 \begin{terminal}[隠しファイルをテキストエディターで開く]
-$ gnome-text-editor ~/.bashrc
+~/practice$ gnome-text-editor ~/.bashrc
 \end{terminal}
 
 一方、\cmd{/etc} の下の設定ファイルのように、root しか書き込めないファイルは、テキストエディターで開いても保存できません。
@@ -563,7 +555,7 @@ $ gnome-text-editor ~/.bashrc
 最もよく使う条件は、名前で探す \cmd{-name} です。
 
 \begin{terminal}[名前でファイルを探す]
-$ find ~ -name memo.txt
+~/practice$ find ~ -name memo.txt
 /home/user/practice/memo.txt
 /home/user/practice/a/memo.txt
 \end{terminal}
@@ -574,7 +566,7 @@ $ find ~ -name memo.txt
 このとき、パターンはクォートで囲んでください（理由は次の節で説明します）。
 
 \begin{terminal}[名前の一部で探す]
-$ find /usr/share/applications -name "org.gnome.*"
+~/practice$ find /usr/share/applications -name "org.gnome.*"
 /usr/share/applications/org.gnome.TextEditor.desktop
 /usr/share/applications/org.gnome.Terminal.desktop
 ...
@@ -602,7 +594,7 @@ $ find /usr/share/applications -name "org.gnome.*"
 ディレクトリだけを探してみましょう。
 
 \begin{terminal}[ディレクトリだけを探す]
-$ find ~/practice -type d
+~/practice$ find ~/practice -type d
 /home/user/practice
 /home/user/practice/a
 /home/user/practice/a/b
@@ -619,8 +611,8 @@ $ find ~/practice -type d
 Ubuntu 24.04 では標準でインストールされていないので、次のように \cmd{plocate} パッケージをインストールして使います（\cmd{sudo apt install} はソフトウェアをインストールするコマンドで、\ref{chap:package}章で詳しく説明します）。
 
 \begin{terminal}[locate を使う]
-$ sudo apt install plocate
-$ locate os-release
+~/practice$ sudo apt install plocate
+~/practice$ locate os-release
 /etc/os-release
 /usr/lib/os-release
 ...
@@ -655,13 +647,12 @@ $ locate os-release
 練習用のファイルを作って試してみましょう。
 
 \begin{terminal}[ワイルドカードを使う]
-$ cd ~/practice
-$ touch data1.csv data2.csv data10.csv note.txt image.png
-$ ls *.csv
+~/practice$ touch data1.csv data2.csv data10.csv note.txt image.png
+~/practice$ ls *.csv
 data1.csv  data10.csv  data2.csv
-$ ls data?.csv
+~/practice$ ls data?.csv
 data1.csv  data2.csv
-$ ls data[12].csv
+~/practice$ ls data[12].csv
 data1.csv  data2.csv
 \end{terminal}
 
@@ -669,9 +660,9 @@ data1.csv  data2.csv
 ワイルドカードは \cmd{ls} だけでなく、\cmd{cp} や \cmd{mv}、\cmd{rm} など、ファイル名を受け取るどのコマンドでも使えます。
 
 \begin{terminal}[CSV ファイルをまとめて移動する]
-$ mkdir csv
-$ mv *.csv csv/
-$ ls csv
+~/practice$ mkdir csv
+~/practice$ mv *.csv csv/
+~/practice$ ls csv
 data1.csv  data10.csv  data2.csv
 \end{terminal}
 
@@ -682,7 +673,7 @@ data1.csv  data10.csv  data2.csv
 \cmd{echo} を使うと、展開された結果を確認できます。
 
 \begin{terminal}[ワイルドカードの展開結果を確認する]
-$ echo csv/*
+~/practice$ echo csv/*
 csv/data1.csv csv/data10.csv csv/data2.csv
 \end{terminal}
 
@@ -701,9 +692,9 @@ csv/data1.csv csv/data10.csv csv/data2.csv
 ワイルドカードと違って、ファイルが存在するかどうかに関係なく展開されるので、新しくファイルやディレクトリを作るときにも使えます。
 
 \begin{terminal}[ブレース展開]
-$ echo file_{a,b,c}.txt
+~/practice$ echo file_{a,b,c}.txt
 file_a.txt file_b.txt file_c.txt
-$ echo log{1..5}
+~/practice$ echo log{1..5}
 log1 log2 log3 log4 log5
 \end{terminal}
 
@@ -711,27 +702,22 @@ log1 log2 log3 log4 log5
 ブレース展開を使うと、複数のディレクトリを一度に作ることができます。
 
 \begin{terminal}[複数のディレクトリを一度に作る]
-$ mkdir -p my_robot/{config,launch,scripts}
-$ ls my_robot
+~/practice$ mkdir -p my_robot/{config,launch,scripts}
+~/practice$ ls my_robot
 config  launch  scripts
 \end{terminal}
 
 ファイルのバックアップを作るときにも便利です。
 
 \begin{terminal}[バックアップを作る]
-$ cp note.txt{,.bak}
-$ ls note*
+~/practice$ cp note.txt{,.bak}
+~/practice$ ls note*
 note.txt  note.txt.bak
 \end{terminal}
 
 \cmd{note.txt\{,.bak\}} は \cmd{note.txt note.txt.bak} に展開されるので、\cmd{cp note.txt note.txt.bak} と入力したのと同じ意味になります。
 
-最後に、練習用のディレクトリを削除しておきましょう。
-
-\begin{terminal}[練習用のディレクトリを削除する]
-$ cd
-$ rm -r ~/practice
-\end{terminal}
+練習用のディレクトリ \cmd{\textasciitilde/practice} は、次の章からも使うので、削除せずに残しておきましょう。
 
 \section*{この章のまとめ}
 

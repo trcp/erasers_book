@@ -23,16 +23,16 @@ Windows や macOS、スマートフォンの画面操作も GUI です。
 コマンドを入力して操作することから、\textbf{CLI}（Command Line Interface）とも呼ばれます。
 本書では、以降は主に CLI と呼ぶことにします。
 
-たとえば「ホームディレクトリにある \cmd{Documents} ディレクトリの中身を見る」という操作は、GUI と CLI で次のように違います。
+たとえば「ホームディレクトリ（自分のファイルを置く場所）の中身を見る」という操作は、GUI と CLI で次のように違います。
 
 \begin{itemize}
-  \item GUI：ファイルマネージャを開き、「Documents」のアイコンをダブルクリックする
-  \item CLI：ターミナルに \cmd{ls \textasciitilde/Documents} と入力して \key{Enter} を押す
+  \item GUI：ファイルマネージャ（「ファイル」）を開いて、「ホーム」を表示する
+  \item CLI：ターミナルに \cmd{ls \textasciitilde/} と入力して \key{Enter} を押す
 \end{itemize}
 
 \begin{terminal}[CLI でディレクトリの中身を見る]
-$ ls ~/Documents
-memo.txt  report.pdf
+$ ls ~/
+Desktop  Documents  Downloads  Music  Pictures  Public  snap  Templates  Videos
 \end{terminal}
 
 \begin{figure}[tb]
@@ -280,7 +280,6 @@ Hello           # 実行結果（この行は入力しない）
 コマンドは、基本的に次の形で入力します。
 それぞれの間は半角スペースで区切ります。
 \begin{terminal}[コマンドの基本形]
-\begin{terminal}
 $ コマンド名 オプション 引数
 \end{terminal}
 
@@ -295,16 +294,16 @@ $ コマンド名 オプション 引数
 
 \begin{terminal}[オプションと引数]
 $ ls
-Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
-$ ls -l Documents
-total 8
--rw-rw-r-- 1 user user   42 Sep 29 18:40 memo.txt
--rw-rw-r-- 1 user user 3120 Sep 29 18:41 report.pdf
+Desktop  Documents  Downloads  Music  Pictures  Public  snap  Templates  Videos
+$ ls -l /home
+total 4
+drwxr-x--- 15 user user 4096 Sep 29 18:33 user
 \end{terminal}
 
 1 つ目の \cmd{ls} は、オプションも引数もなしで実行しています。
 この場合、カレントディレクトリの中身が表示されます。
-2 つ目の \cmd{ls -l Documents} では、\cmd{-l}（詳しい情報を表示する）というオプションと、\cmd{Documents} という引数を指定しています。
+2 つ目の \cmd{ls -l /home} では、\cmd{-l}（詳しい情報を表示する）というオプションと、\cmd{/home} という引数を指定しています。
+\cmd{/home} は、ユーザごとのホームディレクトリが置かれている場所（\ref{sec:linux-internals-fs}節）で、自分のユーザ名のディレクトリが表示されます（\cmd{user} の部分は、自分のユーザ名になります）。
 
 \subsection{短いオプションと長いオプション}
 
@@ -514,7 +513,7 @@ $ history
     1  date
     2  echo $SHELL
     3  which date
-    4  ls -l Documents
+    4  ls -l /home
     5  history
 \end{terminal}
 
@@ -525,7 +524,7 @@ $ history
 入力した文字列を含むコマンドが、新しいものから順に検索されます。
 
 \begin{terminal}[Ctrl+R で履歴を検索する]
-(reverse-i-search)`ls': ls -l Documents
+(reverse-i-search)`ls': ls -l /home
 \end{terminal}
 
 \key{Ctrl}+\key{R} を続けて押すと、さらに古い候補に移ります。

@@ -106,7 +106,7 @@ GitHub で公開するつもりなら、メールアドレスは公開されて�
 \begin{terminal}[リポジトリを作る]
 $ mkdir ~/my_robot
 $ cd ~/my_robot
-$ git init
+~/my_robot$ git init
 Initialized empty Git repository in /home/user/my_robot/.git/
 \end{terminal}
 
@@ -147,7 +147,7 @@ Initialized empty Git repository in /home/user/my_robot/.git/
 \cmd{git status} は、Git を使っていて迷ったときにまず実行するコマンドです。
 
 \begin{terminal}[リポジトリの状態を確認する]
-$ git status
+~/my_robot$ git status
 On branch main
 
 No commits yet
@@ -166,8 +166,8 @@ nothing added to commit but untracked files present (use "git add" to track)
 \cmd{git add} で、\cmd{README.md} をステージングエリアに登録します。
 
 \begin{terminal}[ステージングエリアに登録する]
-$ git add README.md
-$ git status
+~/my_robot$ git add README.md
+~/my_robot$ git status
 On branch main
 
 No commits yet
@@ -182,7 +182,7 @@ Changes to be committed:
 \cmd{-m} の後ろには、何を変更したのかを説明する\textbf{コミットメッセージ}を書きます。
 
 \begin{terminal}[コミットする]
-$ git commit -m "Add README"
+~/my_robot$ git commit -m "Add README"
 [main (root-commit) 1a2b3c4] Add README
  1 file changed, 3 insertions(+)
  create mode 100644 README.md
@@ -206,7 +206,7 @@ $ git commit -m "Add README"
 \cmd{git diff} を使うと、最後のコミットから何が変わったのか（\textbf{差分}）を確認できます。
 
 \begin{terminal}[変更の差分を確認する]
-$ git diff
+~/my_robot$ git diff
 diff --git a/README.md b/README.md
 index 3b18e51..a3c9d2f 100644
 --- a/README.md
@@ -226,8 +226,8 @@ index 3b18e51..a3c9d2f 100644
 \cmd{git add .} と書くと、カレントディレクトリの下にある、変更されたすべてのファイルをまとめて登録できます。
 
 \begin{terminal}[変更をまとめてコミットする]
-$ git add .
-$ git commit -m "Add usage section to README"
+~/my_robot$ git add .
+~/my_robot$ git commit -m "Add usage section to README"
 \end{terminal}
 
 \subsection{履歴を見る}
@@ -236,7 +236,7 @@ $ git commit -m "Add usage section to README"
 \cmd{--oneline} を付けると、1 つのコミットを 1 行で簡潔に表示します。
 
 \begin{terminal}[コミットの履歴を見る]
-$ git log --oneline
+~/my_robot$ git log --oneline
 5d6e7f8 (HEAD -> main) Add usage section to README
 1a2b3c4 Add README
 \end{terminal}
@@ -250,11 +250,11 @@ $ git log --oneline
 \cmd{README.md} に間違えて行を追加したことにして、試してみましょう。
 
 \begin{terminal}[編集した内容を捨てる]
-$ echo "まちがえて追加した行" >> README.md
-$ git status --short
+~/my_robot$ echo "まちがえて追加した行" >> README.md
+~/my_robot$ git status --short
  M README.md
-$ git restore README.md
-$ git status --short
+~/my_robot$ git restore README.md
+~/my_robot$ git status --short
 \end{terminal}
 
 \cmd{--short} は、\cmd{git status} の表示を短くするオプションで、\cmd{M} は変更されたファイルを表しています。
@@ -264,12 +264,12 @@ $ git status --short
 このとき、ファイルの編集内容はそのまま残ります。
 
 \begin{terminal}[git add を取り消す]
-$ echo "まちがえて追加した行" >> README.md
-$ git add README.md
-$ git restore --staged README.md
-$ git status --short
+~/my_robot$ echo "まちがえて追加した行" >> README.md
+~/my_robot$ git add README.md
+~/my_robot$ git restore --staged README.md
+~/my_robot$ git status --short
  M README.md
-$ git restore README.md
+~/my_robot$ git restore README.md
 \end{terminal}
 
 \cmd{git restore --staged} の後は、ステージングエリアから外れて「編集しただけ」の状態（\cmd{M}）に戻っています。
@@ -367,9 +367,9 @@ __pycache__/
 \cmd{git branch} で、ブランチの一覧と、今いるブランチ（\cmd{*} が付いたもの）を確認できます。
 
 \begin{terminal}[ブランチを作って切り替える]
-$ git switch -c feature/lidar
+~/my_robot$ git switch -c feature/lidar
 Switched to a new branch 'feature/lidar'
-$ git branch
+~/my_robot$ git branch
 * feature/lidar
   main
 \end{terminal}
@@ -377,17 +377,17 @@ $ git branch
 このブランチの上で、ファイルを作ったり編集したりしてコミットしてみましょう。
 
 \begin{terminal}[ブランチの上でコミットする]
-$ echo "lidar_port: /dev/ttyUSB0" > lidar.yaml
-$ git add lidar.yaml
-$ git commit -m "Add LiDAR config"
+~/my_robot$ echo "lidar_port: /dev/ttyUSB0" > lidar.yaml
+~/my_robot$ git add lidar.yaml
+~/my_robot$ git commit -m "Add LiDAR config"
 \end{terminal}
 
 \cmd{git switch main} で \cmd{main} ブランチに戻ると、\cmd{lidar.yaml} は作業ディレクトリから消えます。
 \cmd{main} ブランチには、まだこのコミットが含まれていないからです。
 
 \begin{terminal}[main ブランチに戻る]
-$ git switch main
-$ ls
+~/my_robot$ git switch main
+~/my_robot$ ls
 README.md
 \end{terminal}
 
@@ -396,13 +396,13 @@ README.md
 \cmd{feature/lidar} ブランチの変更を \cmd{main} に取り込むには、\cmd{main} ブランチにいる状態で \cmd{git merge} を実行します。
 
 \begin{terminal}[ブランチをマージする]
-$ git merge feature/lidar
+~/my_robot$ git merge feature/lidar
 Updating 5d6e7f8..9a8b7c6
 Fast-forward
  lidar.yaml | 1 +
  1 file changed, 1 insertion(+)
  create mode 100644 lidar.yaml
-$ ls
+~/my_robot$ ls
 README.md  lidar.yaml
 \end{terminal}
 
@@ -417,28 +417,28 @@ README.md  lidar.yaml
 次に、\cmd{feature/speed} ブランチでは最高速度を 1.0 に、\cmd{main} ブランチでは 0.5 に、それぞれ書き換えてコミットします。
 
 \begin{terminal}[2 つのブランチで同じ行を書き換える]
-$ echo "max_speed: 0.4" > params.yaml
-$ git add params.yaml
-$ git commit -m "Add params"
-$ git switch -c feature/speed
-$ echo "max_speed: 1.0" > params.yaml
-$ git add params.yaml
-$ git commit -m "Increase max speed"
-$ git switch main
-$ echo "max_speed: 0.5" > params.yaml
-$ git add params.yaml
-$ git commit -m "Change max speed to 0.5"
+~/my_robot$ echo "max_speed: 0.4" > params.yaml
+~/my_robot$ git add params.yaml
+~/my_robot$ git commit -m "Add params"
+~/my_robot$ git switch -c feature/speed
+~/my_robot$ echo "max_speed: 1.0" > params.yaml
+~/my_robot$ git add params.yaml
+~/my_robot$ git commit -m "Increase max speed"
+~/my_robot$ git switch main
+~/my_robot$ echo "max_speed: 0.5" > params.yaml
+~/my_robot$ git add params.yaml
+~/my_robot$ git commit -m "Change max speed to 0.5"
 \end{terminal}
 
 この状態で \cmd{feature/speed} をマージすると、コンフリクトが起きます。
 コンフリクトが起きると、Git はマージを途中で止めて、ファイルの中に両方の内容を書き込みます。
 
 \begin{terminal}[マージしてコンフリクトが起きる]
-$ git merge feature/speed
+~/my_robot$ git merge feature/speed
 Auto-merging params.yaml
 CONFLICT (content): Merge conflict in params.yaml
 Automatic merge failed; fix conflicts and then commit the result.
-$ cat params.yaml
+~/my_robot$ cat params.yaml
 <<<<<<< HEAD
 max_speed: 0.5
 =======
@@ -452,8 +452,8 @@ max_speed: 1.0
 その後、\cmd{git add} と \cmd{git commit} を行えば、マージが完了します。
 
 \begin{terminal}[コンフリクトを解決してマージを完了する]
-$ git add params.yaml
-$ git commit -m "Merge feature/speed"
+~/my_robot$ git add params.yaml
+~/my_robot$ git commit -m "Merge feature/speed"
 \end{terminal}
 
 コンフリクトは失敗ではなく、Git が「人間が判断してください」と教えてくれている状態です。
@@ -483,8 +483,8 @@ GitHub を使うには、\url{https://github.com} でアカウントを作成し
 最も手軽なのは、GitHub の公式のコマンドラインツール \cmd{gh} を使う方法です。
 
 \begin{terminal}[gh を使って GitHub にログインする]
-$ sudo apt install gh
-$ gh auth login
+~/my_robot$ sudo apt install gh
+~/my_robot$ gh auth login
 ? Where do you use GitHub? GitHub.com
 ? What is your preferred protocol for Git operations on this host? HTTPS
 ? Authenticate Git with your GitHub credentials? Yes
@@ -502,8 +502,8 @@ GitHub の Web ページで、新しいリポジトリ（ここでは \cmd{my\_r
 作成したら、ローカルリポジトリにリモートリポジトリの場所を登録し、\cmd{git push} でコミットを送ります。
 
 \begin{terminal}[GitHub のリポジトリにコミットを送る]
-$ git remote add origin https://github.com/<ユーザ名>/my_robot.git
-$ git push -u origin main
+~/my_robot$ git remote add origin https://github.com/<ユーザ名>/my_robot.git
+~/my_robot$ git push -u origin main
 ...
 To https://github.com/<ユーザ名>/my_robot.git
  * [new branch]      main -> main
@@ -518,16 +518,16 @@ GitHub のリポジトリのページを開くと、\cmd{README.md} などが表
 GitHub にあるリポジトリを自分のコンピュータにコピーするには、\cmd{git clone} を使います。
 ほかの人が公開しているロボットのプログラムを使うときや、別のコンピュータ（ロボットの PC など）で同じリポジトリを使うときに使います。
 
-\begin{terminal}[リポジトリをコピーする]
+\begin{termexample}[リポジトリをコピーする]
 $ git clone https://github.com/<ユーザ名>/my_robot.git
 $ cd my_robot
-\end{terminal}
+\end{termexample}
 
 リモートリポジトリに、ほかの人（または別のコンピュータの自分）が送った新しいコミットがあるときは、\cmd{git pull} で取り込みます。
 
-\begin{terminal}[リモートリポジトリの変更を取り込む]
+\begin{termexample}[リモートリポジトリの変更を取り込む]
 $ git pull
-\end{terminal}
+\end{termexample}
 
 \subsection{Pull Request}
 
@@ -563,11 +563,11 @@ gitを用いたチーム開発手法は、企業や部署によって、それ�
   \item レビューで問題がなければ \cmd{main} にマージし、作業用のブランチは削除する
 \end{enumerate}
 
-\begin{terminal}[作業を始めるときの手順]
+\begin{termexample}[作業を始めるときの手順]
 $ git switch main
 $ git pull
 $ git switch -c feature/lidar
-\end{terminal}
+\end{termexample}
 
 作業を始める前に \cmd{git pull} で \cmd{main} を最新にしておくと、ほかの人の変更とのコンフリクトが起きにくくなります。
 

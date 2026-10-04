@@ -97,17 +97,17 @@ teleop\_twist\_keyboard を止めてから、障害物を避けるノードを�
 
 \begin{terminal}[障害物を避けるノードを起動する]
 $ cd ~/ros2_ws
-$ colcon build --symlink-install --packages-select my_package
-$ source install/local_setup.bash
-$ ros2 run my_package obstacle_avoider --ros-args -p use_sim_time:=true
+~/ros2_ws$ colcon build --symlink-install --packages-select my_package
+~/ros2_ws$ source install/local_setup.bash
+~/ros2_ws$ ros2 run my_package obstacle_avoider --ros-args -p use_sim_time:=true
 \end{terminal}
 
 ロボットがまっすぐ進み、柱や壁に近づくと、その場で回って向きを変え、また進んでいきます。
 別のターミナルから、パラメータを変えてみましょう。
 
 \begin{terminal}[実行中にパラメータを変える]
-$ ros2 param set /obstacle_avoider safe_distance 0.8
-$ ros2 param set /obstacle_avoider linear_speed 0.22
+~/ros2_ws$ ros2 param set /obstacle_avoider safe_distance 0.8
+~/ros2_ws$ ros2 param set /obstacle_avoider linear_speed 0.22
 \end{terminal}
 
 \begin{caution}[ノードを止めてもロボットは止まらない]
@@ -150,14 +150,14 @@ slam\_toolbox をインストールして、起動します。
 シミュレーションは起動したままにしておきます（障害物を避けるノードは止めておきます）。
 
 \begin{terminal}[slam\_toolbox をインストールして起動する]
-$ sudo apt install ros-jazzy-slam-toolbox
-$ ros2 launch slam_toolbox online_async_launch.py use_sim_time:=true
+~/ros2_ws$ sudo apt install ros-jazzy-slam-toolbox
+~/ros2_ws$ ros2 launch slam_toolbox online_async_launch.py use_sim_time:=true
 \end{terminal}
 
 作っている地図を見るために、RViz2 を起動して、次のように設定します（\ref{sec:tf-viz-rviz}節）。
 
 \begin{terminal}[RViz2 を起動する]
-$ rviz2 --ros-args -p use_sim_time:=true
+~/ros2_ws$ rviz2 --ros-args -p use_sim_time:=true
 \end{terminal}
 
 \begin{enumerate}
@@ -204,11 +204,11 @@ teleop\_twist\_keyboard でロボットをゆっくり動かして、世界の�
 Navigation2 の \cmd{map\_saver\_cli} を使います。
 
 \begin{terminal}[地図を保存する]
-$ sudo apt install ros-jazzy-navigation2 ros-jazzy-nav2-bringup
-$ ros2 run nav2_map_server map_saver_cli -f ~/map --ros-args -p use_sim_time:=true
+~/ros2_ws$ sudo apt install ros-jazzy-navigation2 ros-jazzy-nav2-bringup
+~/ros2_ws$ ros2 run nav2_map_server map_saver_cli -f ~/map --ros-args -p use_sim_time:=true
 ...
 [INFO] [...] [map_saver]: Map saved successfully
-$ ls ~/map.*
+~/ros2_ws$ ls ~/map.*
 /home/user/map.pgm  /home/user/map.yaml
 \end{terminal}
 
@@ -237,7 +237,7 @@ TurtleBot3 には、Navigation2 を TurtleBot3 用の設定で起動する launc
 シミュレーションを起動したまま、前の節で保存した地図を指定して起動します。
 
 \begin{terminal}[Navigation2 を起動する]
-$ ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=$HOME/map.yaml
+~/ros2_ws$ ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=$HOME/map.yaml
 \end{terminal}
 
 Navigation2 の設定が済んだ RViz2 が、一緒に起動します。
@@ -277,7 +277,7 @@ RViz2 には、計画した経路や、障害物の周りの「近づかない�
 アクションの一覧を見てみましょう。
 
 \begin{terminal}[Navigation2 のアクションを調べる]
-$ ros2 action list
+~/ros2_ws$ ros2 action list
 ...
 /navigate_to_pose
 ...
@@ -288,7 +288,7 @@ $ ros2 action list
 \cmd{orientation} の \cmd{w: 1.0} は、地図の x 軸の方向（ヨーが 0）を向くという意味です（クォータニオン、\ref{sec:tf-viz-tf2}節）。
 
 \begin{terminal}[コマンドから目的地を指示する]
-$ ros2 action send_goal /navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: map}, pose: {position: {x: 1.0, y: 0.5}, orientation: {w: 1.0}}}}" --feedback
+~/ros2_ws$ ros2 action send_goal /navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: map}, pose: {position: {x: 1.0, y: 0.5}, orientation: {w: 1.0}}}}" --feedback
 \end{terminal}
 
 ロボットが地図の (1.0, 0.5) の位置に向かって移動し、途中経過として、残りの距離などがフィードバックで表示されます。
