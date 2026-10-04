@@ -1,0 +1,26 @@
+% 執筆者一覧：本書に関わった人を並べる
+% 行を追加するときは、tabular の中に「名前 & 担当 \\」の形で 1 行ずつ書き足す。
+\clearpage\phantomsection\addcontentsline{toc}{part}{執筆者一覧}
+\chapter*{執筆者一覧}
+\markboth{執筆者一覧}{}
+
+本書は、ロボットチーム eR@sers のメンバーによって執筆されました。
+
+\begin{tablebox}
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{lp{0.6\linewidth}}
+    \toprule
+    名前 & 担当 \\
+    \midrule
+    坂巻 新 & 全体の構成、執筆 \\
+    % 名前 & 担当 \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+\vspace{2\baselineskip}
+
+\begin{description}
+  \item[本書の原稿] \url{https://github.com/trcp/erasers_book}
+  \item[サンプルコード] \url{https://github.com/trcp/erasers_book_code}
+\end{description}

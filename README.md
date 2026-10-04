@@ -316,7 +316,7 @@ Linux とは何かというところから始め、コマンドラインの基�
     ├── preamble.tex       # パッケージ読み込み・囲み環境・共通マクロ
     ├── .latexmkrc         # latexmk の設定（LuaLaTeX, 出力先 build/）
     ├── Makefile
-    ├── frontmatter/       # はじめに・おわりに
+    ├── frontmatter/       # はじめに・おわりに・執筆者一覧
     ├── chapters/          # 各章の原稿
     │   ├── _template.tex  # 執筆用サンプル（環境・マクロの使用例）
     │   ├── linux/         # 第I部 Linux 入門
@@ -449,6 +449,7 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | 付録E | 用語集 | `appendix/glossary.tex` |
 | 付録F | 参考文献・オンラインリソース | `appendix/references.tex` |
 | — | はじめに / おわりに | `frontmatter/preface.tex` / `frontmatter/afterword.tex` |
+| — | 執筆者一覧 | `frontmatter/contributors.tex` |
 
 章の追加・削除・順番の入れ替えは `main.tex` の `\include` を編集して行います。
 章番号は LaTeX が自動で振るので、ファイル名やディレクトリ名（`images/` のサブディレクトリを含む）には章番号を付けず、章の内容を表す名前を使ってください。
