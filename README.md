@@ -401,6 +401,21 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 
 <https://github.com/trcp/erasers_book/releases/download/latest/erasers_book.pdf>
 
+### バージョンを付けた PDF
+
+`v` から始まるタグ（例：`v1.0.0`）を push すると、そのタグのコミットから PDF をビルドし、タグと同じ名前の Release に `erasers_book-v1.0.0.pdf` として置きます。
+
+```bash
+git tag -a v1.0.0 -m "v1.0.0"
+git push origin v1.0.0
+```
+
+表紙と奥付の「版」には、タグ名（例：`v1.0.0`）が入ります。
+タグの付いていないコミットからビルドした PDF では「開発版」と表示され、奥付にはビルドしたコミットの番号が入ります。
+版の情報は `.latexmkrc` がビルドのたびに `build/bookinfo.tex` に書き出します（環境変数 `BOOK_VERSION`、`BOOK_COMMIT` で上書きできます）。
+
+同じタグで作り直したいときは、タグを付け直して `git push -f origin v1.0.0` で push すると、Release も作り直されます。
+
 `draft` ブランチへの push と Pull Request では、PDF のビルドだけを行い、Releases には置きません。
 ビルドに失敗した PR はマージしないでください。
 生成された PDF は、リポジトリの Actions タブで該当する実行結果を開き、Artifacts の `pdf` からダウンロードできます（zip 形式、GitHub へのログインが必要、保存期間は最長 90 日）。
@@ -450,6 +465,7 @@ docker compose up watch             # 原稿を保存するたびに自動でビ
 | 付録F | 参考文献・オンラインリソース | `appendix/references.tex` |
 | — | はじめに / おわりに | `frontmatter/preface.tex` / `frontmatter/afterword.tex` |
 | — | 執筆者一覧 | `frontmatter/contributors.tex` |
+| — | 奥付 | `frontmatter/colophon.tex` |
 
 章の追加・削除・順番の入れ替えは `main.tex` の `\include` を編集して行います。
 章番号は LaTeX が自動で振るので、ファイル名やディレクトリ名（`images/` のサブディレクトリを含む）には章番号を付けず、章の内容を表す名前を使ってください。

@@ -1,0 +1,32 @@
+% 奥付：書名、版、著者、ビルドの情報をページの下側にまとめる
+% 版とコミットの番号は preamble.tex の \bookversion と \bookcommit から入る
+\clearpage
+\thispagestyle{empty}
+\null\vfill
+
+\noindent
+{\large\bfseries これを読めばあなたもロボットを動かせるようになる！}\par
+\noindent
+〜ロボット初学者のための Linux・コマンドライン・ROS 入門〜\par
+
+\medskip
+\noindent\rule{\linewidth}{0.4pt}\par
+\medskip
+
+\noindent
+\begin{tabular}{@{}ll@{}}
+  発行日 & \today \\
+  版 & \bookversion \\
+  著者 & eR@sers \\
+  原稿 & \url{https://github.com/trcp/erasers_book} \\
+  サンプルコード & \url{https://github.com/trcp/erasers_book_code} \\
+\end{tabular}
+
+\medskip
+\noindent\rule{\linewidth}{0.4pt}\par
+\smallskip
+
+\noindent
+{\small この PDF は、コミット \texttt{\bookcommit} から自動で生成しました。}\par
+\noindent
+{\small \copyright\ \the\year\ eR@sers}

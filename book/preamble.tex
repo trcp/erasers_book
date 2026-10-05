@@ -228,3 +228,12 @@
 }
 % \appendix で、番号の付け方を本編と同じ形に戻す
 \jlreqsetup{appendix_precode={\renewcommand{\chapprefix}{}}}
+
+% ---------------------------------------------------------------
+% 版の情報（表紙と奥付で使う）
+%   .latexmkrc がビルドのたびに build/bookinfo.tex を書き出し、
+%   \bookversion（タグ名、なければ「開発版」）と \bookcommit（コミットの番号）を定義する
+% ---------------------------------------------------------------
+\newcommand{\bookversion}{開発版}
+\newcommand{\bookcommit}{不明}
+\InputIfFileExists{build/bookinfo.tex}{}{}

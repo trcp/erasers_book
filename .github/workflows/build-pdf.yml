@@ -3,6 +3,8 @@ name: Build PDF
 on:
   push:
     branches: [master, draft]
+    # v1.0.0 のようなタグを push したときも実行する
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -22,6 +24,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build
+        env:
+          # 表紙と奥付に入れる版の情報。タグの push のときだけタグ名を入れる
+          BOOK_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+          BOOK_COMMIT: ${{ github.sha }}
         run: |
           command -v make || (apt-get update && apt-get install -y make)
           make
@@ -54,3 +60,30 @@ jobs:
             --target "$GITHUB_SHA" \
             --title "最新版 PDF" \
             --notes "master ブランチの最新コミット (${GITHUB_SHA::7}) から自動生成した PDF です。"
+
+  # v で始まるタグを push したときは、そのタグの名前で Releases に PDF を公開する
+  # （例：git tag v1.0.0 && git push origin v1.0.0 → リリース「v1.0.0」に erasers_book-v1.0.0.pdf）
+  release-tag:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pdf
+
+      - name: Publish tagged release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          mv main.pdf "erasers_book-${TAG}.pdf"
+          # 同じタグのリリースがあれば作り直す（タグ自体は消さない）
+          gh release delete "$TAG" --yes || true
+          gh release create "$TAG" "erasers_book-${TAG}.pdf" \
+            --verify-tag \
+            --title "$TAG" \
+            --notes "タグ ${TAG}（${GITHUB_SHA::7}）から自動生成した PDF です。"
