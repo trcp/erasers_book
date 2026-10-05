@@ -63,7 +63,6 @@
 - [ ] `pip` と `venv` が標準で入っておらず、`sudo apt install python3-pip python3-venv` が必要なこと
 - [ ] 仮想環境の外で `pip install` したときのエラーメッセージ（`error: externally-managed-environment`）
 - [ ] `pip install numpy` の出力と、例に使った NumPy のバージョン（`2.1.1`）
-- [ ] `pipx` が `sudo apt install pipx` で入ること
 - [ ] ROS 2 と仮想環境を組み合わせる方法（`--system-site-packages`）の記述が、ROS 2 Jazzy の公式ドキュメントの推奨と合っているか
 - [ ] コラム「venv 以外の開発ツール」：uv の速さ（開発元の公称で pip の 10〜100 倍）、pixi と RoboStack で ROS 2 の環境を作れること、Anaconda の有料ライセンスの条件が、出版時点の情報と合っているか
 
@@ -71,7 +70,7 @@
 
 - [x] 本文の例と練習問題の解答例を実行し、出力が本文と一致すること（執筆用コンテナの Python 3.14 で確認済み。`numpy` を使う例だけは未実行）
 - [ ] Ubuntu 24.04 の Python 3.12 で、トレースバックの表示（`^^^^` の位置など）が本文と一致すること（Python のバージョンによって表示が少し変わる）
-- [ ] `pipx install ruff` と、`ruff format` / `ruff check` の出力
+- [ ] 仮想環境の中での `pip install ruff` と、`ruff format` / `ruff check` の出力（VS Code の Ruff の拡張機能に Ruff の本体が含まれていること）
 - [ ] 練習問題の難易度と量が適切か（`example_python` の教材をもとに作成。ロボットの題材に置き換えたものもある）
 
 ### 第2章 Linux とは：Ubuntu 環境の用意・デスクトップ（`chapters/linux/what_is_linux.tex`）
@@ -327,7 +326,7 @@
   - 第3章：ユーザ空間、カーネル空間、システムコール、ファイルシステム、ルートディレクトリ、マウント、FHS、ユーザ、UID、グループ、GID、root、sudo、プロセス、PID、親プロセス・子プロセス、systemd、スケジューラ、デバイスファイル
   - 第15章：コンテナ、Docker、仮想マシン、ハイパーバイザ、イメージ、タグ、レジストリ、Docker Hub、Dockerfile、ボリューム（`-v`）、Docker Compose、Dev Containers、Docker Desktop
   - 第16章：インタプリタ、コンパイラ、コンパイル、ソースコード、静的型付け、動的型付け、ガベージコレクション、ライブラリ
-  - 第17章：対話モード、スクリプト、shebang、標準ライブラリ、パッケージ、PyPI、pip、仮想環境、venv、PEP 668、pipx
+  - 第17章：対話モード、スクリプト、shebang、標準ライブラリ、パッケージ、PyPI、pip、仮想環境、venv、PEP 668
   - 第2章（追加）：VirtualBox、仮想化ソフトウェア、ホスト OS、ゲスト OS、スナップショット、Guest Additions、ブリッジアダプター、仮想化支援機能、タッチタイピング、ホームポジション、デュアルブート、仮想マシン、WSL2、ISO イメージ、GNOME、デスクトップ環境、Dock、ワークスペース、Super キー、Mozc
   - 第6章：パーミッション、所有者、chmod、chown、sudoers、tee、dialout、udev、ルールファイル、ベンダ ID、プロダクト ID
   - 第7章：標準入力、標準出力、標準エラー出力、リダイレクト、/dev/null、パイプ、CSV、grep、正規表現、wc、cut、sort、uniq、sed、awk
@@ -409,7 +408,7 @@
 ## PDF へのコメント（Python の章）への対応
 
 - [x] 第17章の語尾、節の順番（pip → PEP 668 → 仮想環境）、第18章の対話モードの始め方、名前の付け方のコラム、実行コマンドの追加、第19章の ROS 2 の小節の第24章への移動、`hello_node.py` の import のコメントに対応した
-- [ ] 第19章の Ruff の節の pipx のインストールの手順（コメントは「pipx はどこでインストールしているのか」。今回は対応を保留）
+- [x] 第19章の Ruff の節：pipx は使わず、第17章の仮想環境に pip でインストールする形にした（コメント「pipx はどこでインストールしているのか」への対応）
 - [ ] erasers_book_code を更新する：第18章のリストにファイル名を付けた（`fstring.py`・`list_example.py`・`dict_example.py`・`none.py`・`for_loop.py`・`break_continue.py`・`default_args.py`）ので、`python/python_basics/` のファイル名をそろえるか。`ros2_ws/src/my_package/my_package/hello_node.py` の import の行にコメントを付けた
 - [ ] 第18章・第19章で実行結果を足した 15 個のリストのファイル名（`comment.py`・`update.py`・`area.py`・`range_sum.py`・`battery.py`・`input_check.py`・`for_list.py`・`comprehension.py`・`dice.py`・`func_value.py`・`math_random.py`・`import_as.py`・`wheel.py`・`typehint.py`・`print_debug.py`）を、erasers_book_code の `python/` にも反映する（`typehint.py` には、関数を呼び出す 2 行を足した）
 - [ ] 第18章の対話モードの起動時の表示（`Python 3.12.3 (main, ...) [GCC ...] on linux`）

@@ -35,7 +35,7 @@
   \item[\cmd{Could not get lock /var/lib/dpkg/lock} と表示される] ほかの apt や、Ubuntu の自動更新が動いています。しばらく待ってから、やり直します（\ref{sec:package-apt}節）。
   \item[\cmd{Unable to locate package} と表示される] \cmd{sudo apt update} を忘れていないか、パッケージ名の打ち間違いがないかを確かめます。ROS 2 のパッケージなら、ROS 2 のリポジトリが追加されているかを確かめます（\ref{sec:ros2-install-install}節）。
   \item[\cmd{GPG error} や \cmd{NO\_PUBKEY} と表示される] リポジトリの鍵が登録されていないか、古くなっています。そのリポジトリのインストール手順に従って、鍵を登録し直します（\ref{sec:package-repository}節）。
-  \item[\cmd{pip install} で \cmd{externally-managed-environment} と表示される] Ubuntu 24.04 では、システムの Python に pip で直接インストールできません。apt・pipx・仮想環境のどれかを使います（\ref{sec:python-pep668}節）。
+  \item[\cmd{pip install} で \cmd{externally-managed-environment} と表示される] Ubuntu 24.04 では、システムの Python に pip で直接インストールできません。apt でインストールするか、仮想環境の中で pip を使います（\ref{sec:python-pep668}節）。
 \end{description}
 
 \section{Git と GitHub}

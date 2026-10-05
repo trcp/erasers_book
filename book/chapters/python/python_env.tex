@@ -182,8 +182,7 @@ Ubuntu 24.04 で Python のパッケージを使いたいときは、次のよ�
     ただし、バージョンは少し古いことがあります。
   \item \textbf{仮想環境の中で pip で入れる}：
     apt にないパッケージや、新しいバージョンが必要なパッケージは、\textbf{仮想環境}を作って、その中で pip で入れます。
-  \item \textbf{pipx で入れる}：
-    Python で書かれた「コマンドとして使うツール」をインストールしたいときは、\cmd{pipx} を使うと、ツールごとに自動で仮想環境を作ってインストールしてくれます（\cmd{sudo apt install pipx}）。
+    Python で書かれた便利なツール（\ref{sec:python-class-style}節のリンタなど）も、この方法でインストールします。
 \end{enumerate}
 
 \begin{caution}[\cmd{--break-system-packages} は使わない]

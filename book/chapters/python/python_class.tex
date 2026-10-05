@@ -566,17 +566,21 @@ if __name__ == "__main__":
 PEP 8 の決まりを、すべて自分で気をつけるのは大変です。
 そこで、コードの見た目を自動で整えてくれる\textbf{フォーマッタ}や、誤りや決まりに合わない書き方を指摘してくれる\textbf{リンタ}を使います。
 代表的なツールに \textbf{Ruff} があり、フォーマッタとリンタの両方の機能を持っています。
-Ruff は、pipx（\ref{sec:python-pep668}節）でインストールできます。
+Ruff は PyPI で公開されているパッケージなので、\ref{sec:python-venv}節で作った \cmd{\textasciitilde/py\_practice} の仮想環境に、pip でインストールします。
+仮想環境を有効にしている間は、\cmd{ruff} コマンドを使えます。
 
 \begin{terminal}[Ruff をインストールして使う]
-~/py_practice$ pipx install ruff
-~/py_practice$ ruff format robot.py      # コードの見た目を整える
+~/py_practice$ source .venv/bin/activate
+(.venv) ~/py_practice$ pip install ruff
+(.venv) ~/py_practice$ ruff format robot.py      # コードの見た目を整える
 1 file reformatted
-~/py_practice$ ruff check robot.py       # 誤りや決まりに合わない書き方を調べる
+(.venv) ~/py_practice$ ruff check robot.py       # 誤りや決まりに合わない書き方を調べる
 All checks passed!
+(.venv) ~/py_practice$ deactivate
 \end{terminal}
 
-VS Code（\ref{sec:editor-vscode}節）でも、拡張機能を入れておくと、保存するたびに自動でコードを整えたり、問題のある箇所に波線を表示したりできます。
+VS Code（\ref{sec:editor-vscode}節）では、Ruff の拡張機能を入れておくと、保存するたびに自動でコードを整えたり、問題のある箇所に波線を表示したりできます。
+この拡張機能には Ruff の本体も含まれているので、仮想環境の外のファイルでも使えます。
 
 \subsection{型ヒント}
 \label{sec:python-class-typehint}
