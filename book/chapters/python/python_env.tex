@@ -138,13 +138,23 @@ pip のよく使うコマンドは、次のとおりです。
 
 プログラムがどのパッケージのどのバージョンを使っているかを記録しておくと、別のコンピュータでも同じ環境を再現できます。
 \cmd{pip freeze} でインストールされているパッケージとバージョンの一覧を出力し、\cmd{requirements.txt} という名前のファイルに保存するのが慣例です（\cmd{>} については\ref{chap:text_pipe}章で説明します）。
+次は、数値計算の NumPy、グラフを描く Matplotlib、シリアル通信の pySerial などをインストールした環境での例です。
+実際には、次の節の仮想環境の中で試します（\ref{sec:python-venv}節）。
 
-\begin{terminal}[パッケージを記録して再現する]
+\begin{termexample}[パッケージを記録して再現する]
 $ pip freeze > requirements.txt
 $ cat requirements.txt
+contourpy==1.3.0
+matplotlib==3.9.2
 numpy==2.1.1
+pyserial==3.5
+...
 $ pip install -r requirements.txt
-\end{terminal}
+\end{termexample}
+
+\cmd{requirements.txt} には、1 行に 1 つずつ、\cmd{パッケージ名==バージョン} の形でパッケージが並びます。
+自分でインストールしたパッケージのほかに、それらが使っているパッケージ（\cmd{contourpy} は Matplotlib が使うパッケージです）も記録されます。
+別のコンピュータでは、\cmd{pip install -r requirements.txt} で、書かれたパッケージをまとめて同じバージョンでインストールできます。
 
 \section{venv による仮想環境}
 \label{sec:python-venv}
@@ -201,17 +211,31 @@ $ cd ~/py_practice
 
 仮想環境の中であれば、\cmd{pip install} でパッケージをインストールできます。
 
+ここでは、数値計算の NumPy と、シリアル通信（マイコンなどとの通信）の pySerial をインストールしてみます。
+パッケージ名を空白で区切って並べると、まとめてインストールできます。
+
 \begin{terminal}[仮想環境でパッケージを入れる]
-~/py_practice$ pip install numpy
+~/py_practice$ pip install numpy pyserial
 Collecting numpy
 ...
-Successfully installed numpy-2.1.1
+Successfully installed numpy-2.1.1 pyserial-3.5
 ~/py_practice$ python3 -c "import numpy; print(numpy.__version__)"
 2.1.1
 \end{terminal}
 
 \cmd{python3 -c} は、後ろに書いた Python の文を実行するオプションです。
-ここでは、NumPy が読み込めることと、そのバージョンを確かめています。
+ここでは、NumPy が読み込めることと、そのバージョンを確かめています（バージョンの数字は、インストールした時期によって変わります）。
+
+\ref{sec:python-pip}節の \cmd{pip freeze} で、インストールしたパッケージを記録してみましょう。
+
+\begin{terminal}[仮想環境のパッケージを記録する]
+~/py_practice$ pip freeze > requirements.txt
+~/py_practice$ cat requirements.txt
+numpy==2.1.1
+pyserial==3.5
+\end{terminal}
+
+仮想環境の中で実行すると、その仮想環境にインストールしたパッケージだけが記録されます。
 
 \subsection{仮想環境を終了する}
 

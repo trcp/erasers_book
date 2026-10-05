@@ -404,6 +404,8 @@
 - [ ] 第15章の Dockerfile の例を `ros:jazzy` から `ubuntu:24.04`（Python と x11-apps）に、GUI の例を turtlesim から `xeyes` に変えた。erasers_book_code の `docker/` も更新する
 - [ ] 変更した第5〜15章のコマンドを、Ubuntu 24.04 の VirtualBox の環境で、本文の順番どおりに実行して確かめる（特に `tail -f /var/log/syslog`、`find /usr/share/applications`、`locate os-release`、`systemctl status NetworkManager`、`ss -tln` の表示、`ssh user@localhost`、`docker build` の出力）
 
+- [ ] 第17章：`pip install numpy pyserial` と `pip freeze` の出力（バージョンの数字、`pip freeze` に表示されるのが 2 つだけか）、17.2.3 節の表示例の `matplotlib` などのバージョン
+
 ## 6. `preamble.tex` の変更・不具合（要 Issue での相談）
 
 - [ ] `\section` / `\subsection` の直後に文章を挟まずに表を置くとビルドエラーになる（jlreq と `tabular` の組み合わせで発生）。原因を調べて直すか、writing_rules.md の注意書きのままにするか
