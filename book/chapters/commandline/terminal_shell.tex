@@ -261,12 +261,13 @@ root はシステムのどんな設定でも変更できる特別なユーザで
   本書のコマンド例では、プロンプトを省略して、一般ユーザで実行するコマンドの先頭に \cmd{\$}、root 権限で実行するコマンドの先頭に \cmd{\#} を付けています。
   \cmd{\$} や \cmd{\#} は入力せず、その後ろの部分だけを入力してください。
   \cmd{\$} や \cmd{\#} が付いていない行は、コマンドの実行結果です。
-\end{point}
-
-\begin{terminal}[本書の表記例]
+  \begin{terminal}[本書の表記例]
 $ echo Hello    # 「echo Hello」と入力する
 Hello           # 実行結果（この行は入力しない）
-\end{terminal}
+  \end{terminal}
+  \cmd{cd}（\ref{chap:files}章）でディレクトリを移動した後は、\cmd{\textasciitilde/practice\$ ls} のように、\cmd{\$} の前に今いるディレクトリを書いています。
+  この場合も、\cmd{\$} から前は入力しません。
+\end{point}
 
 \begin{caution}[表示される言語について]
   Ubuntu を日本語でインストールした場合、コマンドの実行結果やエラーメッセージが日本語で表示されることがあります。

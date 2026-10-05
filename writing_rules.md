@@ -39,8 +39,8 @@
 | 外部ファイルのコード | `\codefile[style=python]{キャプション}{lst:ラベル}{samples/rclpy/my_package/my_package/foo.py}`（`firstline=`・`lastline=` なども `[ ]` に書ける） |
 | キャプションのない短いコード | `\begin{lstlisting}[style=python, numbers=none, xleftmargin=0pt, framexleftmargin=0pt] ... \end{lstlisting}`（コラムや注意などの囲みの中で使う） |
 | この章で学ぶこと | `\begin{goalbox} ... \end{goalbox}` |
-| ポイント | `\begin{point}[タイトル] ... \end{point}`（タイトル省略時は「ポイント」） |
-| 注意 | `\begin{caution}[タイトル] ... \end{caution}`（タイトル省略時は「注意」） |
+| ポイント | `\begin{point}[タイトル] ... \end{point}`（「ポイント：タイトル」と表示される。タイトルを省略すると「ポイント」） |
+| 注意 | `\begin{caution}[タイトル] ... \end{caution}`（「注意：タイトル」と表示される。タイトルを省略すると「注意」） |
 | コラム | `\begin{column}{タイトル} ... \end{column}` |
 | TIPS | `\begin{tips}{タイトル} ... \end{tips}`（本筋とは別の、すぐに役立つ実践的なアドバイス。コラムは読み物・背景知識に使う） |
 | 本文中の表 | `\begin{tablebox}[キャプション][tab:ラベル] \begin{tabular}{ll} ... \end{tabular} \end{tablebox}`（前後に余白が空き、表の上に「表 5.1 キャプション」が付く。キャプションと表は同じページに置かれる） |

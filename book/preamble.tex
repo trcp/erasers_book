@@ -154,13 +154,15 @@
 }
 
 % ポイント・注意・コラム
-\newtcolorbox{point}[1][ポイント]{
+% ポイント：タイトルを付けると「ポイント：タイトル」、付けなければ「ポイント」と表示する
+\newtcolorbox{point}[1][]{
   colback=green!4, colframe=green!40!black, arc=2pt,
-  title={#1}, fonttitle=\sffamily\bfseries,
+  title={ポイント\if\relax\detokenize{#1}\relax\else：#1\fi}, fonttitle=\sffamily\bfseries,
 }
-\newtcolorbox{caution}[1][注意]{
+% 注意：タイトルを付けると「注意：タイトル」、付けなければ「注意」と表示する
+\newtcolorbox{caution}[1][]{
   colback=red!4, colframe=red!60!black, arc=2pt,
-  title={#1}, fonttitle=\sffamily\bfseries,
+  title={注意\if\relax\detokenize{#1}\relax\else：#1\fi}, fonttitle=\sffamily\bfseries,
 }
 \newtcolorbox{column}[1]{
   colback=orange!4, colframe=orange!60!black, arc=2pt,
