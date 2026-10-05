@@ -106,7 +106,7 @@ Python には、標準でさまざまな機能（\textbf{標準ライブラリ}�
 
 PyPI のパッケージをインストールするには、\textbf{pip} というコマンドを使います。
 Ubuntu 24.04 では pip は標準でインストールされていないので、次のようにインストールします。
-あわせて、次の節で使う仮想環境の機能もインストールしておきましょう。
+あわせて、\ref{sec:python-venv}節で使う仮想環境の機能もインストールしておきましょう。
 
 \begin{terminal}[pip と venv をインストールする]
 $ sudo apt install python3-pip python3-venv
@@ -128,18 +128,15 @@ pip のよく使うコマンドは、次のとおりです。
   \end{tabular}
 \end{tablebox}
 
-\begin{caution}[Ubuntu 24.04 では仮想環境の中で使う]
-  Ubuntu 24.04 では、仮想環境の外で \cmd{pip install} を実行すると、\cmd{externally-managed-environment} というエラーになり、パッケージをインストールできません。
-  これは故障ではなく、システムを守るための意図的な制限です（\ref{sec:python-pep668}節）。
-  pip は、次の節で説明する仮想環境の中で使うのが基本です。
-\end{caution}
+ただし、Ubuntu 24.04 では、この表のコマンドをそのまま実行しても、パッケージをインストールできません。
+その理由と、どうすればよいかを、次の\ref{sec:python-pep668}節で説明します。
 
 \subsection{使っているパッケージを記録する}
 
 プログラムがどのパッケージのどのバージョンを使っているかを記録しておくと、別のコンピュータでも同じ環境を再現できます。
-\cmd{pip freeze} でインストールされているパッケージとバージョンの一覧を出力し、\cmd{requirements.txt} という名前のファイルに保存するのが慣例です（\cmd{>} については\ref{chap:text_pipe}章で説明します）。
+\cmd{pip freeze} でインストールされているパッケージとバージョンの一覧を出力し、\cmd{requirements.txt} という名前のファイルに保存するのが慣例です（\cmd{>} については\ref{chap:text_pipe}章で説明しました）。
 次は、数値計算の NumPy、グラフを描く Matplotlib、シリアル通信の pySerial などをインストールした環境での例です。
-実際には、次の節の仮想環境の中で試します（\ref{sec:python-venv}節）。
+実際には、\ref{sec:python-venv}節の仮想環境の中で試します。
 
 \begin{termexample}[パッケージを記録して再現する]
 $ pip freeze > requirements.txt
@@ -155,6 +152,48 @@ $ pip install -r requirements.txt
 \cmd{requirements.txt} には、1 行に 1 つずつ、\cmd{パッケージ名==バージョン} の形でパッケージが並びます。
 自分でインストールしたパッケージのほかに、それらが使っているパッケージ（\cmd{contourpy} は Matplotlib が使うパッケージです）も記録されます。
 別のコンピュータでは、\cmd{pip install -r requirements.txt} で、書かれたパッケージをまとめて同じバージョンでインストールできます。
+
+\section{Ubuntu 24.04 での注意点（PEP 668）}
+\label{sec:python-pep668}
+
+\subsection{\cmd{externally-managed-environment} エラー}
+
+Ubuntu 24.04 で、\ref{sec:python-pip}節の \cmd{pip install} を試してみると、次のようなエラーが表示されます。
+
+\begin{terminal}[仮想環境の外で pip install する]
+$ pip install numpy
+error: externally-managed-environment
+...
+\end{terminal}
+
+これは、\textbf{PEP 668} という Python の取り決めに基づいた制限です\footnote{PEP（Python Enhancement Proposal）は、Python の機能や決まりごとを提案・記録するための文書で、番号で呼ばれます。}。
+Ubuntu のシステムには、OS の一部として動いている Python のプログラムがたくさんあり、それらは \cmd{apt} で管理されたパッケージを使っています。
+pip でシステムの Python のパッケージを書き換えてしまうと、\cmd{apt} で管理しているパッケージと食い違いが起きて、システムのツールが動かなくなるおそれがあります。
+そこで、システムの Python は \cmd{apt} に管理を任せ、pip は仮想環境の中で使う、という役割分担が決められました。
+
+\subsection{パッケージを入れる方法の選び方}
+
+Ubuntu 24.04 で Python のパッケージを使いたいときは、次のように選びます。
+
+\begin{enumerate}
+  \item \textbf{apt で入れる}：
+    よく使われるパッケージの多くは、\cmd{python3-} で始まる名前で Ubuntu のパッケージとしても提供されています（例：\cmd{sudo apt install python3-numpy}）。
+    システム全体で使え、ROS 2 のノードからもそのまま使えます。
+    ただし、バージョンは少し古いことがあります。
+  \item \textbf{仮想環境の中で pip で入れる}：
+    apt にないパッケージや、新しいバージョンが必要なパッケージは、\textbf{仮想環境}を作って、その中で pip で入れます。
+  \item \textbf{pipx で入れる}：
+    Python で書かれた「コマンドとして使うツール」をインストールしたいときは、\cmd{pipx} を使うと、ツールごとに自動で仮想環境を作ってインストールしてくれます（\cmd{sudo apt install pipx}）。
+\end{enumerate}
+
+\begin{caution}[\cmd{--break-system-packages} は使わない]
+  エラーメッセージを検索すると、\cmd{pip install} に \cmd{--break-system-packages} というオプションを付けて制限を無視する方法が見つかります。
+  名前のとおり「システムのパッケージを壊す」おそれがあるオプションなので、使わないようにしましょう。
+  同じ理由で、\cmd{sudo pip install} も使ってはいけません。
+\end{caution}
+
+本書では、Python の練習で使うパッケージは 2 の仮想環境に、ROS 2 のノードで使うパッケージは 1 の apt で入れることにします。
+次の節では、仮想環境の作り方と使い方を学びます。
 
 \section{venv による仮想環境}
 \label{sec:python-venv}
@@ -279,45 +318,6 @@ user@robot:~/py_practice$
 
   uv は venv や pip とほぼ同じ感覚で使えるので、慣れてきたら試してみるとよいでしょう。
 \end{column}
-
-\section{Ubuntu 24.04 での注意点（PEP 668）}
-\label{sec:python-pep668}
-
-\subsection{\cmd{externally-managed-environment} エラー}
-
-Ubuntu 24.04 で、仮想環境の外から \cmd{pip install} を実行すると、次のようなエラーが表示されます。
-
-\begin{terminal}[仮想環境の外で pip install する]
-~/py_practice$ pip install numpy
-error: externally-managed-environment
-...
-\end{terminal}
-
-これは、\textbf{PEP 668} という Python の取り決めに基づいた制限です\footnote{PEP（Python Enhancement Proposal）は、Python の機能や決まりごとを提案・記録するための文書で、番号で呼ばれます。}。
-Ubuntu のシステムには、OS の一部として動いている Python のプログラムがたくさんあり、それらは \cmd{apt} で管理されたパッケージを使っています。
-pip でシステムの Python のパッケージを書き換えてしまうと、\cmd{apt} で管理しているパッケージと食い違いが起きて、システムのツールが動かなくなるおそれがあります。
-そこで、システムの Python は \cmd{apt} に管理を任せ、pip は仮想環境の中で使う、という役割分担が決められました。
-
-\subsection{パッケージを入れる方法の選び方}
-
-Ubuntu 24.04 で Python のパッケージを使いたいときは、次のように選びます。
-
-\begin{enumerate}
-  \item \textbf{apt で入れる}：
-    よく使われるパッケージの多くは、\cmd{python3-} で始まる名前で Ubuntu のパッケージとしても提供されています（例：\cmd{sudo apt install python3-numpy}）。
-    システム全体で使え、ROS 2 のノードからもそのまま使えます。
-    ただし、バージョンは少し古いことがあります。
-  \item \textbf{仮想環境の中で pip で入れる}：
-    apt にないパッケージや、新しいバージョンが必要なパッケージは、仮想環境を作って pip で入れます（\ref{sec:python-venv}節）。
-  \item \textbf{pipx で入れる}：
-    Python で書かれた「コマンドとして使うツール」をインストールしたいときは、\cmd{pipx} を使うと、ツールごとに自動で仮想環境を作ってインストールしてくれます（\cmd{sudo apt install pipx}）。
-\end{enumerate}
-
-\begin{caution}[\cmd{--break-system-packages} は使わない]
-  エラーメッセージを検索すると、\cmd{pip install} に \cmd{--break-system-packages} というオプションを付けて制限を無視する方法が見つかります。
-  名前のとおり「システムのパッケージを壊す」おそれがあるオプションなので、使わないようにしましょう。
-  同じ理由で、\cmd{sudo pip install} も使ってはいけません。
-\end{caution}
 
 \subsection{ROS 2 と Python のパッケージ}
 

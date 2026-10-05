@@ -406,6 +406,14 @@
 
 - [ ] 第17章：`pip install numpy pyserial` と `pip freeze` の出力（バージョンの数字、`pip freeze` に表示されるのが 2 つだけか）、17.2.3 節の表示例の `matplotlib` などのバージョン
 
+## PDF へのコメント（Python の章）への対応
+
+- [x] 第17章の語尾、節の順番（pip → PEP 668 → 仮想環境）、第18章の対話モードの始め方、名前の付け方のコラム、実行コマンドの追加、第19章の ROS 2 の小節の第24章への移動、`hello_node.py` の import のコメントに対応した
+- [ ] 第19章の Ruff の節の pipx のインストールの手順（コメントは「pipx はどこでインストールしているのか」。今回は対応を保留）
+- [ ] erasers_book_code を更新する：第18章のリストにファイル名を付けた（`fstring.py`・`list_example.py`・`dict_example.py`・`none.py`・`for_loop.py`・`break_continue.py`・`default_args.py`）ので、`python/python_basics/` のファイル名をそろえるか。`ros2_ws/src/my_package/my_package/hello_node.py` の import の行にコメントを付けた
+- [ ] 第18章・第19章で実行結果を足した 15 個のリストのファイル名（`comment.py`・`update.py`・`area.py`・`range_sum.py`・`battery.py`・`input_check.py`・`for_list.py`・`comprehension.py`・`dice.py`・`func_value.py`・`math_random.py`・`import_as.py`・`wheel.py`・`typehint.py`・`print_debug.py`）を、erasers_book_code の `python/` にも反映する（`typehint.py` には、関数を呼び出す 2 行を足した）
+- [ ] 第18章の対話モードの起動時の表示（`Python 3.12.3 (main, ...) [GCC ...] on linux`）
+
 ## 6. `preamble.tex` の変更・不具合（要 Issue での相談）
 
 - [ ] `\section` / `\subsection` の直後に文章を挟まずに表を置くとビルドエラーになる（jlreq と `tabular` の組み合わせで発生）。原因を調べて直すか、writing_rules.md の注意書きのままにするか

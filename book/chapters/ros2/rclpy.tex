@@ -50,6 +50,13 @@ VS Code で \cmd{\textasciitilde/ros2\_ws} を開き（\ref{sec:editor-vscode}�
   \item[17〜21 行目] \key{Ctrl}+\key{C} が押されると、例外（\ref{sec:python-class-exception}節）の \cmd{KeyboardInterrupt} が起きます。それを受け止めて、ノードを片付け（\cmd{destroy\_node}）、rclpy を終了します（\cmd{try\_shutdown}）。
 \end{description}
 
+\begin{point}[Python のクラスの継承と ROS 2 のノード]
+  ROS 2 では、\ref{sec:python-class-inherit}節で学んだクラスの\textbf{継承}をよく使います。
+  \cmd{Node} クラスには、ほかのノードと通信するための機能（パブリッシャやタイマを作る、ログを出すなど）がたくさん用意されていて、\cmd{class HelloNode(Node):} のように継承するだけで、それらを自分のクラスで使えるようになります。
+  \cmd{super().\_\_init\_\_('hello\_node')} で親クラス（\cmd{Node}）の準備をし、\cmd{self.get\_logger()} のように、親クラスから引き継いだメソッドを \cmd{self.} を付けて使います。
+  この章のどのノードも、この形で書いていきます。
+\end{point}
+
 12 行目からの \cmd{main} 関数の形は、この章のどのノードでもほとんど同じです。
 以降のプログラムでは、ノードのクラスの部分だけを示します。
 
@@ -167,6 +174,11 @@ C++ で書かれたノードと Python で書かれたノードでも、トピ�
 talker では、\cmd{create\_timer()} を使って、0.5 秒ごとに \cmd{timer\_callback} を呼び出していました。
 listener では、メッセージが届くたびに \cmd{listener\_callback} が呼び出されていました。
 このように、ROS 2 のノードは、「〇〇が起きたら、この関数を呼び出す」という\textbf{コールバック}の集まりとして書きます。
+
+これは、\ref{sec:python-class-callback}節で学んだコールバックの考え方そのものです。
+talker の \cmd{self.create\_timer(0.5, self.timer\_callback)} で、\cmd{self.timer\_callback} に \cmd{()} が付いていないことに注目してください。
+メソッドをその場で呼び出すのではなく、メソッドそのものを ROS 2 に渡して、「時間になったらこれを呼んでほしい」と登録しているのです。
+\cmd{create\_subscription()} に渡す \cmd{self.listener\_callback} も同じです。
 
 \cmd{rclpy.spin()} は、タイマの時間になったか、メッセージが届いたか、といったことを見張り続け、何かが起きたら対応するコールバックを呼び出します。
 自分で \cmd{while} の繰り返しを書かなくても、ノードが動き続けるのはこのためです。

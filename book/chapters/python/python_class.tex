@@ -71,7 +71,8 @@ print(hero.hp, wizard.hp)
 \end{codelisting}
 
 \begin{terminal}[クラスのプログラムを実行する]
-$ python3 player.py
+$ cd ~/py_practice
+~/py_practice$ python3 player.py
 勇者は攻撃をした！
 魔法使いは攻撃をした！
 魔法使いの体力が 20 回復した（体力: 80）
@@ -117,6 +118,7 @@ robot.move(1.0, 2.0)   # 最高速度 0.5 m/s に制限される
 \end{codelisting}
 
 \begin{terminal}[ロボットのクラスの実行結果]
+~/py_practice$ python3 robot.py
 turtle: 0.3 m/s で 2.0 秒進んだ（x = 0.60）
 turtle: 0.5 m/s で 2.0 秒進んだ（x = 1.60）
 \end{terminal}
@@ -173,6 +175,7 @@ drone.move()     # 子クラスで上書きしたメソッド
 \end{codelisting}
 
 \begin{terminal}[継承のプログラムの実行結果]
+~/py_practice$ python3 inherit.py
 こんにちは、telloです
 telloは高度 10 m まで飛んだ
 \end{terminal}
@@ -183,24 +186,12 @@ telloは高度 10 m まで飛んだ
   \item \cmd{super().\_\_init\_\_(name)} は、親クラスの \cmd{\_\_init\_\_} を呼び出しています。こうすることで、親クラスが行う準備（ここでは \cmd{self.name} の設定）を、子クラスでもそのまま利用できます。
 \end{itemize}
 
-\subsection{ROS 2 のノードと継承}
-
-ROS 2 で Python のノードを作るときは、ROS 2 が用意している \cmd{Node} というクラスを継承して、自分のクラスを作ります。
-\cmd{Node} クラスには、ほかのノードと通信するための機能がたくさん用意されていて、継承するだけでそれらを使えるようになります。
-次のコードは、\ref{chap:rclpy}章で学ぶノードの形を先取りしたものです（今はまだ実行できなくても構いません）。
-
-\begin{codelisting}[style=python]{ROS 2 のノードの形（先取り）}{lst:python-class-node-preview}
-from rclpy.node import Node
-
-
-class MyNode(Node):                 # Node クラスを継承する
-    def __init__(self):
-        super().__init__("my_node")   # 親クラスにノードの名前を渡す
-        self.get_logger().info("ノードを起動しました")
-\end{codelisting}
-
-\cmd{super().\_\_init\_\_("my\_node")} で親クラス（\cmd{Node}）の準備をし、\cmd{self.get\_logger( )} のように、親クラスから引き継いだメソッドを使っています。
-この章で学んだクラスと継承の知識が、そのまま使われていることがわかるでしょう。
+\begin{point}[ROS 2 とクラスの継承]
+  ROS 2 では、クラスの継承をよく使います。
+  たとえば、Python で ROS 2 のプログラム（ノード）を作るときは、ROS 2 が用意している \cmd{Node} というクラスを継承して、自分のクラスを作ります。
+  \cmd{Node} クラスには、ほかのノードと通信するための機能がたくさん用意されていて、継承するだけでそれらを使えるようになります。
+  詳しくは、\ref{chap:rclpy}章で学びます。
+\end{point}
 
 \begin{exercise}
 \begin{enumerate}
@@ -217,7 +208,7 @@ class MyNode(Node):                 # Node クラスを継承する
 Python では、関数も数値や文字列と同じように、変数に入れたり、ほかの関数の引数として渡したりできます。
 関数名の後ろに \cmd{( )} を付けると関数が\textbf{呼び出され}ますが、\cmd{( )} を付けずに書くと、関数\textbf{そのもの}を表します。
 
-\begin{codelisting}[style=python]{関数を変数に入れる}{lst:python-class-func-value}
+\begin{codelisting}[style=python]{関数を変数に入れる（func\_value.py）}{lst:python-class-func-value}
 def greet():
     print("こんにちは")
 
@@ -225,6 +216,11 @@ def greet():
 f = greet   # ( ) を付けないので、関数そのものを f に入れる
 f()         # f を呼び出すと greet が実行される
 \end{codelisting}
+
+\begin{terminal}[関数を変数に入れるプログラムを実行する]
+~/py_practice$ python3 func_value.py
+こんにちは
+\end{terminal}
 
 \subsection{コールバック}
 
@@ -258,6 +254,7 @@ run_timer(0.5, 2, check_battery)
 \end{codelisting}
 
 \begin{terminal}[コールバックの実行結果]
+~/py_practice$ python3 callback.py
 0 回目: こんにちは
 1 回目: こんにちは
 2 回目: こんにちは
@@ -268,25 +265,11 @@ run_timer(0.5, 2, check_battery)
 \cmd{run\_timer} は、「一定の間隔で何かを呼ぶ」という部分だけを担当し、「何をするか」は渡されたコールバック関数に任せています。
 こうしておくと、同じ \cmd{run\_timer} を、いろいろな処理に使い回せます。
 
-\subsection{ROS 2 とコールバック}
-
-ROS 2 のプログラムは、コールバックの考え方で動いています。
-「0.5 秒ごとに、この関数を呼んでほしい」（タイマ）、「センサのデータが届いたら、この関数を呼んでほしい」（トピックの受信、\ref{chap:ros2_concepts}章）というように、コールバック関数を ROS 2 に登録しておき、出来事が起きるたびに ROS 2 がその関数を呼び出します。
-ROS 2 では、コールバックとしてクラスのメソッド（\cmd{self.timer\_callback} など）を渡すことがよくあります。
-
-\begin{codelisting}[style=python]{ROS 2 のタイマのコールバック（先取り）}{lst:python-class-timer-preview}
-class MyNode(Node):
-    def __init__(self):
-        super().__init__("my_node")
-        # 0.5 秒ごとに self.timer_callback を呼んでもらう
-        self.timer = self.create_timer(0.5, self.timer_callback)
-
-    def timer_callback(self):
-        self.get_logger().info("タイマが呼ばれました")
-\end{codelisting}
-
-\cmd{self.create\_timer(0.5, self.timer\_callback)} の \cmd{self.timer\_callback} に \cmd{( )} が付いていないことに注目してください。
-メソッドを呼び出すのではなく、メソッドそのものを ROS 2 に渡しているのです。
+\begin{point}[ROS 2 とコールバック]
+  ROS 2 のプログラムは、コールバックの考え方で動いています。
+  「0.5 秒ごとに、この関数を呼んでほしい」「センサのデータが届いたら、この関数を呼んでほしい」というように、関数を ROS 2 に登録しておき、出来事が起きるたびに ROS 2 がその関数を呼び出します。
+  詳しくは、\ref{chap:rclpy}章で学びます。
+\end{point}
 
 \begin{column}{lambda 式}
   ちょっとした処理のためだけに、わざわざ \cmd{def} で関数を定義するのが面倒なときは、\textbf{lambda 式}で名前のない関数をその場で作れます。
@@ -311,7 +294,7 @@ Python には、よく使う機能をまとめた\textbf{モジュール}が最�
 モジュールの機能を使うには、\cmd{import} でモジュールを読み込みます。
 読み込んだ後は、\cmd{モジュール名.関数名( )} の形で使います。
 
-\begin{codelisting}[style=python]{math モジュールと random モジュール}{lst:python-class-import}
+\begin{codelisting}[style=python]{math モジュールと random モジュール（math\_random.py）}{lst:python-class-import}
 import math
 import random
 
@@ -321,6 +304,16 @@ print(math.degrees(math.pi))     # ラジアンを度に変換する（180.0）
 print(random.randint(1, 100))    # 1〜100 の整数の乱数
 \end{codelisting}
 
+\begin{terminal}[モジュールを使うプログラムを実行する]
+~/py_practice$ python3 math_random.py
+1.4142135623730951
+3.141592653589793
+180.0
+57
+\end{terminal}
+
+最後の行は乱数なので、実行するたびに変わります。
+
 ロボットの向きや角度の計算では、\cmd{math} モジュールの三角関数（\cmd{math.sin}, \cmd{math.cos}）や、ラジアンと度の変換（\cmd{math.radians}, \cmd{math.degrees}）をよく使います。
 
 \subsection{import のいろいろな書き方}
@@ -328,7 +321,7 @@ print(random.randint(1, 100))    # 1〜100 の整数の乱数
 \cmd{from モジュール名 import 名前} と書くと、モジュール名を付けずに関数などを使えます。
 \cmd{import モジュール名 as 別名} と書くと、モジュールに短い別名を付けられます。
 
-\begin{codelisting}[style=python]{import のいろいろな書き方}{lst:python-class-import2}
+\begin{codelisting}[style=python]{import のいろいろな書き方（import\_as.py）}{lst:python-class-import2}
 from math import pi, sqrt   # math.pi ではなく pi と書ける
 import numpy as np          # numpy を np という名前で使う
 
@@ -336,6 +329,18 @@ print(pi * 10 * 10)         # 半径 10 の円の面積
 print(sqrt(16))
 print(np.mean([1.0, 2.0, 3.0]))
 \end{codelisting}
+
+\begin{terminal}[import のいろいろな書き方を試す]
+~/py_practice$ source .venv/bin/activate
+(.venv) ~/py_practice$ python3 import_as.py
+314.1592653589793
+4.0
+2.0
+(.venv) ~/py_practice$ deactivate
+\end{terminal}
+
+NumPy は、\ref{sec:python-venv}節で \cmd{\textasciitilde/py\_practice} の仮想環境にインストールしたので、仮想環境を有効にしてから実行しています。
+仮想環境を有効にしないで実行すると、\cmd{ModuleNotFoundError: No module named 'numpy'} というエラーになります。
 
 NumPy のような標準ライブラリ以外のパッケージは、\ref{sec:python-pip}節の方法（Ubuntu では \cmd{sudo apt install python3-numpy} など）でインストールしてから使います。
 なお、\cmd{from math import *} のようにすべてを読み込む書き方もありますが、どの名前がどこから来たのかわからなくなるので、使わないほうがよいでしょう。
@@ -369,9 +374,9 @@ print(f"速度: {speed}")
 \end{codelisting}
 
 \begin{terminal}[自分で作ったモジュールを使う]
-$ python3 main.py
+~/py_practice$ python3 main.py
 速度: 0.5
-$ python3 robot_utils.py
+~/py_practice$ python3 robot_utils.py
 1.0
 \end{terminal}
 
@@ -403,7 +408,7 @@ ROS 2 のノードのファイルも、最後にこの形で \cmd{main( )} を�
 たとえば、数値を期待しているところに文字が入力されると、\cmd{ValueError} という例外が発生します。
 
 \begin{terminal}[例外が発生してプログラムが止まる]
-$ python3 speed_input.py
+~/py_practice$ python3 speed_input.py
 速度 [m/s] => fast
 Traceback (most recent call last):
   File "/home/user/py_practice/speed_input.py", line 1, in <module>
@@ -434,7 +439,7 @@ print(f"速度を {speed} m/s に設定しました")
 \end{codelisting}
 
 \begin{terminal}[例外処理をしたプログラムの実行結果]
-$ python3 speed_input.py
+~/py_practice$ python3 speed_input.py
 速度 [m/s] => fast
 数値を入力してください
 速度 [m/s] => 0.3
@@ -482,7 +487,7 @@ finally:
 \end{codelisting}
 
 \begin{terminal}[Ctrl+C で止めたときの実行結果]
-$ python3 stop.py
+~/py_practice$ python3 stop.py
 走行中...
 走行中...
 ^CCtrl+C が押されました
@@ -533,7 +538,7 @@ Python には、\textbf{PEP 8} というコーディングの決まり（スタ�
 
 また、ファイルの中は、次の順番で書くと読みやすくなります。
 
-\begin{codelisting}[style=python]{読みやすいファイルの構成}{lst:python-class-layout}
+\begin{codelisting}[style=python]{読みやすいファイルの構成（wheel.py）}{lst:python-class-layout}
 # 1. import
 import math
 
@@ -551,6 +556,11 @@ if __name__ == "__main__":
     print(wheel_speed(2.0))
 \end{codelisting}
 
+\begin{terminal}[読みやすい構成のプログラムを実行する]
+~/py_practice$ python3 wheel.py
+0.4146902302738527
+\end{terminal}
+
 \subsection{フォーマッタとリンタ}
 
 PEP 8 の決まりを、すべて自分で気をつけるのは大変です。
@@ -559,10 +569,10 @@ PEP 8 の決まりを、すべて自分で気をつけるのは大変です。
 Ruff は、pipx（\ref{sec:python-pep668}節）でインストールできます。
 
 \begin{terminal}[Ruff をインストールして使う]
-$ pipx install ruff
-$ ruff format robot.py      # コードの見た目を整える
+~/py_practice$ pipx install ruff
+~/py_practice$ ruff format robot.py      # コードの見た目を整える
 1 file reformatted
-$ ruff check robot.py       # 誤りや決まりに合わない書き方を調べる
+~/py_practice$ ruff check robot.py       # 誤りや決まりに合わない書き方を調べる
 All checks passed!
 \end{terminal}
 
@@ -576,7 +586,7 @@ Python では、変数や引数の型を書く必要はありません（\ref{se
 そこで、Python では、変数や引数・戻り値に、\textbf{型ヒント}として型を書き添えられます。
 引数は \cmd{名前: 型}、戻り値は \cmd{) -> 型:} の形で書きます。
 
-\begin{codelisting}[style=python]{型ヒントを書いた関数}{lst:python-class-typehint}
+\begin{codelisting}[style=python]{型ヒントを書いた関数（typehint.py）}{lst:python-class-typehint}
 import math
 
 
@@ -589,7 +599,17 @@ def valid_average(distances: list[float]) -> float | None:
     if len(valid) == 0:
         return None
     return sum(valid) / len(valid)
+
+
+print(wheel_speed(2.0))
+print(valid_average([1.2, -1.0, 0.8]))
 \end{codelisting}
+
+\begin{terminal}[型ヒントを書いたプログラムを実行する]
+~/py_practice$ python3 typehint.py
+0.4146902302738527
+1.0
+\end{terminal}
 
 \cmd{list[float]} は「小数のリスト」、\cmd{float | None} は「小数か \cmd{None}」（\ref{sec:python-basics-none}節）という意味です。
 型ヒントは、あくまで読む人やツールのための「ヒント」で、違う型の値を渡しても、Python はそのまま実行します。
@@ -645,12 +665,19 @@ ROS 2 の公式のサンプルや、公開されているパッケージのコ�
 そのようなときは、途中の変数の値を \cmd{print( )} で表示して、どこから期待と違う値になっているのかを調べます。
 f 文字列で \cmd{\{変数名=\}} と書くと、変数名と値を一緒に表示できて便利です。
 
-\begin{codelisting}[style=python]{print で途中の値を確かめる}{lst:python-class-printdebug}
+\begin{codelisting}[style=python]{print で途中の値を確かめる（print\_debug.py）}{lst:python-class-printdebug}
 total = 0
 for i in range(1, 4):
     total += i
     print(f"{i=} {total=}")   # i=1 total=1 のように表示される
 \end{codelisting}
+
+\begin{terminal}[print でデバッグするプログラムを実行する]
+~/py_practice$ python3 print_debug.py
+i=1 total=1
+i=2 total=3
+i=3 total=6
+\end{terminal}
 
 \subsection{デバッガを使う}
 
@@ -658,7 +685,7 @@ for i in range(1, 4):
 プログラムの止めたい場所に \cmd{breakpoint()} と書いて実行すると、その行でプログラムが止まり、Python のデバッガ（pdb）が起動します。
 
 \begin{terminal}[pdb でプログラムを 1 行ずつ実行する]
-$ python3 robot.py
+~/py_practice$ python3 robot.py
 > /home/user/py_practice/robot.py(10)move()
 -> if speed > self.max_speed:
 (Pdb) p speed
