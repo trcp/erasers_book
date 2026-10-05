@@ -37,6 +37,19 @@ ROS 2 では、座標系の向きと単位について、次のような決ま�
   \item 回転は、軸の向きに右手の親指を向けたとき、ほかの指が曲がる向きが正（z 軸まわりなら、上から見て左回りが正）
 \end{itemize}
 
+\begin{tips}{右手座標系}
+  x・y・z の 3 本の軸の向きの決め方には、「右手座標系」と「左手座標系」の 2 種類があります。
+  ROS 2 では、\textbf{右手座標系}を使います。
+  右手の親指・人差し指・中指を、それぞれ直角になるように開いたとき、\textbf{親指が x 軸、人差し指が y 軸、中指が z 軸}の向きになるのが右手座標系です。
+  ロボットに当てはめると、親指を前（x）に向けたとき、人差し指が左（y）、中指が上（z）を指します。
+
+  回転の向きも、右手で覚えられます。
+  右手で軸を握るようにして、親指を軸の向きに合わせたとき、ほかの 4 本の指が曲がる向きが、回転の正の向きです（右ねじの法則と同じです）。
+  z 軸なら、親指を上に向けると指は左回りに曲がるので、上から見て左回りが正になります。
+
+  ゲームエンジンなどには左手座標系を使うものもあるので、ほかのソフトウェアとデータをやり取りするときは、どちらの座標系かを確かめましょう。
+\end{tips}
+
 \begin{figure}[tb]
   \centering
   \input{images/tf_viz/axes}
@@ -74,7 +87,13 @@ z 軸まわりの回転を\textbf{ヨー}（yaw）、y 軸まわりを\textbf{�
 
 \subsection{tf2 とは}
 
-ROS 2 では、座標系どうしの位置関係を、\textbf{tf2} というしくみで管理します。
+\textbf{tf2 があるから ROS を使う、と言っても過言ではありません。}
+ロボットには、LiDAR・カメラ・車輪・アームなど、たくさんの部品が付いていて、それぞれに座標系があります。
+ロボットが動けば、地図から見たそれぞれの位置も、時々刻々と変わっていきます。
+これらの位置関係を自分で計算しようとすると、回転と移動を何段階も組み合わせる必要があり、手間がかかるうえに間違えやすくなります。
+tf2 を使えば、どの 2 つの座標系の間の位置関係でも、問い合わせるだけで計算してくれます。
+
+ROS 2 では、座標系どうしの位置関係を、この \textbf{tf2} というしくみで管理します。
 各ノードは、「親の座標系から見た、子の座標系の位置と向き」を、\cmd{/tf} と \cmd{/tf\_static} という 2 つのトピックにパブリッシュします。
 座標変換を使いたいノードは、これらのトピックをサブスクライブしておき、必要なときに「A の座標系から見た B の座標系の位置」を問い合わせます。
 途中の変換をたどる計算は、tf2 がやってくれます。
@@ -155,7 +174,7 @@ $ ros2 run tf2_ros static_transform_publisher --x 0.1 --y 0 --z 0.2 --yaw 0 --pi
 自分のノードで座標変換を使うときは、\cmd{tf2\_ros} パッケージを使います。
 次のノードは、tf2 のデモが動いている状態で、\cmd{world} 座標系から見た \cmd{turtle1} の位置を 1 秒ごとに表示します。
 
-\codefile[style=python, firstline=10, lastline=27]{座標変換を調べるノード（my\_package/frame\_listener.py）}{lst:tf-viz-listener}{samples/rclpy/my_package/my_package/frame_listener.py}
+\codefile[style=python]{座標変換を調べるノード（my\_package/frame\_listener.py）}{lst:tf-viz-listener}{samples/rclpy/my_package/my_package/frame_listener.py}
 
 \cmd{Buffer} は、届いた座標変換をためておく入れ物で、\cmd{TransformListener} が \cmd{/tf} と \cmd{/tf\_static} をサブスクライブして、\cmd{Buffer} に入れてくれます。
 \cmd{lookup\_transform(親, 子, 時刻)} で、座標変換を問い合わせます。
@@ -275,24 +294,14 @@ RViz2 の画面の左側にある「Displays」パネルで、何を表示する
   \item 同じように「TF」を追加すると、各リンクの座標系が、赤（x）・緑（y）・青（z）の矢印で表示されます。
 \end{enumerate}
 
-joint\_state\_publisher\_gui のスライダを動かすと、車輪が回り、座標系の矢印も一緒に回ることがわかります（図\ref{fig:tf-viz-rviz}）。
+joint\_state\_publisher\_gui のスライダを動かすと、車輪が回り、座標系の矢印も一緒に回ることがわかります。
+図\ref{fig:tf-viz-rviz}は、同じ方法で、\ref{chap:simulation}章で使う TurtleBot3 のモデルを表示した例です。
+部品ごとの座標系が、赤・緑・青の矢印で表示されています。
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：display.launch.py を起動し、RViz2 に RobotModel と TF を表示した画面と、joint_state_publisher_gui のウィンドウのスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{tf_viz/rviz.png}
-  \caption{RViz2 でロボットのモデルと座標系を表示した例}
+  \includegraphics[width=0.9\linewidth]{tf_viz/rviz.png}
+  \caption{RViz2 でロボットのモデルと座標系を表示した例（TurtleBot3）}
   \label{fig:tf-viz-rviz}
 \end{figure}
 

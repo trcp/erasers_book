@@ -50,8 +50,8 @@ $ sudo add-apt-repository universe
 
 \begin{terminal}[ROS 2 のリポジトリを追加する]
 $ sudo apt update && sudo apt install curl -y
-$ export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
-$ curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo $VERSION_CODENAME)_all.deb"
+$ export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}')
+$ curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
 $ sudo dpkg -i /tmp/ros2-apt-source.deb
 \end{terminal}
 
@@ -59,24 +59,50 @@ $ sudo dpkg -i /tmp/ros2-apt-source.deb
 
 \begin{itemize}
   \item 2 行目では、\cmd{curl}（Web からデータを取得するコマンド）で \cmd{ros2-apt-source} の最新版の情報を取得し、パイプ（\ref{sec:text-pipe-pipe}節）でつないだ \cmd{grep} と \cmd{awk}（\ref{sec:text-pipe-tools}節）でバージョン番号だけを取り出して、環境変数 \cmd{ROS\_APT\_SOURCE\_VERSION} に入れています。\cmd{\$(コマンド)} は、コマンドの実行結果を使う書き方です（\ref{sec:shellscript-variable}節）。
-  \item 3 行目では、そのバージョンの \cmd{.deb} ファイルを \cmd{/tmp} にダウンロードしています。\cmd{\$(. /etc/os-release \&\& echo \$VERSION\_CODENAME)} の部分は、Ubuntu のコードネーム（\cmd{noble}）に置き換わります。
+  \item 3 行目では、そのバージョンの \cmd{.deb} ファイルを \cmd{/tmp} にダウンロードしています。\cmd{\$(. /etc/os-release \&\& echo ...)} の部分は、\cmd{/etc/os-release}（\ref{sec:files-view}節）に書かれた Ubuntu のコードネーム（\cmd{noble}）に置き換わります。
   \item 4 行目の \cmd{dpkg -i} は、ダウンロードした \cmd{.deb} ファイルをインストールするコマンドです。これで、ROS 2 のリポジトリの設定ファイルと GPG 鍵が登録されます。
 \end{itemize}
 
+\subsection{開発用の道具をインストールする}
+
+次に、ROS 2 の開発に使う道具をまとめた \cmd{ros-dev-tools} をインストールします。
+\cmd{ros-dev-tools} には、パッケージをビルドするための \cmd{colcon} や、依存関係を解決する \cmd{rosdep}（\ref{chap:workspace}章）などが含まれています。
+
+その前に、Ubuntu の apt の設定を確かめておきます。
+Ubuntu 24.04 では、apt の設定に \cmd{noble-updates} と \cmd{noble-backports} が含まれていないと、\cmd{ros-dev-tools} をインストールするときに、パッケージの依存関係がぶつかってエラーになることがあります。
+
+\begin{terminal}[apt の設定を確かめる]
+$ grep Suites /etc/apt/sources.list.d/ubuntu.sources
+Suites: noble noble-updates noble-backports
+...
+\end{terminal}
+
+\cmd{Suites:} の行に \cmd{noble-updates} と \cmd{noble-backports} があれば、そのままで構いません。
+足りないときは、\cmd{/etc/apt/sources.list.d/ubuntu.sources} を root の権限で編集して（\ref{sec:files-edit}節）、その行を \cmd{Suites: noble noble-updates noble-backports} に書き換えてから、次のコマンドを実行します。
+
+\begin{termexample}[apt の設定を書き換えた後に実行する]
+$ sudo apt clean && sudo apt update && sudo apt full-upgrade -y
+\end{termexample}
+
+確かめたら、\cmd{ros-dev-tools} をインストールします。
+
+\begin{terminal}[開発用の道具をインストールする]
+$ sudo apt update && sudo apt install ros-dev-tools
+\end{terminal}
+
 \subsection{ROS 2 をインストールする}
 
-リポジトリを追加したら、パッケージの一覧を更新し、インストール済みのパッケージを最新にしてから、ROS 2 をインストールします。
+パッケージの一覧を更新し、インストール済みのパッケージを最新にしてから、ROS 2 をインストールします。
+ROS 2 のパッケージは、頻繁に更新されている Ubuntu の上でビルドされているので、インストールする前にシステムを最新にしておくことがすすめられています。
 
 \begin{terminal}[ROS 2 Jazzy をインストールする]
 $ sudo apt update
 $ sudo apt upgrade
 $ sudo apt install ros-jazzy-desktop
-$ sudo apt install ros-dev-tools
 \end{terminal}
 
 \cmd{ros-jazzy-desktop} は、ROS 2 の本体に加えて、RViz などの GUI のツールや、デモ・チュートリアル用のパッケージをまとめたものです。
 ダウンロードするデータが大きいので、インストールには時間がかかります。
-\cmd{ros-dev-tools} には、パッケージをビルドするための \cmd{colcon} や、依存関係を解決する \cmd{rosdep}（\ref{chap:workspace}章）など、開発に使う道具が含まれています。
 
 \begin{tablebox}[ROS 2 Jazzy の主なインストール用パッケージ][tab:ros2-install-packages]
   \begin{tabular}{lp{0.55\linewidth}}
@@ -177,19 +203,7 @@ $ ros2 run turtlesim turtlesim_node
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：turtlesim を起動し、turtle_teleop_key でカメを少し動かして軌跡が描かれた状態のウィンドウのスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.6\linewidth]{ros2_install/turtlesim.png}
+  \includegraphics[width=0.5\linewidth]{ros2_install/turtlesim.png}
   \caption{turtlesim のウィンドウ}
   \label{fig:ros2-install-turtlesim}
 \end{figure}

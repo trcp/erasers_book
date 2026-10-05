@@ -80,7 +80,7 @@ LiDAR のデータを読んで、障害物を避けながら走り回るノー�
 
 \cmd{my\_package} に \cmd{obstacle\_avoider.py} を作ります。
 
-\codefile[style=python, lastline=60]{障害物を避けるノード（my\_package/obstacle\_avoider.py）}{lst:practice-avoider}{samples/rclpy/my_package/my_package/obstacle_avoider.py}
+\codefile[style=python]{障害物を避けるノード（my\_package/obstacle\_avoider.py）}{lst:practice-avoider}{samples/rclpy/my_package/my_package/obstacle_avoider.py}
 
 \begin{description}
   \item[パラメータ] 止まって曲がり始める距離・進む速さ・回る速さを、パラメータ（\ref{sec:rclpy-param}節）にしています。プログラムを書き換えずに、実行しながら調整できます。\cmd{front\_angle}（LiDAR から見たロボットの正面の向き）と \cmd{stamped}（\cmd{TwistStamped} で送るか、\cmd{Twist} で送るか）は、別のロボットでこのノードを使うためのパラメータで、\ref{chap:kachaka}章で使います。TurtleBot3 では初期値のままで構いません。
@@ -173,19 +173,7 @@ teleop\_twist\_keyboard でロボットをゆっくり動かして、世界の�
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：slam_toolbox で turtlebot3_world の地図を作っている途中の RViz2 の画面（Map・LaserScan・RobotModel を表示）のスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{practice/slam.png}
+  \includegraphics[width=0.9\linewidth]{practice/slam.png}
   \caption{SLAM で地図を作っている様子}
   \label{fig:practice-slam}
 \end{figure}

@@ -152,9 +152,9 @@ Python のパッケージより、ビルドに時間がかかることがわか�
 \subsection{パブリッシャ}
 
 \ref{sec:rclpy-pubsub}節の \cmd{talker.py} を C++ で書くと、次のようになります。
-\cmd{main} 関数は、ノードのクラスの名前が違うだけなので省略します。
+\cmd{main} 関数は、作るノードのクラスの名前が違うだけで、\ref{sec:rclcpp-first}節と同じ形です。
 
-\codefile[style=cpp, lastline=35]{パブリッシャ（src/talker.cpp）}{lst:rclcpp-talker}{samples/rclcpp/my_cpp_package/src/talker.cpp}
+\codefile[style=cpp]{パブリッシャ（src/talker.cpp）}{lst:rclcpp-talker}{samples/rclcpp/my_cpp_package/src/talker.cpp}
 
 \begin{description}
   \item[6 行目] メッセージ型 \cmd{std\_msgs/msg/String} を読み込みます。C++ では、\cmd{パッケージ名/msg/型の名前.hpp} を \cmd{\#include} します。ファイル名は、型の名前を小文字とアンダースコアにしたものです（\cmd{RobotStatus} なら \cmd{robot\_status.hpp}）。
@@ -185,7 +185,7 @@ Python のパッケージより、ビルドに時間がかかることがわか�
 
 \ref{sec:rclpy-pubsub}節の \cmd{listener.py} を C++ で書くと、次のようになります。
 
-\codefile[style=cpp, lastline=25]{サブスクライバ（src/listener.cpp）}{lst:rclcpp-listener}{samples/rclcpp/my_cpp_package/src/listener.cpp}
+\codefile[style=cpp]{サブスクライバ（src/listener.cpp）}{lst:rclcpp-listener}{samples/rclcpp/my_cpp_package/src/listener.cpp}
 
 コールバックには、届いたメッセージが引数として渡されるので、\cmd{std::bind} に \cmd{std::placeholders::\_1}（「1 つ目の引数をここに渡す」という意味）を付けます。
 コールバックの引数の \cmd{const std\_msgs::msg::String \& msg} は、「メッセージをコピーせずに、変更しない約束で受け取る」という意味です。
@@ -207,7 +207,7 @@ C++ で書いたノードと Python で書いたノードが、問題なく通�
 
 \ref{sec:rclpy-timer}節の \cmd{turtle\_controller.py} を C++ で書くと、次のようになります。
 
-\codefile[style=cpp, lastline=54]{カメを自動で動かすノード（src/turtle\_controller.cpp）}{lst:rclcpp-turtle-controller}{samples/rclcpp/my_cpp_package/src/turtle_controller.cpp}
+\codefile[style=cpp]{カメを自動で動かすノード（src/turtle\_controller.cpp）}{lst:rclcpp-turtle-controller}{samples/rclcpp/my_cpp_package/src/turtle_controller.cpp}
 
 構成は Python とまったく同じです。
 Python では、まだ位置が届いていないことを \cmd{None}（\ref{sec:python-basics-none}節）で表しましたが、C++ では \cmd{std::optional} を使っています。
@@ -223,7 +223,7 @@ $ ros2 run my_cpp_package turtle_controller     # 2 つ目のターミナル
 
 \ref{sec:rclpy-service}節の \cmd{add\_two\_ints\_server.py} を C++ で書くと、次のようになります。
 
-\codefile[style=cpp, lastline=35]{サービスサーバ（src/add\_two\_ints\_server.cpp）}{lst:rclcpp-service-server}{samples/rclcpp/my_cpp_package/src/add_two_ints_server.cpp}
+\codefile[style=cpp]{サービスサーバ（src/add\_two\_ints\_server.cpp）}{lst:rclcpp-service-server}{samples/rclcpp/my_cpp_package/src/add_two_ints_server.cpp}
 
 \cmd{using AddTwoInts = ...} は、長い型の名前に、短い別名を付ける書き方です。
 サービスのコールバックは、リクエストとレスポンスの 2 つを受け取るので、\cmd{std::placeholders::\_1} と \cmd{\_2} を付けます。
@@ -238,7 +238,7 @@ ROS 2 の公式のチュートリアル（付録\ref{app:references}）に、C++
 
 \ref{sec:rclpy-param}節の \cmd{param\_node.py} を C++ で書くと、次のようになります。
 
-\codefile[style=cpp, lastline=31]{パラメータを使うノード（src/param\_node.cpp）}{lst:rclcpp-param}{samples/rclcpp/my_cpp_package/src/param_node.cpp}
+\codefile[style=cpp]{パラメータを使うノード（src/param\_node.cpp）}{lst:rclcpp-param}{samples/rclcpp/my_cpp_package/src/param_node.cpp}
 
 パラメータの宣言は、Python と同じく、名前と初期値を渡します。
 値を取得するときは、\cmd{as\_string()} や \cmd{as\_double()} のように、型を指定して取り出します。

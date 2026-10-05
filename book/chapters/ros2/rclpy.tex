@@ -50,15 +50,15 @@ VS Code で \cmd{\textasciitilde/ros2\_ws} を開き（\ref{sec:editor-vscode}�
   \item[17〜21 行目] \key{Ctrl}+\key{C} が押されると、例外（\ref{sec:python-class-exception}節）の \cmd{KeyboardInterrupt} が起きます。それを受け止めて、ノードを片付け（\cmd{destroy\_node}）、rclpy を終了します（\cmd{try\_shutdown}）。
 \end{description}
 
-\begin{point}[Python のクラスの継承と ROS 2 のノード]
-  ROS 2 では、\ref{sec:python-class-inherit}節で学んだクラスの\textbf{継承}をよく使います。
-  \cmd{Node} クラスには、ほかのノードと通信するための機能（パブリッシャやタイマを作る、ログを出すなど）がたくさん用意されていて、\cmd{class HelloNode(Node):} のように継承するだけで、それらを自分のクラスで使えるようになります。
-  \cmd{super().\_\_init\_\_('hello\_node')} で親クラス（\cmd{Node}）の準備をし、\cmd{self.get\_logger()} のように、親クラスから引き継いだメソッドを \cmd{self.} を付けて使います。
-  この章のどのノードも、この形で書いていきます。
-\end{point}
+\subsection{クラスの継承と ROS 2 のノード}
 
-12 行目からの \cmd{main} 関数の形は、この章のどのノードでもほとんど同じです。
-以降のプログラムでは、ノードのクラスの部分だけを示します。
+ROS 2 では、\ref{sec:python-class-inherit}節で学んだクラスの\textbf{継承}をよく使います。
+\cmd{Node} クラスには、ほかのノードと通信するための機能（パブリッシャやタイマを作る、ログを出すなど）がたくさん用意されていて、\cmd{class HelloNode(Node):} のように継承するだけで、それらを自分のクラスで使えるようになります。
+\cmd{super().\_\_init\_\_('hello\_node')} で親クラス（\cmd{Node}）の準備をし、\cmd{self.get\_logger()} のように、親クラスから引き継いだメソッドを \cmd{self.} を付けて使います。
+この章のどのノードも、この形で書いていきます。
+
+12 行目からの \cmd{main} 関数の形は、この章のどのノードでもほとんど同じで、作るノードのクラスの名前（ここでは \cmd{HelloNode}）だけが変わります。
+この章のプログラムは、どれも \cmd{main} 関数まで含めた全体を載せているので、そのまま入力すれば動かせます。
 
 \subsection{依存関係とエントリポイントを追加する}
 
@@ -114,7 +114,7 @@ $ cd ~/ros2_ws
 次は、トピック（\ref{sec:ros2-concepts-topic}節）で文字列のメッセージを送るノード（パブリッシャ）を書きます。
 \cmd{talker.py} を作り、次のように入力しましょう。
 
-\codefile[style=python, lastline=21]{パブリッシャ（my\_package/talker.py）}{lst:rclpy-talker}{samples/rclpy/my_package/my_package/talker.py}
+\codefile[style=python]{パブリッシャ（my\_package/talker.py）}{lst:rclpy-talker}{samples/rclpy/my_package/my_package/talker.py}
 
 \begin{description}
   \item[4 行目] 使うメッセージ型（\cmd{std\_msgs/msg/String}）を読み込みます。メッセージ型は、\cmd{from パッケージ名.msg import 型の名前} の形で読み込みます。
@@ -138,7 +138,7 @@ $ cd ~/ros2_ws
 
 次に、\cmd{chatter} トピックのメッセージを受け取るノード（サブスクライバ）を書きます。
 
-\codefile[style=python, lastline=15]{サブスクライバ（my\_package/listener.py）}{lst:rclpy-listener}{samples/rclpy/my_package/my_package/listener.py}
+\codefile[style=python]{サブスクライバ（my\_package/listener.py）}{lst:rclpy-listener}{samples/rclpy/my_package/my_package/listener.py}
 
 \begin{description}
   \item[11〜12 行目] \cmd{create\_subscription()} でサブスクライバを作ります。引数は、メッセージ型、トピック名、\textbf{メッセージが届いたときに呼び出す関数（コールバック）}、QoS の 4 つです。
@@ -195,7 +195,7 @@ talker の \cmd{self.create\_timer(0.5, self.timer\_callback)} で、\cmd{self.t
 カメの位置（\cmd{/turtle1/pose}）を受け取り、壁に近づいたら曲がり、そうでなければまっすぐ進むように、速度の指令（\cmd{/turtle1/cmd\_vel}）を送ります。
 turtlesim の画面は、左下が (0, 0)、右上がおよそ (11, 11) です。
 
-\codefile[style=python, lastline=35]{カメを自動で動かすノード（my\_package/turtle\_controller.py）}{lst:rclpy-turtle-controller}{samples/rclpy/my_package/my_package/turtle_controller.py}
+\codefile[style=python]{カメを自動で動かすノード（my\_package/turtle\_controller.py）}{lst:rclpy-turtle-controller}{samples/rclpy/my_package/my_package/turtle_controller.py}
 
 \cmd{pose\_callback} は、届いた最新の位置を \cmd{self.pose} に覚えておくだけです。
 どう動くかは、0.1 秒ごとに呼び出される \cmd{timer\_callback} が、覚えておいた位置をもとに決めます。
@@ -228,7 +228,7 @@ int64 b
 int64 sum
 \end{terminal}
 
-\codefile[style=python, lastline=18]{サービスサーバ（my\_package/add\_two\_ints\_server.py）}{lst:rclpy-service-server}{samples/rclpy/my_package/my_package/add_two_ints_server.py}
+\codefile[style=python]{サービスサーバ（my\_package/add\_two\_ints\_server.py）}{lst:rclpy-service-server}{samples/rclpy/my_package/my_package/add_two_ints_server.py}
 
 サービスの型は、\cmd{from パッケージ名.srv import 型の名前} の形で読み込みます。
 \cmd{create\_service()} の引数は、サービスの型、サービス名、リクエストが届いたときに呼び出すコールバックの 3 つです。
@@ -309,7 +309,7 @@ example_interfaces.srv.AddTwoInts_Response(sum=8)
 ここでは、ROS 2 に用意されている \cmd{example\_interfaces/action/Fibonacci} 型を使って、フィボナッチ数列（0, 1, 1, 2, 3, 5, \ldots のように、前の 2 つの数を足して次の数を作る数列）を 1 秒に 1 つずつ計算するサーバを作ります。
 ゴールで数列の長さ（\cmd{order}）を受け取り、途中経過として計算中の数列を送り、最後に完成した数列を結果として返します。
 
-\codefile[style=python, lastline=29]{アクションサーバ（my\_package/fibonacci\_server.py）}{lst:rclpy-action-server}{samples/rclpy/my_package/my_package/fibonacci_server.py}
+\codefile[style=python]{アクションサーバ（my\_package/fibonacci\_server.py）}{lst:rclpy-action-server}{samples/rclpy/my_package/my_package/fibonacci_server.py}
 
 \cmd{ActionServer} の引数は、ノード、アクションの型、アクション名、ゴールを受け取ったときに呼び出すコールバックです。
 コールバックの中では、\cmd{publish\_feedback()} で途中経過を送り、処理が終わったら \cmd{succeed()} を呼び出して、結果を \cmd{return} します。
@@ -339,7 +339,7 @@ Goal finished with status: SUCCEEDED
 ノードにパラメータ（\ref{sec:ros2-concepts-param}節）を持たせると、プログラムを書き換えずに設定を変えられるようになります。
 rclpy では、\cmd{declare\_parameter()} でパラメータの名前と初期値を宣言し、\cmd{get\_parameter()} で値を取得します。
 
-\codefile[style=python, lastline=18]{パラメータを使うノード（my\_package/param\_node.py）}{lst:rclpy-param}{samples/rclpy/my_package/my_package/param_node.py}
+\codefile[style=python]{パラメータを使うノード（my\_package/param\_node.py）}{lst:rclpy-param}{samples/rclpy/my_package/my_package/param_node.py}
 
 パラメータの型は、初期値から決まります。
 \cmd{'turtle'} なら文字列、\cmd{0.5} なら小数です。
@@ -462,7 +462,7 @@ bool is_moving    # 動いているかどうか
 
 \cmd{RobotStatus} 型のメッセージを 1 秒ごとにパブリッシュするノードは、次のようになります。
 
-\codefile[style=python, lastline=20]{自分で定義した型を使うノード（my\_package/status\_publisher.py）}{lst:rclpy-status}{samples/rclpy/my_package/my_package/status_publisher.py}
+\codefile[style=python]{自分で定義した型を使うノード（my\_package/status\_publisher.py）}{lst:rclpy-status}{samples/rclpy/my_package/my_package/status_publisher.py}
 
 \cmd{setup.py} に登録して、ワークスペース全体をビルドします。
 \cmd{package.xml} に依存関係を書いておいたので、colcon が \cmd{my\_interfaces} → \cmd{my\_package} の順にビルドしてくれます。

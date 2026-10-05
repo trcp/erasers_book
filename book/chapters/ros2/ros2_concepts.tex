@@ -430,25 +430,14 @@ $ rqt_graph
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：turtlesim_node と turtle_teleop_key を起動した状態で rqt_graph を開き、/teleop_turtle → /turtle1/cmd_vel → /turtlesim のつながりが表示されたスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{ros2_concepts/rqt_graph.png}
+  \includegraphics[width=0.9\linewidth]{ros2_concepts/rqt_graph.png}
   \caption{rqt\_graph でノードとトピックのつながりを表示した例}
   \label{fig:ros2-concepts-rqt-graph}
 \end{figure}
 
-図\ref{fig:ros2-concepts-rqt-graph}のように、楕円がノード、矢印がトピックを表します。
+図\ref{fig:ros2-concepts-rqt-graph}のように、楕円がノード、四角がトピックを表し、矢印がデータの流れる向きを表します。
 \cmd{/teleop\_turtle} から \cmd{/turtlesim} へ、\cmd{/turtle1/cmd\_vel} トピックでデータが流れていることが一目でわかります。
+\cmd{/turtle1/rotate\_absolute} の中の四角は、\ref{sec:ros2-concepts-action}節で学ぶアクションが内部で使っているトピックです。
 自分で作ったノードが思ったとおりにつながっているかを確かめるときに、とても便利です。
 表示が更新されないときは、左上の更新ボタンを押します。
 

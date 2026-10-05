@@ -90,13 +90,6 @@ Gazebo は、ROS 2 とは別のソフトウェアで、内部では独自の通�
 そのため、ROS 2 のノードから Gazebo の中のロボットを動かしたり、センサのデータを受け取ったりするには、両者の間でメッセージを変換して中継する必要があります。
 この役目をするのが、\textbf{ros\_gz\_bridge} です（図\ref{fig:simulation-bridge}）。
 
-\begin{figure}[tb]
-  \centering
-  \input{images/simulation/bridge}
-  \caption{Gazebo と ROS 2 のつながり}
-  \label{fig:simulation-bridge}
-\end{figure}
-
 ros\_gz\_bridge は、ROS 2 のノードの側から見ると、「Gazebo の中のセンサのデータをパブリッシュし、速度の指令をサブスクライブするノード」に見えます。
 そのため、シミュレーションでも、実際のロボットでも、同じトピック名と型でやり取りするようにしておけば、自分のノードは書き換えずにそのまま使えます。
 
@@ -119,6 +112,13 @@ ros\_gz\_bridge には、「どの Gazebo のトピックを、どの ROS 2 の�
   gz_type_name: "gz.msgs.Twist"
   direction: ROS_TO_GZ        # ROS 2 から Gazebo へ
 \end{codelisting}
+
+\begin{figure}[htbp]
+  \centering
+  \input{images/simulation/bridge}
+  \caption{Gazebo と ROS 2 のつながり}
+  \label{fig:simulation-bridge}
+\end{figure}
 
 この章で使う TurtleBot3 のシミュレーションのパッケージには、このような設定がすでに用意されていて、launch ファイルで ros\_gz\_bridge も一緒に起動されます。
 自分でロボットのモデルを作るときに、このような設定を書くことになります。
@@ -147,7 +147,22 @@ launch ファイルの YAML でまとめて設定するときは、\ref{sec:laun
 \textbf{TurtleBot3} は、ROBOTIS 社が開発した、ROS の学習や研究のための小型の移動ロボットです。
 左右 2 つの車輪で動き、LiDAR を搭載しています。
 世界中で使われていて、シミュレーションのモデルや、地図作り・自律移動のサンプルも公開されているので、ROS 2 を学ぶ題材として最適です。
-TurtleBot3 には、小さな「Burger」と、少し大きくカメラも搭載できる「Waffle」などのモデルがあります。
+TurtleBot3 には、次のようなモデルがあります。
+シミュレーションでも、使うモデルを選べます。
+
+\begin{tablebox}[TurtleBot3 の主なモデル][tab:simulation-tb3-models]
+  \begin{tabular}{llp{0.5\linewidth}}
+    \toprule
+    モデル & \cmd{TURTLEBOT3\_MODEL} の値 & 特徴 \\
+    \midrule
+    Burger & \cmd{burger} & いちばん小さいモデル。LiDAR を搭載 \\
+    Waffle & \cmd{waffle} & 一回り大きく、荷物も載せやすいモデル。LiDAR とカメラ（Intel RealSense）を搭載 \\
+    Waffle Pi & \cmd{waffle\_pi} & Waffle のカメラを、Raspberry Pi 用のカメラにしたモデル \\
+    \bottomrule
+  \end{tabular}
+\end{tablebox}
+
+本書では、主に Burger を使い、カメラを使うときだけ Waffle を使います（\ref{sec:simulation-sensor}節）。
 
 \subsection{TurtleBot3 のシミュレーションを用意する}
 
@@ -184,19 +199,7 @@ Gazebo の画面に、六角形の壁の中に柱が並んだ世界と、そこ�
 
 \begin{figure}[tb]
   \centering
-  \large
-  \begin{tikzpicture}
-    \draw rectangle++(4.5,3);
-    \clip rectangle++(4.5,3);
-    \foreach\x in{0,1,2,3,4}{
-      \foreach\y in{0,1,2,3,4,5,6}{
-        \path(\x*1.5-\y*0.5,\y*0.6)node[rotate=10,text=gray]{\sffamily\bfseries\itshape Sample };
-      }
-    }
-  \end{tikzpicture}
-  %% 入れる画像：turtlebot3_world.launch.py を起動したときの Gazebo の画面（六角形の壁の中に柱が並んだ世界と TurtleBot3 Burger）のスクリーンショット
-  % eps 画像を貼る場合は includegraphics をお使いください。
-  % \includegraphics[width=0.8\linewidth]{simulation/turtlebot3_world.png}
+  \includegraphics[width=0.9\linewidth]{simulation/turtlebot3_world.png}
   \caption{Gazebo で TurtleBot3 を起動した様子}
   \label{fig:simulation-tb3}
 \end{figure}

@@ -268,7 +268,7 @@ erasers\_kachaka は、\cmd{/er\_kachaka/kachaka\_speak} トピックに \cmd{st
 決まった間隔で話させるノードを書いてみましょう。
 \ref{sec:rclpy-pubsub}節の talker とほとんど同じです。
 
-\codefile[style=python, lastline=21]{カチャカに話させるノード（my\_package/kachaka\_speaker.py）}{lst:kachaka-speaker}{samples/rclpy/my_package/my_package/kachaka_speaker.py}
+\codefile[style=python]{カチャカに話させるノード（my\_package/kachaka\_speaker.py）}{lst:kachaka-speaker}{samples/rclpy/my_package/my_package/kachaka_speaker.py}
 
 トピック名を、\cmd{/er\_kachaka/kachaka\_speak} ではなく、\cmd{kachaka\_speak} という相対名（\ref{sec:launch-namespace}節）で書いているのがポイントです。
 起動するときに名前空間 \cmd{/er\_kachaka} を指定すれば、\cmd{/er\_kachaka/kachaka\_speak} になります。
@@ -303,7 +303,7 @@ ROS 2 の画像のメッセージと、OpenCV で扱う画像は形が違うの�
 
 \subsection{画像を表示するノード}
 
-\codefile[style=python, lastline=28]{カメラの画像を表示するノード（my\_package/camera\_viewer.py）}{lst:kachaka-camera}{samples/rclpy/my_package/my_package/camera_viewer.py}
+\codefile[style=python]{カメラの画像を表示するノード（my\_package/camera\_viewer.py）}{lst:kachaka-camera}{samples/rclpy/my_package/my_package/camera_viewer.py}
 
 \begin{description}
   \item[QoS] カメラの画像は、大量のデータを次々と送るので、\cmd{BEST\_EFFORT} でパブリッシュされています。サブスクライバも \cmd{qos\_profile\_sensor\_data} を使わないと、データが届きません（\ref{sec:debug-qos}節）。
@@ -353,7 +353,7 @@ LiDAR の角度 0（x 軸の向き）がロボットの左なので、ロボッ�
 この $\theta$ に、ロボットの正面の向き（$-\pi/2$）を入れれば、正面の障害物までの距離が求められます。
 これを使って、正面の距離を表示するノードを書いてみましょう。
 
-\codefile[style=python, lastline=36]{正面の障害物までの距離を表示するノード（my\_package/front\_distance.py）}{lst:kachaka-front}{samples/rclpy/my_package/my_package/front_distance.py}
+\codefile[style=python]{正面の障害物までの距離を表示するノード（my\_package/front\_distance.py）}{lst:kachaka-front}{samples/rclpy/my_package/my_package/front_distance.py}
 
 計算した番号は小数になるので、\cmd{round()} で一番近い整数にしています。
 距離の値が \cmd{inf}（無限大）のときは測れる範囲に障害物がない、\cmd{nan}（数ではない）のときは正しく測れなかった、という意味です。
