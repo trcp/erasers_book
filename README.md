@@ -412,6 +412,8 @@ git push origin v1.0.0
 
 表紙と奥付の「版」には、タグ名（例：`v1.0.0`）が入ります。
 タグの付いていないコミットからビルドした PDF では「開発版」と表示され、奥付にはビルドしたコミットの番号が入ります。
+タグの付いた版では、本文のサンプルコードのリンク（はじめに、執筆者一覧、奥付）が `https://github.com/trcp/erasers_book_code/tree/<タグ>` になります。
+**本のリポジトリにタグを打つときは、erasers_book_code にも同じ名前のタグを打って push してください**（打たないとリンク先が 404 になります）。
 版の情報は `.latexmkrc` がビルドのたびに `build/bookinfo.tex` に書き出します（環境変数 `BOOK_VERSION`、`BOOK_COMMIT` で上書きできます）。
 
 同じタグで作り直したいときは、タグを付け直して `git push -f origin v1.0.0` で push すると、Release も作り直されます。

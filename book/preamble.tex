@@ -233,7 +233,11 @@
 % 版の情報（表紙と奥付で使う）
 %   .latexmkrc がビルドのたびに build/bookinfo.tex を書き出し、
 %   \bookversion（タグ名、なければ「開発版」）と \bookcommit（コミットの番号）を定義する
+%   タグがあれば \booktaggedtrue にし、\codeurl を erasers_book_code の同じタグへのリンクにする
 % ---------------------------------------------------------------
 \newcommand{\bookversion}{開発版}
 \newcommand{\bookcommit}{不明}
+\newif\ifbooktagged  % タグの付いた版をビルドしているとき真
+% サンプルコードのリポジトリの URL（タグの付いた版では、同じタグを指すリンクになる）
+\newcommand{\codeurl}{\url{https://github.com/trcp/erasers_book_code}}
 \InputIfFileExists{build/bookinfo.tex}{}{}

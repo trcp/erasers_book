@@ -13,6 +13,7 @@ make_path(map { "$out_dir/$_" } qw(
 
 # 表紙と奥付に入れる版の情報を build/bookinfo.tex に書き出す
 #   BOOK_VERSION: 環境変数があればそれを、なければ HEAD に付いたタグを使う（空なら「開発版」）
+#                 タグがあれば、サンプルコードのリンクも erasers_book_code の同じタグを指す
 #   BOOK_COMMIT : 環境変数があればそれを、なければ HEAD のコミットを使う（先頭 7 文字）
 # 中身が変わったときだけ書き換えるので、版が変わると latexmk が再ビルドする
 {
@@ -21,7 +22,12 @@ make_path(map { "$out_dir/$_" } qw(
   chomp($version, $commit);
   $commit = substr($commit, 0, 7);
   my $info = '';
-  $info .= "\\renewcommand{\\bookversion}{\\detokenize{$version}}\n" if $version ne '';
+  if ($version ne '') {
+    $info .= "\\renewcommand{\\bookversion}{\\detokenize{$version}}\n";
+    # サンプルコードのリポジトリも、同じ名前のタグを指すリンクにする
+    $info .= "\\booktaggedtrue\n";
+    $info .= "\\renewcommand{\\codeurl}{\\url{https://github.com/trcp/erasers_book_code/tree/$version}}\n";
+  }
   $info .= "\\renewcommand{\\bookcommit}{\\detokenize{$commit}}\n"   if $commit  ne '';
   my $file = "$out_dir/bookinfo.tex";
   my $old = '';
