@@ -142,7 +142,7 @@ ROS 2 は、いくつかの層を積み重ねた構造になっています（�
     ノードを書くためのライブラリで、Python 用の \cmd{rclpy} と、C++ 用の \cmd{rclcpp} があります。
     本書では \cmd{rclpy} を使います（\ref{chap:rclpy}章）。
   \item[rcl と rmw]
-    どの言語から使っても同じように動くように、共通の機能をまとめた層（\cmd{rcl}）と、その下の通信の部分を取り替えられるようにするための層（\cmd{rmw}）があります。
+    どの言語から使っても同じように動くように、共通の機能をまとめた層（\cmd{rcl}、ROS Client Library）と、その下の通信の部分を取り替えられるようにするための層（\cmd{rmw}、ROS Middleware）があります。
   \item[DDS]
     実際にネットワークを通じてデータを送り届けるのが、DDS という通信の層です。
 \end{description}
@@ -188,17 +188,19 @@ ROS 2 のディストリビューションには、「Jazzy Jalisco」のよう�
 偶数年の 5 月に公開されるディストリビューションは\textbf{LTS}（長期サポート）版で、5 年間サポートされます。
 それ以外のディストリビューションのサポート期間は 1 年半ほどです。
 LTS 版の ROS 2 は、同じ年に公開される Ubuntu の LTS 版に合わせて作られています（\ref{sec:linux-distribution}節）。
+2026 年 5 月には、ROS 2 の第 12 弾となる LTS リリースとして「Lyrical Luth」がリリースされました。
 
 最近の主なディストリビューションは、次のとおりです。
 
 \begin{tablebox}[最近の主な ROS 2 のディストリビューション][tab:what-is-ros-distros]
-  \begin{tabular}{llll}
+  \begin{tabular}{lllll}
     \toprule
-    名前 & 公開 & 対応する Ubuntu & サポート \\
+    名前 & 日本語での呼び方 & 公開 & 対応する Ubuntu & サポート \\
     \midrule
-    Humble Hawksbill & 2022 年 5 月 & 22.04 & LTS（2027 年 5 月まで） \\
-    Jazzy Jalisco & 2024 年 5 月 & 24.04 & LTS（2029 年 5 月まで） \\
-    Kilted Kaiju & 2025 年 5 月 & 24.04 & 2026 年 12 月まで \\
+    Humble Hawksbill & ハンブル ホークスビル & 2022 年 5 月 & 22.04 & LTS（2027 年 5 月まで） \\
+    Jazzy Jalisco & ジャジー ハリスコ & 2024 年 5 月 & 24.04 & LTS（2029 年 5 月まで） \\
+    Kilted Kaiju & キルテッド カイジュウ & 2025 年 5 月 & 24.04 & 2026 年 12 月まで \\
+    Lyrical Luth & リリカル ルース & 2026 年 5 月 & 26.04 & LTS（2031 年 5 月まで） \\
     \bottomrule
   \end{tabular}
 \end{tablebox}

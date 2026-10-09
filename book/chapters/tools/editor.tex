@@ -73,7 +73,14 @@ Vim や Emacs など、ほかのエディタに慣れている人は、それを
 \label{sec:editor-nano}
 
 \textbf{nano} は、操作が簡単で、初めての人でも迷わずに使えるターミナルエディタです。
-Ubuntu には最初からインストールされています。
+デスクトップ版の Ubuntu には最初からインストールされています。
+ただし、Ubuntu Server などの CLI 環境や軽量な OS では、nano がインストールされていない場合もあります。
+その場合は、次のコマンドを実行して \cmd{apt} パッケージマネージャ経由でインストールできます（\ref{sec:package-apt}節）。
+
+\begin{terminal}[nano をインストールする]
+$ sudo apt update && sudo apt install -y nano
+\end{terminal}
+
 \cmd{nano} の後ろに編集したいファイル名を指定して起動します（ファイルがなければ、新しく作られます）。
 
 \begin{terminal}[nano でファイルを開く]
@@ -90,16 +97,64 @@ nano を起動すると、画面の上部にファイル名、下部に操作方
     キー & 動作 \\
     \midrule
     \key{Ctrl}+\key{O} → \key{Enter} & 保存する \\
+    \key{Ctrl}+\key{S} → \key{Enter} & 保存する \\
     \key{Ctrl}+\key{X} & 終了する（未保存なら保存するか聞かれる） \\
+    \key{Ctrl}+\key{C} & 下記機能をキャンセルする \\
+    \key{Ctrl}+\key{G} & ヘルプを表示する \\
     \key{Ctrl}+\key{W} & 文字列を検索する \\
     \key{Ctrl}+\key{K} & 今の行を切り取る \\
     \key{Ctrl}+\key{U} & 切り取った行を貼り付ける \\
+    \key{Alt}+\key{\textbackslash} & 文字列を置換する \\
+    \key{Alt}+\key{G} & 指定した行番号へ移動する \\
     \bottomrule
   \end{tabular}
 \end{tablebox}
 
 \cmd{git commit} を \cmd{-m} なしで実行したときなど、コマンドがエディタを開いてくることがあります（\ref{sec:git-basic}節）。
 Ubuntu では、この「標準のエディタ」も初期設定では nano になっています。
+
+\subsection{.nanorc によるカスタマイズ}
+
+nano は手軽に使える反面、標準の設定のままでは行番号が表示されないなど、やや利便性に欠ける面があります。
+nano では、ホームディレクトリに \cmd{.nanorc} という設定ファイルを作成し、設定項目を追記することで使い勝手を大幅に向上させることができます。
+次のコマンドを実行して、ホームディレクトリ上に \cmd{.nanorc} を新規作成（または編集）してみましょう。
+
+\begin{terminal}[.nanorc を作成する]
+$ nano ~/.nanorc
+\end{terminal}
+
+\cmd{.nanorc} に記述するおすすめの設定は、次のとおりです。
+
+\begin{codelisting}[style=bash]{\textasciitilde/.nanorc のおすすめ設定}{lst:editor-nanorc}
+set linenumbers
+set autoindent
+set tabstospaces
+set mouse
+set tabsize 4
+\end{codelisting}
+
+これらの設定項目の意味は次のとおりです。
+
+\begin{description}
+  \item[\cmd{set linenumbers}]
+    画面の左端に行番号を表示します。
+    エラーメッセージに表示された行を探すときや、プログラムの何行目を編集しているかを確認するのに便利です。
+  \item[\cmd{set autoindent}]
+    自動インデントを有効にします。
+    改行したときに、直前の行と同じ深さのインデント（字下げ）を自動で引き継ぎます。
+  \item[\cmd{set tabstospaces}]
+    \key{Tab} キーを押したときに、タブ文字の代わりに半角スペースを入力します。
+    Python など、インデントにタブとスペースの混在を許さない言語を扱う際に役立ちます。
+  \item[\cmd{set mouse}]
+    マウス操作を有効にします。
+    マウスでクリックした位置にカーソルを移動させたり、スクロールしたりできるようになります。
+  \item[\cmd{set tabsize 4}]
+    タブ幅（\key{Tab} キーで挿入されるスペースの数）を 4 文字分に設定します。
+\end{description}
+
+設定を記述したら、\key{Ctrl}+\key{S} または \key{Ctrl}+\key{O} で保存し、\key{Ctrl}+\key{X} で終了します。
+次回以降に nano を起動したときから、これらの設定が自動的に適用されます。
+
 
 \section{Vim}
 \label{sec:editor-vim}
